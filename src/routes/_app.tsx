@@ -9,7 +9,7 @@ const tabs = [
   { to: "/", label: "發現小秘me", icon: Gamepad2, paths: ["/"] },
   { to: "/cafe", label: "職業咖啡館", icon: Coffee, paths: ["/cafe"] },
   { to: "/match", label: "媒你不行", icon: Briefcase, paths: ["/match"] },
-  { to: "/map", label: "職圖", icon: Map, paths: ["/map"] },
+  { to: "/map", label: "職圖", icon: MapIcon, paths: ["/map"] },
   { to: "/call", label: "您撥的號碼是未來", icon: Phone, paths: ["/call"] },
 ];
 
