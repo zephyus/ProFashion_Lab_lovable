@@ -154,15 +154,10 @@ function CallPage() {
         {personas.map((p) => (
           <div key={p.id} className="overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-card)]">
             <div className={`bg-gradient-to-r ${p.color} px-5 py-4 text-white`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{p.tag}</span>
-                  <h3 className="mt-2 text-lg font-bold">{p.name}</h3>
-                  <p className="text-xs opacity-90">{p.job}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-mono text-xs opacity-80">{p.number}</p>
-                </div>
+              <div>
+                <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{p.tag}</span>
+                <h3 className="mt-2 text-lg font-bold">{p.name}</h3>
+                <p className="text-xs opacity-90">{p.job}</p>
               </div>
             </div>
             <div className="flex items-center justify-between gap-3 px-5 py-4">
