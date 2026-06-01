@@ -9,61 +9,153 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppMatchRouteImport } from './routes/_app.match'
+import { Route as AppMapRouteImport } from './routes/_app.map'
+import { Route as AppCallRouteImport } from './routes/_app.call'
+import { Route as AppCafeRouteImport } from './routes/_app.cafe'
 
-const IndexRoute = IndexRouteImport.update({
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMatchRoute = AppMatchRouteImport.update({
+  id: '/match',
+  path: '/match',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMapRoute = AppMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCallRoute = AppCallRouteImport.update({
+  id: '/call',
+  path: '/call',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCafeRoute = AppCafeRouteImport.update({
+  id: '/cafe',
+  path: '/cafe',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
+  '/cafe': typeof AppCafeRoute
+  '/call': typeof AppCallRoute
+  '/map': typeof AppMapRoute
+  '/match': typeof AppMatchRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/cafe': typeof AppCafeRoute
+  '/call': typeof AppCallRoute
+  '/map': typeof AppMapRoute
+  '/match': typeof AppMatchRoute
+  '/': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_app/cafe': typeof AppCafeRoute
+  '/_app/call': typeof AppCallRoute
+  '/_app/map': typeof AppMapRoute
+  '/_app/match': typeof AppMatchRoute
+  '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/cafe' | '/call' | '/map' | '/match'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/cafe' | '/call' | '/map' | '/match' | '/'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_app/cafe'
+    | '/_app/call'
+    | '/_app/map'
+    | '/_app/match'
+    | '/_app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/match': {
+      id: '/_app/match'
+      path: '/match'
+      fullPath: '/match'
+      preLoaderRoute: typeof AppMatchRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/map': {
+      id: '/_app/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof AppMapRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/call': {
+      id: '/_app/call'
+      path: '/call'
+      fullPath: '/call'
+      preLoaderRoute: typeof AppCallRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/cafe': {
+      id: '/_app/cafe'
+      path: '/cafe'
+      fullPath: '/cafe'
+      preLoaderRoute: typeof AppCafeRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
+interface AppRouteChildren {
+  AppCafeRoute: typeof AppCafeRoute
+  AppCallRoute: typeof AppCallRoute
+  AppMapRoute: typeof AppMapRoute
+  AppMatchRoute: typeof AppMatchRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCafeRoute: AppCafeRoute,
+  AppCallRoute: AppCallRoute,
+  AppMapRoute: AppMapRoute,
+  AppMatchRoute: AppMatchRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
