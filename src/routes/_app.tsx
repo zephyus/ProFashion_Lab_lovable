@@ -1,5 +1,5 @@
 import { Link, Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
-import { Gamepad2, Coffee, Briefcase, Map, Phone } from "lucide-react";
+import { Gamepad2, Coffee, Briefcase, Map as MapIcon, Phone } from "lucide-react";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
