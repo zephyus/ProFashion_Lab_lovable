@@ -3,7 +3,7 @@ import { useState } from "react";
 import { MapPin, Calendar, Users, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/_app/match")({
-  head: () => ({ meta: [{ title: "媒你不行 - 職場體驗" }] }),
+  head: () => ({ meta: [{ title: "媒你不行" }] }),
   component: MatchPage,
 });
 
