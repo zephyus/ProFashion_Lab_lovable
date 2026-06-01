@@ -11,7 +11,6 @@ type Persona = {
   id: string;
   name: string;
   job: string;
-  number: string;
   tag: string;
   color: string;
   intro: string;
@@ -20,7 +19,7 @@ type Persona = {
 
 const personas: Persona[] = [
   {
-    id: "av", name: "綾瀨小姐", job: "AV 女優", number: "0900-181-001", tag: "成人產業",
+    id: "av", name: "綾瀨小姐", job: "AV 女優", tag: "成人產業",
     color: "from-rose-400 to-pink-500",
     intro: "從業 6 年，公開分享產業真實面",
     script: [
@@ -32,7 +31,7 @@ const personas: Persona[] = [
     ],
   },
   {
-    id: "mortician", name: "阿明師傅", job: "禮儀師", number: "0900-181-002", tag: "生命產業",
+    id: "mortician", name: "阿明師傅", job: "禮儀師", tag: "生命產業",
     color: "from-slate-500 to-zinc-700",
     intro: "送行 20 年，把告別變成禮物",
     script: [
@@ -44,7 +43,7 @@ const personas: Persona[] = [
     ],
   },
   {
-    id: "esports", name: "Ray", job: "電競選手", number: "0900-181-003", tag: "新興職業",
+    id: "esports", name: "Ray", job: "電競選手", tag: "新興職業",
     color: "from-teal-400 to-cyan-500",
     intro: "前職業隊隊長，現為教練",
     script: [
@@ -56,7 +55,7 @@ const personas: Persona[] = [
     ],
   },
   {
-    id: "deepsea", name: "老陳", job: "遠洋漁工", number: "0900-181-004", tag: "傳統產業",
+    id: "deepsea", name: "老陳", job: "遠洋漁工", tag: "傳統產業",
     color: "from-blue-500 to-indigo-600",
     intro: "出海 15 年，跑過三大洋",
     script: [
@@ -68,7 +67,7 @@ const personas: Persona[] = [
     ],
   },
   {
-    id: "perfumer", name: "Élise", job: "調香師", number: "0900-181-005", tag: "藝術職業",
+    id: "perfumer", name: "Élise", job: "調香師", tag: "藝術職業",
     color: "from-amber-400 to-orange-500",
     intro: "巴黎學成，自創香水品牌",
     script: [
