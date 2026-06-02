@@ -178,45 +178,49 @@ export default function ExploreQuiz({ onBack }: ExploreQuizProps) {
     <div>
       <button
         onClick={onBack}
-        className="mb-4 flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        className="press mb-4 flex items-center gap-1.5 text-footnote font-medium text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="h-4 w-4" /> 返回探索選單
+        <ArrowLeft className="h-4 w-4" strokeWidth={1.7} /> 返回探索選單
       </button>
 
-      <header className="mb-6">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-xs font-medium text-primary-deep">
-          <Sparkles className="h-3 w-3" /> 職感小測驗
-        </div>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight">發現小秘 me</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+      <header className="mb-6 animate-rise">
+        <p className="text-caption uppercase tracking-widest text-primary-deep">
+          職感小測驗
+        </p>
+        <h1 className="mt-1 text-large-title text-foreground">發現小秘 me</h1>
+        <p className="mt-2 text-body text-muted-foreground">
           {QUESTIONS.length} 題情境式選擇，幫你找出職涯傾向、特質與適合的職業類型。
         </p>
       </header>
 
       {!done && (
         <>
-          <div className="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-primary-soft">
-            <div className="h-full rounded-full bg-[image:var(--gradient-hero)] transition-all" style={{ width: `${progress}%` }} />
+          <div className="mb-3 h-1 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-[width] duration-500"
+              style={{ width: `${progress}%`, transitionTimingFunction: "var(--ease-spring)" }}
+            />
           </div>
-          <p className="mb-3 text-xs text-muted-foreground">第 {step + 1} / {QUESTIONS.length} 題</p>
+          <p className="mb-4 text-caption">第 {step + 1} / {QUESTIONS.length} 題</p>
 
-          <div className="rounded-3xl bg-card p-6 shadow-[var(--shadow-card)]">
-            <h2 className="text-lg font-semibold leading-snug">{QUESTIONS[step].q}</h2>
-            <div className="mt-5 space-y-3">
+          <div className="rounded-2xl border border-border bg-card p-6 animate-rise">
+            <h2 className="text-title-3 text-foreground">{QUESTIONS[step].q}</h2>
+            <div className="mt-5 space-y-2.5">
               {QUESTIONS[step].a.map((opt, i) => (
                 <button
                   key={i}
                   onClick={() => choose(opt.axis, opt.weight)}
-                  className="group flex w-full items-center justify-between rounded-2xl border border-border bg-background px-4 py-4 text-left text-sm font-medium transition-all hover:border-primary hover:bg-primary-soft active:scale-[0.98]"
+                  className="press group flex w-full items-center justify-between rounded-xl border border-border bg-background px-4 py-4 text-left text-callout font-medium transition-colors hover:border-primary hover:bg-muted/40"
                 >
                   <span>{opt.text}</span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary-deep" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary-deep" strokeWidth={1.7} />
                 </button>
               ))}
             </div>
           </div>
         </>
       )}
+
 
       {done && (() => {
         const r = analyze(scores);
