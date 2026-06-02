@@ -34,9 +34,8 @@ function ExplorePage() {
     <div className="px-5 pt-10 pb-8 animate-page">
       <header className="mb-7 animate-rise">
         <p className="text-caption uppercase tracking-widest text-primary-deep">
-          Station 01
+          發現小秘me
         </p>
-        <h1 className="mt-1 text-large-title text-foreground">發現</h1>
         <p className="mt-3 text-body text-muted-foreground">
           從一道題、一場任務開始。把你不知道怎麼說的自己，變成可以指著看的資料。
         </p>
