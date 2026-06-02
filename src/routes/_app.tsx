@@ -39,7 +39,7 @@ function AppLayout() {
               <li key={to}>
                 <Link
                   to={to}
-                  className={`flex flex-col items-center gap-0.5 py-2.5 transition-colors ${
+                  className={`press flex flex-col items-center gap-0.5 py-2.5 transition-colors ${
                     active ? "text-primary-deep" : "text-muted-foreground"
                   }`}
                 >

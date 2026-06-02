@@ -142,7 +142,7 @@ function HomePage() {
       )}
 
       {/* Hero — Large Title */}
-      <section className="pt-8 pb-10">
+      <section className="pt-8 pb-10 animate-rise">
         <h1 className="text-large-title text-foreground">
           今天，
           <br />
@@ -155,14 +155,14 @@ function HomePage() {
 
       {/* 2×2 stations */}
       <section className="grid grid-cols-2 gap-3">
-        {stations.map((s) => {
+        {stations.map((s, i) => {
           const Icon = s.icon;
           return (
             <Link
               key={s.key}
               to={s.to}
-              className="group flex flex-col justify-between rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/40 active:scale-[0.98]"
-              style={{ minHeight: 148 }}
+              className="press group flex flex-col justify-between rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/40 animate-rise"
+              style={{ minHeight: 148, animationDelay: `${80 + i * 50}ms` }}
             >
               <Icon
                 className="h-6 w-6 text-primary-deep"
@@ -181,7 +181,8 @@ function HomePage() {
       {/* Single emphasis row — what's new / continue */}
       <Link
         to="/explore"
-        className="mt-3 flex items-center justify-between rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted/40"
+        className="press mt-3 flex items-center justify-between rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted/40 animate-rise"
+        style={{ animationDelay: "320ms" }}
       >
         <div className="min-w-0 pr-3">
           <p className="text-caption uppercase tracking-wider text-primary-deep">

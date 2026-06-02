@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, ChevronRight, RotateCcw, ArrowLeft } from "lucide-react";
+import { ChevronRight, RotateCcw, ArrowLeft } from "lucide-react";
 
 // 不對外暴露量表名稱：內部使用代號
 // H_* 為 Holland 六型；P_* 為人格傾向；C_* 為核心職能
@@ -178,39 +178,42 @@ export default function ExploreQuiz({ onBack }: ExploreQuizProps) {
     <div>
       <button
         onClick={onBack}
-        className="mb-4 flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        className="press mb-4 flex items-center gap-1.5 text-footnote font-medium text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="h-4 w-4" /> 返回探索選單
+        <ArrowLeft className="h-4 w-4" strokeWidth={1.7} /> 返回探索選單
       </button>
 
-      <header className="mb-6">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-xs font-medium text-primary-deep">
-          <Sparkles className="h-3 w-3" /> 職感小測驗
-        </div>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight">發現小秘 me</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+      <header className="mb-6 animate-rise">
+        <p className="text-caption uppercase tracking-widest text-primary-deep">
+          職感小測驗
+        </p>
+        <h1 className="mt-1 text-large-title text-foreground">發現小秘 me</h1>
+        <p className="mt-2 text-body text-muted-foreground">
           {QUESTIONS.length} 題情境式選擇，幫你找出職涯傾向、特質與適合的職業類型。
         </p>
       </header>
 
       {!done && (
         <>
-          <div className="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-primary-soft">
-            <div className="h-full rounded-full bg-[image:var(--gradient-hero)] transition-all" style={{ width: `${progress}%` }} />
+          <div className="mb-3 h-1 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-[width] duration-500"
+              style={{ width: `${progress}%`, transitionTimingFunction: "var(--ease-spring)" }}
+            />
           </div>
-          <p className="mb-3 text-xs text-muted-foreground">第 {step + 1} / {QUESTIONS.length} 題</p>
+          <p className="mb-4 text-caption">第 {step + 1} / {QUESTIONS.length} 題</p>
 
-          <div className="rounded-3xl bg-card p-6 shadow-[var(--shadow-card)]">
-            <h2 className="text-lg font-semibold leading-snug">{QUESTIONS[step].q}</h2>
-            <div className="mt-5 space-y-3">
+          <div className="rounded-2xl border border-border bg-card p-6 animate-rise">
+            <h2 className="text-title-3 text-foreground">{QUESTIONS[step].q}</h2>
+            <div className="mt-5 space-y-2.5">
               {QUESTIONS[step].a.map((opt, i) => (
                 <button
                   key={i}
                   onClick={() => choose(opt.axis, opt.weight)}
-                  className="group flex w-full items-center justify-between rounded-2xl border border-border bg-background px-4 py-4 text-left text-sm font-medium transition-all hover:border-primary hover:bg-primary-soft active:scale-[0.98]"
+                  className="press group flex w-full items-center justify-between rounded-xl border border-border bg-background px-4 py-4 text-left text-callout font-medium transition-colors hover:border-primary hover:bg-muted/40"
                 >
                   <span>{opt.text}</span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary-deep" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary-deep" strokeWidth={1.7} />
                 </button>
               ))}
             </div>
@@ -218,103 +221,120 @@ export default function ExploreQuiz({ onBack }: ExploreQuizProps) {
         </>
       )}
 
+
       {done && (() => {
         const r = analyze(scores);
         const maxH = Math.max(...r.holland.map((x) => Math.abs(x.v)), 1);
         const maxC = Math.max(...r.core.map((x) => Math.abs(x.v)), 1);
         return (
-          <div className="space-y-4">
-            {/* 主結果卡 */}
-            <div className="rounded-3xl bg-[image:var(--gradient-hero)] p-6 text-primary-foreground shadow-[var(--shadow-float)]">
-              <p className="text-xs uppercase tracking-widest opacity-80">你的職感類型</p>
-              <p className="mt-2 text-3xl font-bold leading-tight">{r.typeName}</p>
-              <p className="mt-3 text-sm opacity-90">
+          <div className="space-y-4 animate-rise">
+            {/* 主結果：單一 hero card */}
+            <div className="rounded-2xl bg-[image:var(--gradient-hero)] p-6 text-primary-foreground">
+              <p className="text-caption uppercase tracking-widest opacity-80">你的職感類型</p>
+              <p className="mt-2 text-title-1 leading-tight">{r.typeName}</p>
+              <p className="mt-3 text-subhead opacity-90">
                 主要核心職能：<span className="font-semibold">{r.core[0].key}</span>
               </p>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {r.personality.map((p) => (
-                  <span key={p} className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-medium backdrop-blur">
+                  <span key={p} className="rounded-full bg-white/20 px-2.5 py-1 text-caption font-medium text-primary-foreground backdrop-blur">
                     {p}
                   </span>
                 ))}
               </div>
             </div>
 
-            {/* 特質 */}
-            <div className="rounded-3xl bg-card p-5 shadow-[var(--shadow-card)]">
-              <h3 className="text-sm font-semibold text-muted-foreground">你的特質關鍵字</h3>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {r.traits.map((t) => (
-                  <span key={t} className="rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary-deep">
-                    {t}
-                  </span>
-                ))}
+            {/* 特質 keywords */}
+            <section>
+              <p className="mb-2 px-1 text-caption uppercase tracking-wider">你的特質關鍵字</p>
+              <div className="rounded-2xl border border-border bg-card p-4">
+                <div className="flex flex-wrap gap-2">
+                  {r.traits.map((t) => (
+                    <span key={t} className="rounded-full bg-muted px-3 py-1.5 text-footnote font-medium text-foreground">
+                      {t}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            </section>
 
-            {/* 六型分布 */}
-            <div className="rounded-3xl bg-card p-5 shadow-[var(--shadow-card)]">
-              <h3 className="text-sm font-semibold text-muted-foreground">職涯傾向分布</h3>
-              <div className="mt-3 space-y-2.5">
+            {/* 職涯傾向 — iOS Health 風格條狀 */}
+            <section>
+              <p className="mb-2 px-1 text-caption uppercase tracking-wider">職涯傾向分布</p>
+              <div className="list-group">
                 {r.holland.map((u) => {
                   const w = Math.max(8, (Math.abs(u.v) / maxH) * 100);
                   return (
-                    <div key={u.key}>
-                      <div className="mb-1 flex justify-between text-xs">
-                        <span className="font-medium">{HOLLAND_META[u.key].name}</span>
-                        <span className="text-muted-foreground">{u.v}</span>
+                    <div key={u.key} className="px-4 py-3">
+                      <div className="mb-1.5 flex items-center justify-between">
+                        <span className="text-callout font-medium">{HOLLAND_META[u.key].name}</span>
+                        <span className="text-caption tabular-nums">{u.v}</span>
                       </div>
-                      <div className="h-2 w-full rounded-full bg-primary-soft">
-                        <div className="h-full rounded-full bg-primary" style={{ width: `${w}%` }} />
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full bg-primary"
+                          style={{ width: `${w}%`, transition: "width var(--dur-slow) var(--ease-spring)" }}
+                        />
                       </div>
                     </div>
                   );
                 })}
               </div>
-            </div>
+            </section>
 
             {/* 核心職能 */}
-            <div className="rounded-3xl bg-card p-5 shadow-[var(--shadow-card)]">
-              <h3 className="text-sm font-semibold text-muted-foreground">核心職能</h3>
-              <div className="mt-3 space-y-2.5">
+            <section>
+              <p className="mb-2 px-1 text-caption uppercase tracking-wider">核心職能</p>
+              <div className="list-group">
                 {r.core.map((u) => {
                   const w = Math.max(8, (Math.abs(u.v) / maxC) * 100);
                   return (
-                    <div key={u.key}>
-                      <div className="mb-1 flex justify-between text-xs">
-                        <span className="font-medium">{u.key}</span>
-                        <span className="text-muted-foreground">{u.v}</span>
+                    <div key={u.key} className="px-4 py-3">
+                      <div className="mb-1.5 flex items-center justify-between">
+                        <span className="text-callout font-medium">{u.key}</span>
+                        <span className="text-caption tabular-nums">{u.v}</span>
                       </div>
-                      <div className="h-2 w-full rounded-full bg-accent">
-                        <div className="h-full rounded-full bg-primary-deep" style={{ width: `${w}%` }} />
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full bg-primary-deep"
+                          style={{ width: `${w}%`, transition: "width var(--dur-slow) var(--ease-spring)" }}
+                        />
                       </div>
                     </div>
                   );
                 })}
               </div>
-            </div>
+            </section>
 
             {/* 推薦職業 */}
-            <div className="rounded-3xl bg-card p-5 shadow-[var(--shadow-card)]">
-              <h3 className="text-sm font-semibold text-muted-foreground">推薦你的職業方向</h3>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {r.careers.map((c) => (
-                  <span key={c} className="rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground">
-                    {c}
-                  </span>
-                ))}
+            <section>
+              <p className="mb-2 px-1 text-caption uppercase tracking-wider">推薦你的職業方向</p>
+              <div className="rounded-2xl border border-border bg-card p-4">
+                <div className="flex flex-wrap gap-2">
+                  {r.careers.map((c) => (
+                    <span key={c} className="rounded-full border border-border bg-background px-3 py-1.5 text-footnote font-medium text-foreground">
+                      {c}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-3 text-caption">
+                  結果依你的回答綜合產生，僅供職涯探索參考，不代表唯一答案。
+                </p>
               </div>
-              <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-                結果依你的回答綜合產生，僅供職涯探索參考，不代表唯一答案。
-              </p>
-            </div>
+            </section>
 
-            <div className="flex gap-3">
-              <button onClick={reset} className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3 text-sm font-medium text-foreground transition-colors hover:bg-primary-soft">
-                <RotateCcw className="h-4 w-4" /> 重新測驗
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={reset}
+                className="press flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 text-callout font-medium text-foreground"
+              >
+                <RotateCcw className="h-4 w-4" strokeWidth={1.7} /> 重新測驗
               </button>
-              <button onClick={onBack} className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90">
-                <ArrowLeft className="h-4 w-4" /> 返回
+              <button
+                onClick={onBack}
+                className="press flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary py-3 text-callout font-semibold text-primary-foreground"
+              >
+                <ArrowLeft className="h-4 w-4" strokeWidth={1.8} /> 返回
               </button>
             </div>
           </div>
@@ -323,3 +343,4 @@ export default function ExploreQuiz({ onBack }: ExploreQuizProps) {
     </div>
   );
 }
+
