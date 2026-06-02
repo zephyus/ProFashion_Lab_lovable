@@ -176,15 +176,16 @@ function InternGame({ onBack }: { onBack: () => void }) {
           </div>
         ) : (
           <div className="mt-4 space-y-2">
-            <button onClick={() => choose("A")}
-              className="w-full rounded-2xl bg-emerald-500 px-4 py-3 text-left text-sm font-semibold text-white active:scale-95">
-              {mission.optionA}
+            <button onClick={() => choose(topChoice)}
+              className="w-full rounded-2xl bg-card border border-border px-4 py-3 text-left text-sm font-semibold text-foreground hover:bg-muted/40 active:scale-95">
+              {topLabel}
             </button>
-            <button onClick={() => choose("B")}
-              className="w-full rounded-2xl bg-rose-400 px-4 py-3 text-left text-sm font-semibold text-white active:scale-95">
-              {mission.optionB}
+            <button onClick={() => choose(bottomChoice)}
+              className="w-full rounded-2xl bg-card border border-border px-4 py-3 text-left text-sm font-semibold text-foreground hover:bg-muted/40 active:scale-95">
+              {bottomLabel}
             </button>
           </div>
+
         )}
       </div>
 
