@@ -245,11 +245,13 @@ function CallPage() {
 
 
   const hangup = () => {
+    speech.cancel();
     setActive(null); setLineIdx(0);
     setSeconds(0); setMuted(false); setSpeakerOn(true);
     setChat([]); setQuestion(""); setAsking(false);
   };
-  const exitDrama = () => { setDrama(null); setDramaIdx(0); setSeconds(0); };
+  const exitDrama = () => { speech.cancel(); setDrama(null); setDramaIdx(0); setSeconds(0); };
+
   const next = () => active && lineIdx < active.script.length - 1 && setLineIdx((i) => i + 1);
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
