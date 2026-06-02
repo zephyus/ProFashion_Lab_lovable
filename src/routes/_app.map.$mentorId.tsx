@@ -41,7 +41,8 @@ export const Route = createFileRoute("/_app/map/$mentorId")({
 type Step = "idle" | "slot" | "form" | "done";
 
 function MentorDetailPage() {
-  const { mentor } = Route.useLoaderData();
+  const { mentorId } = Route.useParams();
+  const mentor = getMentor(mentorId)!;
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("idle");
   const [slot, setSlot] = useState<MentorSlot | null>(null);
