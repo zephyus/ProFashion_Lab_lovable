@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Heart, MessageCircle, Send, Briefcase } from "lucide-react";
 
 export const Route = createFileRoute("/_app/cafe")({
-  head: () => ({ meta: [{ title: "職業咖啡館" }] }),
+  head: () => ({ meta: [{ title: "故事 — 職感 Zhígǎn" }] }),
   component: CafePage,
 });
 
@@ -50,13 +50,12 @@ function CafePage() {
   };
 
   return (
-    <div className="px-5 pt-10">
-      {/* iOS news app: Large Title + subtitle */}
+    <div className="px-5 pt-10 animate-page">
       <header className="mb-7 animate-rise">
         <p className="text-caption uppercase tracking-widest text-primary-deep">真實心得</p>
-        <h1 className="mt-1 text-large-title text-foreground">職業咖啡館</h1>
-        <p className="mt-2 text-body text-muted-foreground">
-          那些前輩不會在訪談裡說的事。
+        <h1 className="mt-1 text-large-title text-foreground">故事</h1>
+        <p className="mt-3 text-body text-muted-foreground">
+          那些職涯講座不會告訴你的事，由真正在做的人親口說。
         </p>
       </header>
 
@@ -98,7 +97,7 @@ function CafePage() {
             {openId === p.id && (
               <div className="border-t border-border bg-muted/50 px-4 py-3 animate-rise">
                 <div className="space-y-2">
-                  {p.comments.length === 0 && <p className="text-caption">還沒有提問，第一個來互動吧。</p>}
+                  {p.comments.length === 0 && <p className="text-caption">還沒有人提問。第一個來開頭吧。</p>}
                   {p.comments.map((c, idx) => (
                     <div key={idx} className="rounded-xl bg-card px-3 py-2 text-footnote">
                       <span className="font-semibold text-primary-deep">{c.user}：</span>{c.text}
@@ -126,7 +125,7 @@ function CafePage() {
         ))}
       </div>
 
-      <p className="my-8 text-center text-caption">滑到底了 · 更多前輩故事整理中</p>
+      <p className="my-8 text-center text-caption">已經是目前的全部 · 更多前輩持續加入中</p>
     </div>
   );
 }
