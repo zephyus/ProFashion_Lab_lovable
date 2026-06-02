@@ -13,10 +13,10 @@ export const Route = createFileRoute("/_app")({
 
 const tabs = [
   { to: "/explore", label: "發現", icon: Compass },
-  { to: "/cafe", label: "咖啡館", icon: Coffee },
-  { to: "/", label: "Lab", icon: Sparkles },
-  { to: "/map", label: "職圖", icon: MapIcon },
-  { to: "/call", label: "來電", icon: Phone },
+  { to: "/cafe", label: "故事", icon: Coffee },
+  { to: "/", label: "主頁", icon: Sparkles },
+  { to: "/map", label: "地圖", icon: MapIcon },
+  { to: "/call", label: "對話", icon: Phone },
 ] as const;
 
 function AppLayout() {
@@ -45,7 +45,7 @@ function AppLayout() {
                 >
                   <Icon
                     className="h-[22px] w-[22px]"
-                    strokeWidth={active ? 2.2 : 1.7}
+                    strokeWidth={active ? 2.2 : 1.85}
                     aria-hidden
                   />
                   <span
