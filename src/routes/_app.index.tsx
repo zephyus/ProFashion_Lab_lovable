@@ -178,25 +178,6 @@ function HomePage() {
         })}
       </section>
 
-      {/* Single emphasis row — what's new / continue */}
-      <Link
-        to="/explore"
-        className="press mt-3 flex items-center justify-between rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted/40 animate-rise"
-        style={{ animationDelay: "320ms" }}
-      >
-        <div className="min-w-0 pr-3">
-          <p className="text-caption uppercase tracking-wider text-primary-deep">
-            新手建議
-          </p>
-          <p className="mt-1 text-subhead font-medium text-foreground">
-            從一個 3 分鐘的小測驗開始
-          </p>
-        </div>
-        <ChevronRight
-          className="h-5 w-5 shrink-0 text-muted-foreground"
-          strokeWidth={1.6}
-        />
-      </Link>
 
       {/* Quiet footer */}
       <footer className="mt-10 pb-8">
