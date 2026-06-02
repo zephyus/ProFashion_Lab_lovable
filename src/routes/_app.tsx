@@ -12,11 +12,10 @@ export const Route = createFileRoute("/_app")({
 });
 
 const tabs = [
-  { to: "/explore", label: "發現", icon: Compass },
-  { to: "/cafe", label: "故事", icon: Coffee },
-  { to: "/", label: "主頁", icon: Sparkles },
-  { to: "/map", label: "地圖", icon: MapIcon },
-  { to: "/call", label: "對話", icon: Phone },
+  { to: "/explore", label: "發現小秘me", icon: Compass },
+  { to: "/cafe", label: "職業咖啡館", icon: Coffee },
+  { to: "/map", label: "職圖", icon: MapIcon },
+  { to: "/call", label: "您撥的號碼是未來", icon: Phone },
 ] as const;
 
 function AppLayout() {
