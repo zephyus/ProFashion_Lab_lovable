@@ -13,11 +13,23 @@ const NATURAL_HINT = /(natural|online|neural)/i;
 const FEMALE_NAMES = /(xiaoxiao|xiaoyi|xiaomeng|xiaohan|xiaomo|xiaoqiu|xiaoshuang|xiaorou|xiaozhen|xiaoxuan|yunfeng|hiumaan|hsiaochen|hsiaoyu|hiugaai|yating|mei|female|woman|girl|sara|amy|samantha|sin-ji|tingting)/i;
 const MALE_NAMES = /(yunjian|yunxi|yunyang|yunhao|yunze|yunfeng|wangwang|kangkang|hanhan|wanlung|danny|male|man|boy|daniel|alex)/i;
 
+const MANDARIN_LANG = /^(zh-CN|zh-TW|zh-SG|cmn)/i; // 普通話 / 國語
+const CANTONESE_LANG = /^(yue|zh-HK|zh-MO)/i; // 廣東話
 const ZH_LANG = /^zh|cmn|yue/i;
+// 廣東話聲音的常見英文名（即使 lang 標成 zh-HK 也要過濾）
+const CANTONESE_NAMES = /(hiumaan|hiugaai|wanlung|sin-?ji|cantonese|yue)/i;
 
 function score(v: SpeechSynthesisVoice, gender: SpeechGender) {
   let s = 0;
-  if (ZH_LANG.test(v.lang)) s += 100; // 中文優先
+  const nameLang = `${v.name} ${v.lang}`;
+  const isCantonese = CANTONESE_LANG.test(v.lang) || CANTONESE_NAMES.test(v.name);
+  if (isCantonese) {
+    s -= 200; // 強烈排除廣東話
+  } else if (MANDARIN_LANG.test(v.lang)) {
+    s += 120; // 普通話最優先
+  } else if (ZH_LANG.test(v.lang)) {
+    s += 60; // 其他中文（未標明地區）次之
+  }
   if (NATURAL_HINT.test(v.name)) s += 50; // Natural/Online 雲端聲大加分
   if (!v.localService) s += 20; // 雲端聲（非本機）再加分
   if (gender === "female" && FEMALE_NAMES.test(v.name)) s += 30;
@@ -25,8 +37,8 @@ function score(v: SpeechSynthesisVoice, gender: SpeechGender) {
   // 反向：性別不符要扣，避免女角配到男聲
   if (gender === "female" && MALE_NAMES.test(v.name)) s -= 25;
   if (gender === "male" && FEMALE_NAMES.test(v.name)) s -= 25;
-  // 偏好繁中
-  if (/zh-TW|zh-HK|Taiwan|Hong/i.test(v.lang + v.name)) s += 5;
+  // 繁中（台灣）略優先於簡中
+  if (/zh-TW|Taiwan|HsiaoChen|HsiaoYu|YunJhe/i.test(nameLang)) s += 8;
   return s;
 }
 
