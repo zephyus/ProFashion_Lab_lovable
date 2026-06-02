@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect, useRef } from "react";
-import { Phone, PhoneOff, Mic, Volume2, Sparkles, Atom, Radio, Send, Loader2 } from "lucide-react";
+import { Phone, PhoneOff, Mic, MicOff, Volume2, Sparkles, Atom, Radio, Send, Loader2 } from "lucide-react";
 import { dramaScenes, type DramaScene } from "@/lib/drama-scenes";
 import { askPersona } from "@/lib/persona-chat.functions";
+import { useSpeech, type SpeechGender } from "@/hooks/use-speech";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_app/call")({
   head: () => ({ meta: [{ title: "對話 — 職感 Zhígǎn" }] }),
