@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppTeacherSignupRouteImport } from './routes/_app.teacher-signup'
 import { Route as AppMapRouteImport } from './routes/_app.map'
+import { Route as AppJoinRouteImport } from './routes/_app.join'
 import { Route as AppExploreRouteImport } from './routes/_app.explore'
 import { Route as AppCallRouteImport } from './routes/_app.call'
 import { Route as AppCafeRouteImport } from './routes/_app.cafe'
@@ -43,6 +44,11 @@ const AppMapRoute = AppMapRouteImport.update({
   path: '/map',
   getParentRoute: () => AppRoute,
 } as any)
+const AppJoinRoute = AppJoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppExploreRoute = AppExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/cafe': typeof AppCafeRoute
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
+  '/join': typeof AppJoinRoute
   '/map': typeof AppMapRouteWithChildren
   '/teacher-signup': typeof AppTeacherSignupRoute
   '/map/$mentorId': typeof AppMapMentorIdRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByTo {
   '/cafe': typeof AppCafeRoute
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
+  '/join': typeof AppJoinRoute
   '/map': typeof AppMapRouteWithChildren
   '/teacher-signup': typeof AppTeacherSignupRoute
   '/': typeof AppIndexRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   '/_app/cafe': typeof AppCafeRoute
   '/_app/call': typeof AppCallRoute
   '/_app/explore': typeof AppExploreRoute
+  '/_app/join': typeof AppJoinRoute
   '/_app/map': typeof AppMapRouteWithChildren
   '/_app/teacher-signup': typeof AppTeacherSignupRoute
   '/_app/': typeof AppIndexRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
     | '/cafe'
     | '/call'
     | '/explore'
+    | '/join'
     | '/map'
     | '/teacher-signup'
     | '/map/$mentorId'
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
     | '/cafe'
     | '/call'
     | '/explore'
+    | '/join'
     | '/map'
     | '/teacher-signup'
     | '/'
@@ -124,6 +135,7 @@ export interface FileRouteTypes {
     | '/_app/cafe'
     | '/_app/call'
     | '/_app/explore'
+    | '/_app/join'
     | '/_app/map'
     | '/_app/teacher-signup'
     | '/_app/'
@@ -172,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMapRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/join': {
+      id: '/_app/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof AppJoinRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/explore': {
       id: '/_app/explore'
       path: '/explore'
@@ -218,6 +237,7 @@ interface AppRouteChildren {
   AppCafeRoute: typeof AppCafeRoute
   AppCallRoute: typeof AppCallRoute
   AppExploreRoute: typeof AppExploreRoute
+  AppJoinRoute: typeof AppJoinRoute
   AppMapRoute: typeof AppMapRouteWithChildren
   AppTeacherSignupRoute: typeof AppTeacherSignupRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -227,6 +247,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCafeRoute: AppCafeRoute,
   AppCallRoute: AppCallRoute,
   AppExploreRoute: AppExploreRoute,
+  AppJoinRoute: AppJoinRoute,
   AppMapRoute: AppMapRouteWithChildren,
   AppTeacherSignupRoute: AppTeacherSignupRoute,
   AppIndexRoute: AppIndexRoute,
