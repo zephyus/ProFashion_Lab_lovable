@@ -349,13 +349,15 @@ function CallPage() {
     }
   }, [kokoroState]);
 
-  // 卸載元件時清掉音訊
+  // 卸載元件時清掉音訊與 worker
   useEffect(() => {
     return () => {
       stopLocalAudio();
       synthSeqRef.current++;
+      disposeKokoroTts();
     };
   }, [stopLocalAudio]);
+
 
   const cycleVoiceMode = () => {
     if (voiceMode === "off") setVoiceMode("browser");
