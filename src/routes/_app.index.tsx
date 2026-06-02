@@ -163,9 +163,7 @@ function HomePage() {
         </Link>
       )}
 
-      <footer className="mt-12 pb-8">
-        <p className="text-caption">ProFashion Lab · 不給你標準答案，給你試錯的空間。</p>
-      </footer>
+      <div className="h-12" />
     </div>
   );
 }
