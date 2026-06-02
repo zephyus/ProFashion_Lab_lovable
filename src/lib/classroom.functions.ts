@@ -65,10 +65,11 @@ export const createClassroom = createServerFn({ method: "POST" })
       throw new Error("僅教師可建立班級。請先到「我是老師」頁面註冊。");
     }
 
-    // 生成不重複邀請碼（最多試 5 次）
+    // 生成不重複邀請碼（用 admin 查全表）
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let invite_code = randomCode();
     for (let i = 0; i < 5; i++) {
-      const { data: exists } = await supabase.from("classrooms").select("id").eq("invite_code", invite_code).maybeSingle();
+      const { data: exists } = await supabaseAdmin.from("classrooms").select("id").eq("invite_code", invite_code).maybeSingle();
       if (!exists) break;
       invite_code = randomCode();
     }
