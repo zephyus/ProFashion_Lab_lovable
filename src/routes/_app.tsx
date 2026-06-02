@@ -67,25 +67,33 @@ function AppLayout() {
       </main>
 
       <nav className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-border bg-card/85 backdrop-blur-xl">
-        {/* Center floating Lab home button */}
-        <div className="absolute left-1/2 -top-5 z-10 -translate-x-1/2">
-          <Link
-            to="/"
-            className={`press flex h-[52px] w-[52px] items-center justify-center rounded-full border-[2.5px] border-card shadow-[0_4px_16px_-4px_oklch(0.2_0.02_220/0.18)] transition-all ${
-              homeActive
-                ? "bg-primary-deep text-primary-foreground scale-105"
-                : "bg-gradient-to-br from-primary to-primary-deep text-primary-foreground"
-            }`}
-            aria-label="ProFashion Lab 主頁"
-          >
-            <FlaskConical className="h-[22px] w-[22px]" strokeWidth={2} aria-hidden />
-          </Link>
-        </div>
-
-        <ul className="grid grid-cols-4 px-1">
+        <ul className="grid grid-cols-5 px-1">
           {leftTabs.map(renderTab)}
-          {/* Spacer for center button */}
-          <li className="pointer-events-none" aria-hidden />
+          <li key="lab-home">
+            <Link
+              to="/"
+              className="press flex flex-col items-center gap-1 px-1 py-2.5"
+              aria-label="ProFashion Lab 主頁"
+            >
+              <span
+                className={`flex h-[34px] w-[34px] items-center justify-center rounded-full transition-all ${
+                  homeActive
+                    ? "bg-primary-deep text-primary-foreground"
+                    : "bg-gradient-to-br from-primary to-primary-deep text-primary-foreground"
+                }`}
+              >
+                <FlaskConical className="h-[20px] w-[20px]" strokeWidth={2.2} aria-hidden />
+              </span>
+              <span
+                className={`text-[10px] leading-tight text-center whitespace-nowrap ${
+                  homeActive ? "text-primary-deep" : "text-muted-foreground"
+                }`}
+                style={{ fontWeight: homeActive ? 600 : 500 }}
+              >
+                Lab
+              </span>
+            </Link>
+          </li>
           {rightTabs.map(renderTab)}
         </ul>
         <div className="h-[env(safe-area-inset-bottom)]" />
