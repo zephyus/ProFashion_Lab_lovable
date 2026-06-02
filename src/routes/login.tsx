@@ -1,12 +1,11 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Trophy, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { useXp } from "@/hooks/useXp";
 import { supabase } from "@/integrations/supabase/client";
-import { Trophy, LogOut } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -20,14 +19,9 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const { xp, completed, tierName } = useXp();
   const [signingIn, setSigningIn] = useState(false);
-
-  // 已登入：不自動跳轉，改成顯示個人帳號 + 經驗值面板
-  useEffect(() => {
-    /* 留空：登入後讓使用者主動返回 */
-  }, [user, loading, navigate]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
