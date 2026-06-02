@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Gamepad2, Trophy, ChevronRight, Briefcase, RefreshCw } from "lucide-react";
 import ExploreQuiz from "../components/ExploreQuiz";
@@ -13,7 +13,6 @@ export const Route = createFileRoute("/_app/explore")({
 type Game = "menu" | "quiz" | "intern";
 
 function ExplorePage() {
-  const navigate = useNavigate();
   const [game, setGame] = useState<Game>("menu");
 
   // —— 測驗 ——
