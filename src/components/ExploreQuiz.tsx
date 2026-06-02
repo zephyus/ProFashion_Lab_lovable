@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, ChevronRight, RotateCcw, ArrowLeft } from "lucide-react";
+import { ChevronRight, RotateCcw, ArrowLeft } from "lucide-react";
 
 // 不對外暴露量表名稱：內部使用代號
 // H_* 為 Holland 六型；P_* 為人格傾向；C_* 為核心職能
