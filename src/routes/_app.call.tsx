@@ -197,10 +197,6 @@ function CallPage() {
   const [muted, setMuted] = useState(false);
   const [speakerOn, setSpeakerOn] = useState(true);
 
-  // Drama state
-  const [drama, setDrama] = useState<(typeof dramaScenes)[number] | null>(null);
-  const [dramaIdx, setDramaIdx] = useState(0);
-
   // Intern state
   const [internStep, setInternStep] = useState(0);
   const [xp, setXp] = useState(0);
@@ -209,58 +205,19 @@ function CallPage() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (active || drama) {
+    if (active) {
       timerRef.current = setInterval(() => setSeconds((s) => s + 1), 1000);
       return () => { if (timerRef.current) clearInterval(timerRef.current); };
     }
-  }, [active, drama]);
+  }, [active]);
 
   const hangup = () => {
-    setActive(null); setDrama(null); setLineIdx(0); setDramaIdx(0);
+    setActive(null); setLineIdx(0);
     setSeconds(0); setMuted(false); setSpeakerOn(true);
   };
   const next = () => active && lineIdx < active.script.length - 1 && setLineIdx((i) => i + 1);
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
-  // ===== Drama active view =====
-  if (drama) {
-    const node = drama.nodes[dramaIdx];
-    return (
-      <div className={`fixed inset-0 z-[60] mx-auto flex max-w-md flex-col bg-gradient-to-br ${drama.color} px-6 py-10 text-white`}>
-        <div className="text-center">
-          <p className="text-xs opacity-80">廣播劇 · {fmt(seconds)}</p>
-          <h2 className="mt-2 text-2xl font-bold">{drama.title}</h2>
-        </div>
-        <div className="mt-8 flex-1 space-y-4 overflow-y-auto">
-          <div className="rounded-2xl bg-white/15 p-4 backdrop-blur-sm">
-            <p className="text-xs opacity-80">{node.speaker}</p>
-            <p className="mt-2 text-base leading-relaxed">{node.line}</p>
-          </div>
-          {node.choices && (
-            <div className="space-y-2">
-              {node.choices.map((c, i) => (
-                <button key={i} onClick={() => setDramaIdx(c.next)}
-                  className="w-full rounded-2xl bg-white/20 p-4 text-left text-sm font-semibold backdrop-blur-sm active:scale-95">
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          )}
-          {node.ending && (
-            <div className="rounded-2xl border border-white/30 bg-black/20 p-4 text-sm">
-              <p className="font-bold">{node.ending}</p>
-            </div>
-          )}
-          {!node.choices && !node.ending && dramaIdx < drama.nodes.length - 1 && (
-            <button onClick={() => setDramaIdx(dramaIdx + 1)} className="w-full rounded-2xl bg-white/20 p-3 text-sm font-semibold">繼續 →</button>
-          )}
-        </div>
-        <button onClick={hangup} className="mx-auto mt-6 flex h-14 w-14 items-center justify-center rounded-full bg-red-500 shadow-2xl active:scale-95">
-          <PhoneOff className="h-6 w-6" />
-        </button>
-      </div>
-    );
-  }
 
   // ===== Persona call active view =====
   if (active) {
