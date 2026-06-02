@@ -1,27 +1,241 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Map, Construction } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { MapPin, Sparkles, ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import { CATEGORY_META, MENTORS, MentorCategory } from "@/lib/mentors";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/map")({
   head: () => ({ meta: [{ title: "職圖" }] }),
   component: MapPage,
 });
 
+type Filter = "all" | MentorCategory;
+
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: "all", label: "全部" },
+  { key: "life", label: CATEGORY_META.life.label },
+  { key: "culture", label: CATEGORY_META.culture.label },
+  { key: "craft", label: CATEGORY_META.craft.label },
+  { key: "education", label: CATEGORY_META.education.label },
+  { key: "media", label: CATEGORY_META.media.label },
+];
+
 function MapPage() {
+  const [filter, setFilter] = useState<Filter>("all");
+  const [api, setApi] = useState<CarouselApi | null>(null);
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  const syncSource = useRef<"map" | "carousel" | null>(null);
+
+  const mentors = useMemo(
+    () => (filter === "all" ? MENTORS : MENTORS.filter((m) => m.category === filter)),
+    [filter],
+  );
+
+  // Reset selection when filter changes
+  useEffect(() => {
+    setSelectedIdx(0);
+    syncSource.current = "map";
+    api?.scrollTo(0, true);
+  }, [filter, api]);
+
+  // Carousel → state
+  useEffect(() => {
+    if (!api) return;
+    const onSelect = () => {
+      if (syncSource.current === "map") {
+        syncSource.current = null;
+        return;
+      }
+      syncSource.current = "carousel";
+      setSelectedIdx(api.selectedScrollSnap());
+    };
+    api.on("select", onSelect);
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api]);
+
+  // State → carousel (when triggered by map pin)
+  useEffect(() => {
+    if (!api) return;
+    if (syncSource.current === "carousel") {
+      syncSource.current = null;
+      return;
+    }
+    api.scrollTo(selectedIdx);
+  }, [selectedIdx, api]);
+
+  const selected = mentors[selectedIdx];
+
   return (
-    <div className="flex min-h-[80vh] flex-col items-center justify-center px-8 text-center">
-      <div className="relative">
-        <div className="absolute inset-0 -z-10 rounded-full bg-primary-soft blur-3xl opacity-60" />
-        <div className="flex h-28 w-28 items-center justify-center rounded-3xl bg-[image:var(--gradient-hero)] shadow-[var(--shadow-float)]">
-          <Map className="h-12 w-12 text-primary-foreground" />
+    <div className="px-5 pt-8">
+      <header className="mb-5">
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-[11px] font-semibold text-primary-deep">
+          <Sparkles className="h-3 w-3" /> 職涯地圖
+        </div>
+        <h1 className="mt-3 text-2xl font-bold tracking-tight">職圖</h1>
+        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+          探索職人地圖，預約一場真實的職涯體驗。
+        </p>
+      </header>
+
+      {/* Category filter chips */}
+      <div className="-mx-5 mb-4 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex gap-2">
+          {FILTERS.map((f) => {
+            const active = filter === f.key;
+            return (
+              <button
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                className={cn(
+                  "shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all",
+                  active
+                    ? "bg-primary text-primary-foreground shadow-[var(--shadow-card)]"
+                    : "bg-card text-muted-foreground border border-border",
+                )}
+              >
+                {f.label}
+              </button>
+            );
+          })}
         </div>
       </div>
-      <h1 className="mt-8 text-3xl font-bold tracking-tight">職圖</h1>
-      <p className="mt-3 max-w-xs text-sm leading-relaxed text-muted-foreground">
-        正在繪製中 — 即將為你呈現完整的職涯地圖，從學科到職位、從技能到產業，一覽無遺。
-      </p>
-      <div className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-xs font-semibold text-accent-foreground">
-        <Construction className="h-3.5 w-3.5" /> Coming Soon
+
+      {/* Map area */}
+      <div className="relative h-72 w-full overflow-hidden rounded-3xl border border-border bg-[image:var(--gradient-soft)] shadow-[var(--shadow-card)]">
+        {/* Decorative contour lines */}
+        <svg className="absolute inset-0 h-full w-full opacity-50" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden>
+          <defs>
+            <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="var(--primary-soft)" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="transparent" />
+            </radialGradient>
+          </defs>
+          <circle cx="120" cy="100" r="90" fill="url(#glow)" />
+          <circle cx="300" cy="220" r="110" fill="url(#glow)" />
+          <g fill="none" stroke="var(--primary)" strokeOpacity="0.18" strokeWidth="1">
+            <path d="M0,80 Q100,40 200,90 T400,70" />
+            <path d="M0,140 Q120,100 220,150 T400,130" />
+            <path d="M0,200 Q140,160 240,210 T400,190" />
+            <path d="M0,260 Q120,220 220,260 T400,250" />
+          </g>
+        </svg>
+
+        {/* Pins */}
+        {mentors.map((m, idx) => {
+          const active = idx === selectedIdx;
+          const tone = CATEGORY_META[m.category].tone;
+          return (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => {
+                syncSource.current = "map";
+                setSelectedIdx(idx);
+              }}
+              className="absolute -translate-x-1/2 -translate-y-full transition-transform"
+              style={{ left: `${m.mapX}%`, top: `${m.mapY}%` }}
+              aria-label={m.name}
+            >
+              <div
+                className={cn(
+                  "flex items-center justify-center rounded-full transition-all",
+                  active ? "h-10 w-10 ring-4 ring-primary/30" : "h-7 w-7",
+                )}
+                style={{ background: tone }}
+              >
+                <MapPin
+                  className={cn("text-white drop-shadow", active ? "h-5 w-5" : "h-4 w-4")}
+                  strokeWidth={2.5}
+                />
+              </div>
+              {active && (
+                <div className="mt-1 whitespace-nowrap rounded-full bg-card px-2 py-0.5 text-[10px] font-semibold text-foreground shadow-[var(--shadow-card)]">
+                  {m.name}
+                </div>
+              )}
+            </button>
+          );
+        })}
+
+        {mentors.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+            這個分類尚未上線職人
+          </div>
+        )}
       </div>
+
+      {/* Horizontal carousel */}
+      {mentors.length > 0 && (
+        <div className="mt-5 -mx-5">
+          <Carousel
+            setApi={setApi}
+            opts={{ align: "center", containScroll: "trimSnaps" }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-3 px-5">
+              {mentors.map((m, idx) => (
+                <CarouselItem
+                  key={m.id}
+                  className="basis-[82%] pl-3"
+                >
+                  <Link
+                    to="/map/$mentorId"
+                    params={{ mentorId: m.id }}
+                    className={cn(
+                      "block rounded-2xl border bg-card p-4 transition-all",
+                      idx === selectedIdx
+                        ? "border-primary shadow-[var(--shadow-float)]"
+                        : "border-border",
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="truncate text-base font-bold">{m.name}</h3>
+                          <span className="text-xs text-muted-foreground">· {m.years} 年</span>
+                        </div>
+                        <p className="mt-0.5 truncate text-sm text-primary-deep font-medium">{m.job}</p>
+                      </div>
+                      <Badge
+                        variant={m.available ? "default" : "secondary"}
+                        className="shrink-0 text-[10px]"
+                      >
+                        {m.available ? "可預約" : "排隊中"}
+                      </Badge>
+                    </div>
+                    <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                      {m.bio}
+                    </p>
+                    <div className="mt-3 flex items-center justify-between">
+                      <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                        <MapPin className="h-3 w-3" /> {m.region}
+                      </span>
+                      <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-primary-deep">
+                        看詳情 <ChevronRight className="h-3 w-3" />
+                      </span>
+                    </div>
+                  </Link>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        </div>
+      )}
+
+      {selected && (
+        <p className="mt-4 text-center text-[11px] text-muted-foreground">
+          {selectedIdx + 1} / {mentors.length} · 滑動或點選地圖切換
+        </p>
+      )}
     </div>
   );
 }
