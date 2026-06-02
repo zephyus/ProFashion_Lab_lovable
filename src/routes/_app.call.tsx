@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect, useRef } from "react";
-import { Phone, PhoneOff, Mic, Volume2, Sparkles, Atom, Radio } from "lucide-react";
+import { Phone, PhoneOff, Mic, Volume2, Sparkles, Atom, Radio, Send, Loader2 } from "lucide-react";
 import { dramaScenes, type DramaScene } from "@/lib/drama-scenes";
+import { askPersona } from "@/lib/persona-chat.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/call")({
   head: () => ({ meta: [{ title: "對話 — 職感 Zhígǎn" }] }),
   component: CallPage,
 });
+
 
 // 莫蘭迪色票 — 全頁子項目統一使用
 const morandiPalette = [
@@ -190,6 +194,14 @@ function CallPage() {
   const [dramaIdx, setDramaIdx] = useState(0);
   const [dramaListIdx, setDramaListIdx] = useState(0);
 
+  // 即時 Q&A（角色用 LLM 回應）
+  type ChatMsg = { role: "user" | "assistant"; content: string };
+  const [chat, setChat] = useState<ChatMsg[]>([]);
+  const [question, setQuestion] = useState("");
+  const [asking, setAsking] = useState(false);
+  const askPersonaFn = useServerFn(askPersona);
+  const chatBottomRef = useRef<HTMLDivElement | null>(null);
+
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -199,13 +211,47 @@ function CallPage() {
     }
   }, [active, drama]);
 
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chat, asking]);
+
   const hangup = () => {
     setActive(null); setLineIdx(0);
     setSeconds(0); setMuted(false); setSpeakerOn(true);
+    setChat([]); setQuestion(""); setAsking(false);
   };
   const exitDrama = () => { setDrama(null); setDramaIdx(0); setSeconds(0); };
   const next = () => active && lineIdx < active.script.length - 1 && setLineIdx((i) => i + 1);
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+
+  const sendQuestion = async () => {
+    if (!active || asking) return;
+    const q = question.trim();
+    if (!q) return;
+    setQuestion("");
+    const prevChat = chat;
+    setChat([...prevChat, { role: "user", content: q }]);
+    setAsking(true);
+    try {
+      const { reply } = await askPersonaFn({
+        data: {
+          personaName: active.name,
+          personaJob: active.job,
+          personaIntro: active.intro,
+          scriptLines: active.script,
+          history: prevChat,
+          userMessage: q,
+        },
+      });
+      setChat((c) => [...c, { role: "assistant", content: reply }]);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "AI 回覆失敗";
+      toast.error(msg);
+    } finally {
+      setAsking(false);
+    }
+  };
+
 
   // ===== Drama immersive view =====
   if (drama) {
@@ -251,52 +297,108 @@ function CallPage() {
 
   // ===== Persona call active view =====
   if (active) {
+    const scriptEnded = lineIdx >= active.script.length - 1;
     return (
-      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col items-center justify-between px-8 py-12"
+      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col px-6 py-8"
         style={{ ...morandiBg(activeIdx), color: morandiInk }}>
-        <div className="text-center">
-          <p className="text-sm opacity-70">
+        <div className="text-center shrink-0">
+          <p className="text-xs opacity-70">
             通話中 · {fmt(seconds)}
             {muted && " · 靜音"}
             {!speakerOn && " · 聽筒"}
           </p>
-          <h2 className="mt-4 text-4xl font-bold">{active.name}</h2>
-          <p className="mt-1 text-sm opacity-80">{active.job}</p>
+          <h2 className="mt-2 text-2xl font-bold">{active.name}</h2>
+          <p className="mt-0.5 text-xs opacity-80">{active.job}</p>
         </div>
 
-        <div className="flex flex-col items-center">
-          <div className="relative">
-            {speakerOn && <div className="absolute inset-0 animate-ping rounded-full bg-white/45" />}
-            <div className="relative flex h-36 w-36 items-center justify-center rounded-full bg-white/40 backdrop-blur-sm">
-              <Volume2 className={`h-16 w-16 ${!speakerOn ? "opacity-40" : ""}`} />
+        {!scriptEnded && (
+          <div className="my-4 flex shrink-0 justify-center">
+            <div className="relative">
+              {speakerOn && <div className="absolute inset-0 animate-ping rounded-full bg-white/45" />}
+              <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-white/40 backdrop-blur-sm">
+                <Volume2 className={`h-11 w-11 ${!speakerOn ? "opacity-40" : ""}`} />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        <div className="w-full">
-          <button onClick={next}
-            className="min-h-[100px] w-full rounded-3xl bg-white/50 p-5 text-left text-[15px] leading-relaxed backdrop-blur-sm transition-all active:bg-white/65">
+        {/* 對話內容（可捲動） */}
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-3 py-2">
+          <button onClick={next} disabled={scriptEnded}
+            className="w-full rounded-2xl bg-white/55 p-4 text-left text-[14px] leading-relaxed backdrop-blur-sm transition-all active:bg-white/70 disabled:opacity-100">
+            <p className="text-[10px] opacity-70 mb-1">{active.name}</p>
             {active.script[lineIdx]}
           </button>
-          <p className="mt-2 text-center text-xs opacity-65">
-            {lineIdx < active.script.length - 1 ? "點擊繼續聆聽 →" : "對話結束，按紅鈕掛斷"}
-          </p>
+          {!scriptEnded && (
+            <p className="text-center text-[11px] opacity-65">點擊繼續聆聽 →</p>
+          )}
 
-          <div className="mt-6 flex items-center justify-around">
-            <button onClick={() => setMuted((m) => !m)} aria-pressed={muted} aria-label={muted ? "取消靜音" : "靜音"}
-              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${muted ? "bg-white" : "bg-white/40"}`}>
-              <Mic className="h-6 w-6" />
+          {scriptEnded && (
+            <>
+              <div className="rounded-2xl border border-black/10 bg-white/40 px-4 py-3 text-[12px] backdrop-blur-sm">
+                你還有什麼想問的？直接打字，{active.name}會親自回你。
+              </div>
+              {chat.map((m, i) => (
+                <div key={i}
+                  className={`rounded-2xl p-3 text-[14px] leading-relaxed backdrop-blur-sm ${
+                    m.role === "user"
+                      ? "ml-8 bg-white/80 text-foreground"
+                      : "mr-4 bg-white/55"
+                  }`}>
+                  <p className="text-[10px] opacity-70 mb-1">
+                    {m.role === "user" ? "你" : active.name}
+                  </p>
+                  {m.content}
+                </div>
+              ))}
+              {asking && (
+                <div className="mr-4 flex items-center gap-2 rounded-2xl bg-white/55 p-3 text-[13px] backdrop-blur-sm">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span className="opacity-80">{active.name}正在回覆…</span>
+                </div>
+              )}
+              <div ref={chatBottomRef} />
+            </>
+          )}
+        </div>
+
+        {/* 輸入區（僅在腳本結束後出現） */}
+        {scriptEnded && (
+          <form
+            onSubmit={(e) => { e.preventDefault(); void sendQuestion(); }}
+            className="mt-3 flex shrink-0 items-center gap-2 rounded-full bg-white/70 px-2 py-1.5 backdrop-blur-sm"
+          >
+            <input
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder={`問問${active.name}…`}
+              maxLength={500}
+              disabled={asking}
+              className="flex-1 bg-transparent px-3 py-1.5 text-sm outline-none placeholder:text-foreground/40"
+            />
+            <button type="submit" disabled={asking || !question.trim()}
+              aria-label="送出問題"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground transition disabled:opacity-40 active:scale-95">
+              {asking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </button>
-            <button onClick={hangup} aria-label="掛斷" className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 text-white shadow-2xl active:scale-95">
-              <PhoneOff className="h-7 w-7" />
-            </button>
-            <button onClick={() => setSpeakerOn((s) => !s)} aria-pressed={speakerOn} aria-label={speakerOn ? "切換聽筒" : "切換喇叭"}
-              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${speakerOn ? "bg-white/40" : "bg-white"}`}>
-              <Volume2 className="h-6 w-6" />
-            </button>
-          </div>
+          </form>
+        )}
+
+        <div className="mt-4 flex shrink-0 items-center justify-around">
+          <button onClick={() => setMuted((m) => !m)} aria-pressed={muted} aria-label={muted ? "取消靜音" : "靜音"}
+            className={`flex h-12 w-12 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${muted ? "bg-white" : "bg-white/40"}`}>
+            <Mic className="h-5 w-5" />
+          </button>
+          <button onClick={hangup} aria-label="掛斷" className="flex h-14 w-14 items-center justify-center rounded-full bg-red-500 text-white shadow-2xl active:scale-95">
+            <PhoneOff className="h-6 w-6" />
+          </button>
+          <button onClick={() => setSpeakerOn((s) => !s)} aria-pressed={speakerOn} aria-label={speakerOn ? "切換聽筒" : "切換喇叭"}
+            className={`flex h-12 w-12 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${speakerOn ? "bg-white/40" : "bg-white"}`}>
+            <Volume2 className="h-5 w-5" />
+          </button>
         </div>
       </div>
+
     );
   }
 
