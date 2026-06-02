@@ -86,8 +86,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "ProFashion Lab 職感實驗室" },
       { name: "twitter:description", content: "讓每個生命都能在最適合的位置上發光。不再有任何一個職業被誤解，不再有任何一個夢想因資訊不足而熄滅。" },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9cb01e50-fa10-41eb-ac6e-e68f79a12307/id-preview-b2e6cbce--87d70d7b-1fbf-42fd-8b99-81fd7f89b685.lovable.app-1780422303399.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9cb01e50-fa10-41eb-ac6e-e68f79a12307/id-preview-b2e6cbce--87d70d7b-1fbf-42fd-8b99-81fd7f89b685.lovable.app-1780422303399.png" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/SVQIwWFV0AdJR9Ktb79pTAPMuNH2/social-images/social-1780423930908-852eb108-50ad-4c09-bffc-52374429f2e9.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/SVQIwWFV0AdJR9Ktb79pTAPMuNH2/social-images/social-1780423930908-852eb108-50ad-4c09-bffc-52374429f2e9.webp" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
