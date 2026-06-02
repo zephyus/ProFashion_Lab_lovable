@@ -44,13 +44,14 @@ export const askPersona = createServerFn({ method: "POST" })
         "Lovable-API-Key": apiKey,
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "openai/gpt-5-nano",
         messages: [
           { role: "system", content: system },
           ...data.history,
           { role: "user", content: data.userMessage },
         ],
       }),
+
     });
 
     if (response.status === 429) {
