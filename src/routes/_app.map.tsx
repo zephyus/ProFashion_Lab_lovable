@@ -34,10 +34,6 @@ function MapPage() {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const syncSource = useRef<"map" | "carousel" | null>(null);
 
-  if (pathname !== "/map") {
-    return <Outlet />;
-  }
-
   const mentors = useMemo(
     () => (filter === "all" ? MENTORS : MENTORS.filter((m) => m.category === filter)),
     [filter],
@@ -78,6 +74,10 @@ function MapPage() {
   }, [selectedIdx, api]);
 
   const selected = mentors[selectedIdx];
+
+  if (pathname !== "/map") {
+    return <Outlet />;
+  }
 
   return (
     <div className="px-5 pt-8">
