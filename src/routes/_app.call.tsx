@@ -45,7 +45,7 @@ type Persona = {
 
 const realPersonas: Persona[] = [
   {
-    id: "av", name: "綾瀨小姐", job: "AV 女優", tag: "成人產業",
+    id: "av", gender: "female", name: "綾瀨小姐", job: "AV 女優", tag: "成人產業",
     color: "from-rose-400 to-pink-500",
     intro: "從業 6 年，公開分享產業真實面",
     script: [
@@ -57,7 +57,7 @@ const realPersonas: Persona[] = [
     ],
   },
   {
-    id: "mortician", name: "阿明師傅", job: "禮儀師", tag: "生命產業",
+    id: "mortician", gender: "male", name: "阿明師傅", job: "禮儀師", tag: "生命產業",
     color: "from-slate-500 to-zinc-700",
     intro: "送行 20 年，把告別變成禮物",
     script: [
@@ -69,7 +69,7 @@ const realPersonas: Persona[] = [
     ],
   },
   {
-    id: "esports", name: "Ray", job: "電競選手", tag: "新興職業",
+    id: "esports", gender: "male", name: "Ray", job: "電競選手", tag: "新興職業",
     color: "from-teal-400 to-cyan-500",
     intro: "前職業隊隊長，現為教練",
     script: [
@@ -81,7 +81,7 @@ const realPersonas: Persona[] = [
     ],
   },
   {
-    id: "deepsea", name: "老陳", job: "遠洋漁工", tag: "傳統產業",
+    id: "deepsea", gender: "male", name: "老陳", job: "遠洋漁工", tag: "傳統產業",
     color: "from-blue-500 to-indigo-600",
     intro: "出海 15 年，跑過三大洋",
     script: [
@@ -93,7 +93,7 @@ const realPersonas: Persona[] = [
     ],
   },
   {
-    id: "perfumer", name: "Élise", job: "調香師", tag: "藝術職業",
+    id: "perfumer", gender: "female", name: "Élise", job: "調香師", tag: "藝術職業",
     color: "from-amber-400 to-orange-500",
     intro: "巴黎學成，自創香水品牌",
     script: [
@@ -108,7 +108,7 @@ const realPersonas: Persona[] = [
 
 const timewarpPersonas: Persona[] = [
   {
-    id: "jobs", name: "Steve Jobs", job: "Apple 創辦人 · 1985", tag: "歷史名人",
+    id: "jobs", gender: "male", name: "Steve Jobs", job: "Apple 創辦人 · 1985", tag: "歷史名人",
     color: "from-neutral-700 to-neutral-900",
     intro: "與賈伯斯聊產品開發哲學",
     script: [
@@ -120,7 +120,7 @@ const timewarpPersonas: Persona[] = [
     ],
   },
   {
-    id: "davinci", name: "達文西", job: "文藝復興斜槓王 · 1503", tag: "歷史名人",
+    id: "davinci", gender: "male", name: "達文西", job: "文藝復興斜槓王 · 1503", tag: "歷史名人",
     color: "from-amber-600 to-yellow-700",
     intro: "聊斜槓人生與跨領域學習",
     script: [
@@ -132,7 +132,7 @@ const timewarpPersonas: Persona[] = [
     ],
   },
   {
-    id: "asteroid", name: "K-7 號採礦員", job: "小行星採礦工程師 · 2087", tag: "未來職業",
+    id: "asteroid", gender: "neutral", name: "K-7 號採礦員", job: "小行星採礦工程師 · 2087", tag: "未來職業",
     color: "from-zinc-600 to-slate-800",
     intro: "在木星軌道採稀土礦",
     script: [
@@ -144,7 +144,7 @@ const timewarpPersonas: Persona[] = [
     ],
   },
   {
-    id: "meta-shrink", name: "Dr. Vex", job: "元宇宙心理醫生 · 2045", tag: "未來職業",
+    id: "meta-shrink", gender: "female", name: "Dr. Vex", job: "元宇宙心理醫生 · 2045", tag: "未來職業",
     color: "from-purple-500 to-fuchsia-600",
     intro: "治療虛擬人格分裂與沉浸症候群",
     script: [
@@ -159,7 +159,7 @@ const timewarpPersonas: Persona[] = [
 
 const hybridPersonas: Persona[] = [
   {
-    id: "ai-detective", name: "林探員", job: "AI 倫理偵探", tag: "跨界混合",
+    id: "ai-detective", gender: "neutral", name: "林探員", job: "AI 倫理偵探", tag: "跨界混合",
     color: "from-emerald-500 to-teal-700",
     intro: "調查 AI 偏見與演算法歧視案件",
     script: [
@@ -171,7 +171,7 @@ const hybridPersonas: Persona[] = [
     ],
   },
   {
-    id: "legacy-restorer", name: "Maya", job: "數位遺產修復師", tag: "跨界混合",
+    id: "legacy-restorer", gender: "female", name: "Maya", job: "數位遺產修復師", tag: "跨界混合",
     color: "from-rose-500 to-purple-600",
     intro: "重建逝者的社群帳號與數位記憶",
     script: [
@@ -408,10 +408,10 @@ function CallPage() {
 
   // ===== List view =====
   const tabs: { id: Mode; label: string; icon: typeof Phone }[] = [
-    { id: "real", gender: "neutral", label: "真實職人", icon: Phone },
-    { id: "timewarp", gender: "neutral", label: "跨時空", icon: Sparkles },
-    { id: "drama", gender: "neutral", label: "職場廣播劇", icon: Radio },
-    { id: "hybrid", gender: "neutral", label: "跨界混合", icon: Atom },
+    { id: "real", gender: "neutral", gender: "neutral", label: "真實職人", icon: Phone },
+    { id: "timewarp", gender: "neutral", gender: "neutral", label: "跨時空", icon: Sparkles },
+    { id: "drama", gender: "neutral", gender: "neutral", label: "職場廣播劇", icon: Radio },
+    { id: "hybrid", gender: "neutral", gender: "neutral", label: "跨界混合", icon: Atom },
   ];
 
   const personaList: Persona[] =
