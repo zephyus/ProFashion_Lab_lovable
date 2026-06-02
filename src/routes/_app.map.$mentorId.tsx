@@ -97,7 +97,7 @@ function MentorDetailPage() {
   };
 
   return (
-    <div className="relative pb-32">
+    <div className="relative pb-44">
       {/* Header band */}
       <div
         className="relative px-5 pb-8 pt-8"
@@ -202,7 +202,7 @@ function MentorDetailPage() {
       {/* Booking sheet */}
       {step !== "idle" && (
         <div
-          className="fixed inset-0 z-50 bg-foreground/30 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] bg-foreground/30 backdrop-blur-sm"
           onClick={() => step !== "done" && resetAll()}
         >
           <div
