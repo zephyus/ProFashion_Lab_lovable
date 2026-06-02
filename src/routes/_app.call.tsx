@@ -194,7 +194,7 @@ function CallPage() {
   if (drama) {
     const node = drama.nodes[dramaIdx];
     return (
-      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col bg-[image:var(--gradient-hero)] px-6 py-10 text-primary-foreground">
+      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col bg-[image:var(--gradient-morandi)] px-6 py-10 text-primary-foreground">
         <div className="text-center">
           <p className="text-xs opacity-80">廣播劇 · {fmt(seconds)}</p>
           <h2 className="mt-2 text-2xl font-bold">{drama.title}</h2>
@@ -234,7 +234,7 @@ function CallPage() {
   // ===== Persona call active view =====
   if (active) {
     return (
-      <div className={`fixed inset-0 z-[60] mx-auto flex max-w-md flex-col items-center justify-between bg-gradient-to-br ${active.color} px-8 py-12 text-white`}>
+      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col items-center justify-between bg-[image:var(--gradient-morandi)] px-8 py-12 text-primary-foreground">
         <div className="text-center">
           <p className="text-sm opacity-80">
             通話中 · {fmt(seconds)}
@@ -320,7 +320,7 @@ function CallPage() {
         <div className="space-y-3">
           {personaList.map((p) => (
             <div key={p.id} className="overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-card)]">
-              <div className={`bg-gradient-to-r ${p.color} px-5 py-4 text-white`}>
+              <div className="bg-[image:var(--gradient-morandi)] px-5 py-4 text-primary-foreground">
                 <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{p.tag}</span>
                 <h3 className="mt-2 text-lg font-bold">{p.name}</h3>
                 <p className="text-xs opacity-90">{p.job}</p>
@@ -346,7 +346,7 @@ function CallPage() {
           <div className="space-y-3">
             {dramaScenes.map((d) => (
               <div key={d.id} className="overflow-hidden rounded-3xl border border-border bg-card shadow-[var(--shadow-card)]">
-                <div className="bg-[image:var(--gradient-hero)] px-5 py-4 text-primary-foreground">
+                <div className="bg-[image:var(--gradient-morandi)] px-5 py-4 text-primary-foreground">
                   <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{d.tag}</span>
                   <h3 className="mt-2 text-lg font-bold">{d.title}</h3>
                   <p className="text-xs opacity-90">{d.intro}</p>
