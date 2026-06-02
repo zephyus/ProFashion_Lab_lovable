@@ -121,5 +121,5 @@ export function useSpeech() {
   // 暴露目前挑到的聲音（給 UI 顯示）
   const currentVoice = (gender: SpeechGender = "neutral") => pickVoice(voices, gender);
 
-  return { supported, speak, cancel, setMuted, voices, currentVoice };
+  return { supported, isEdge, speak, cancel, setMuted, voices, currentVoice };
 }
