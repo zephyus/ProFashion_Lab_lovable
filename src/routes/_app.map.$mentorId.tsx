@@ -9,6 +9,8 @@ import {
   Heart,
   CheckCircle2,
   Calendar,
+  User,
+  Users,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CATEGORY_META, MentorSlot, getMentor } from "@/lib/mentors";
 import { cn } from "@/lib/utils";
+
+type BookingType = "individual" | "class";
 
 export const Route = createFileRoute("/_app/map/$mentorId")({
   head: ({ params }) => {
