@@ -20,28 +20,28 @@ const stations = [
     key: "explore",
     icon: Sparkles,
     title: "發現小秘 me",
-    desc: "了解自己，是所有選擇的起點。從一題開始，一關一關累積經驗值，讓資料替你說出——你是誰、你擅長什麼。",
+    desc: "認識你自己。",
     to: "/explore",
   },
   {
     key: "cafe",
     icon: Coffee,
     title: "職業咖啡館",
-    desc: "決定一份工作前，先聽聽做這份工作的人怎麼說。把模糊的想像，換成真實、可被驗證的細節。",
+    desc: "聽前輩怎麼說。",
     to: "/cafe",
   },
   {
     key: "map",
     icon: MapPin,
     title: "職圖",
-    desc: "串連各職業與你之間的關聯，進行了解、媒合與實習。讓學科、能力與興趣自然連線，看見屬於你的路徑。",
+    desc: "看見你的路徑。",
     to: "/map",
   },
   {
     key: "call",
     icon: Phone,
     title: "您撥的號碼是未來",
-    desc: "與其想像職場，不如先走一遍。在廣播劇與角色通話裡預演關鍵時刻，把焦慮換成準備好的從容。",
+    desc: "預演關鍵時刻。",
     to: "/call",
   },
 ] as const;
@@ -99,59 +99,44 @@ function HomePage() {
       </header>
 
       {/* Hero */}
-      <section className="pt-8 pb-6 animate-rise">
-        <p className="text-footnote font-semibold uppercase tracking-widest text-primary-deep">
-          ProFashion · Lab
-        </p>
-        <h1 className="mt-2 text-large-title text-foreground">
-          四種方式，
+      <section className="pt-10 pb-7 animate-rise">
+        <h1 className="text-large-title text-foreground">
+          今天，
           <br />
-          探索你的職涯。
+          想認識哪一個自己？
         </h1>
-        <p className="mt-4 text-body text-muted-foreground">
-          把模糊的「未來」變成具體的下一步。
-        </p>
       </section>
 
-      {/* XP card */}
+      {/* XP card — slim */}
       <Link
         to="/explore"
-        className="press flex items-stretch justify-between gap-4 rounded-3xl bg-[image:var(--gradient-hero)] p-5 text-primary-foreground shadow-[var(--shadow-card)] animate-rise"
+        className="press flex items-center justify-between gap-4 rounded-2xl bg-[image:var(--gradient-hero)] px-5 py-4 text-primary-foreground shadow-[var(--shadow-card)] animate-rise"
         style={{ animationDelay: "60ms" }}
       >
-        <div className="flex flex-col justify-between">
-          <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest opacity-90">
-            <Trophy className="h-3 w-3" strokeWidth={2} />
-            職涯帳號
-          </div>
+        <div className="flex items-center gap-2.5">
+          <Trophy className="h-4 w-4" strokeWidth={2} />
           <div>
-            <p className="text-title-2 font-semibold">{tierName}</p>
-            <p className="mt-0.5 text-footnote text-primary-foreground/80">
+            <p className="text-subhead font-semibold leading-tight">{tierName}</p>
+            <p className="text-[11px] opacity-80">
               {completed > 0 ? `已完成 ${completed} 關` : "尚未開始"}
             </p>
           </div>
         </div>
-        <div className="flex flex-col items-end justify-between text-right">
-          <p className="text-[10px] uppercase tracking-widest opacity-80">總經驗值</p>
-          <div>
-            <p className="text-large-title font-bold leading-none tabular-nums">{xp}</p>
-            <p className="mt-1 text-[10px] uppercase tracking-widest opacity-80">XP</p>
-          </div>
+        <div className="text-right">
+          <p className="text-title-2 font-bold leading-none tabular-nums">{xp}</p>
+          <p className="text-[10px] uppercase tracking-widest opacity-80 mt-0.5">XP</p>
         </div>
       </Link>
 
       {/* 四大區域 — 2×2 grid */}
-      <h2 className="mt-9 mb-3 text-title-3 text-foreground animate-rise" style={{ animationDelay: "120ms" }}>
-        四大區域
-      </h2>
-      <div className="grid grid-cols-2 gap-3 animate-rise" style={{ animationDelay: "160ms" }}>
+      <div className="mt-6 grid grid-cols-2 gap-3 animate-rise" style={{ animationDelay: "120ms" }}>
         {stations.map((s) => {
           const Icon = s.icon;
           return (
             <Link
               key={s.key}
               to={s.to}
-              className="press flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-card)] transition-colors hover:bg-muted/30"
+              className="press flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted/30"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
                 <Icon className="h-[18px] w-[18px]" strokeWidth={1.9} />
@@ -169,20 +154,16 @@ function HomePage() {
       {!user && !loading && (
         <Link
           to="/login"
-          className="press mt-6 flex items-center justify-between rounded-2xl bg-primary px-5 py-4 text-primary-foreground shadow-[var(--shadow-card)] animate-rise"
-          style={{ animationDelay: "220ms" }}
+          className="press mt-6 flex items-center justify-between rounded-2xl bg-primary px-5 py-4 text-primary-foreground animate-rise"
+          style={{ animationDelay: "180ms" }}
         >
-          <div>
-            <p className="text-subhead font-semibold">登入以保留你的軌跡</p>
-            <p className="mt-0.5 text-[11px] opacity-85">同步 XP、實習進度與收藏</p>
-          </div>
+          <p className="text-subhead font-semibold">登入以保留你的軌跡</p>
+
           <ArrowRight className="h-5 w-5" strokeWidth={2} />
         </Link>
       )}
 
-      <footer className="mt-12 pb-8">
-        <p className="text-caption">ProFashion Lab · 不給你標準答案，給你試錯的空間。</p>
-      </footer>
+      <div className="h-12" />
     </div>
   );
 }
