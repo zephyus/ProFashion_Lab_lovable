@@ -117,10 +117,10 @@ function InternGame({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <div className="px-5 pt-8 pb-8">
+    <div className="px-5 pt-8 pb-8 animate-page">
       <button onClick={onBack}
-        className="mb-4 text-sm font-medium text-muted-foreground hover:text-foreground">
-        ← 返回探索選單
+        className="press mb-4 inline-flex items-center text-subhead text-muted-foreground hover:text-foreground">
+        ← 回到發現
       </button>
 
       {/* XP 顯示卡 */}
@@ -179,8 +179,8 @@ function InternGame({ onBack }: { onBack: () => void }) {
         )}
       </div>
 
-      <p className="mt-4 text-center text-[11px] text-muted-foreground">
-        每完成一關自動累積經驗值 · 經驗值會同步顯示在你的個人檔案
+      <p className="mt-4 text-center text-caption">
+        每完成一關，經驗值會自動跟著你。
       </p>
     </div>
   );
