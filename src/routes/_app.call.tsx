@@ -318,7 +318,6 @@ function CallPage() {
     <div className="px-5 pt-10 pb-24 animate-page">
       <header className="mb-6 animate-rise">
         <p className="text-caption uppercase tracking-widest text-primary-deep">您撥的號碼是未來</p>
-        <h1 className="mt-1 text-large-title text-foreground">對話</h1>
         <p className="mt-3 text-body text-muted-foreground">
           撥一通電話聽真實的職人，或走進五分鐘廣播劇，先把未來走一遍。
         </p>
