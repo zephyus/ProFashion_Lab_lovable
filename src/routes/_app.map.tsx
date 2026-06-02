@@ -80,18 +80,16 @@ function MapPage() {
   }
 
   return (
-    <div className="px-5 pt-8">
-      <header className="mb-5">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-[11px] font-semibold text-primary-deep">
-          <Sparkles className="h-3 w-3" /> 職涯地圖
-        </div>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight">職圖</h1>
-        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+    <div className="px-5 pt-10">
+      <header className="mb-5 animate-rise">
+        <p className="text-caption uppercase tracking-widest text-primary-deep">職涯地圖</p>
+        <h1 className="mt-1 text-large-title text-foreground">職圖</h1>
+        <p className="mt-2 text-body text-muted-foreground">
           探索職人地圖，預約一場真實的職涯體驗。
         </p>
       </header>
 
-      {/* Category filter chips */}
+      {/* Category filter chips — iOS segmented look */}
       <div className="-mx-5 mb-4 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex gap-2">
           {FILTERS.map((f) => {
@@ -101,9 +99,9 @@ function MapPage() {
                 key={f.key}
                 onClick={() => setFilter(f.key)}
                 className={cn(
-                  "shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all",
+                  "press shrink-0 rounded-full px-3.5 py-1.5 text-footnote font-semibold transition-colors",
                   active
-                    ? "bg-primary text-primary-foreground shadow-[var(--shadow-card)]"
+                    ? "bg-primary text-primary-foreground"
                     : "bg-card text-muted-foreground border border-border",
                 )}
               >
@@ -113,6 +111,7 @@ function MapPage() {
           })}
         </div>
       </div>
+
 
       {/* Map area */}
       <div className="relative h-72 w-full overflow-hidden rounded-3xl border border-border bg-[image:var(--gradient-soft)] shadow-[var(--shadow-card)]">
