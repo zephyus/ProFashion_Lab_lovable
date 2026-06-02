@@ -199,7 +199,18 @@ function CallPage() {
   const [lineIdx, setLineIdx] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [muted, setMuted] = useState(false);
-  const [speakerOn, setSpeakerOn] = useState(true);
+
+  // Voice mode: off | browser (Web Speech) | kokoro (local AI)
+  type VoiceMode = "off" | "browser" | "kokoro";
+  const [voiceMode, setVoiceMode] = useState<VoiceMode>("browser");
+  const [kokoroState, setKokoroState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [kokoroProgress, setKokoroProgress] = useState<number>(0);
+  const [isVoiceLoading, setIsVoiceLoading] = useState(false);
+  const [isVoicePlaying, setIsVoicePlaying] = useState(false);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const currentAudioCleanupRef = useRef<(() => void) | null>(null);
+  const synthSeqRef = useRef(0); // 用來作廢過時的合成請求
 
   // Drama state
   const [drama, setDrama] = useState<DramaScene | null>(null);
@@ -216,29 +227,95 @@ function CallPage() {
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Web Speech API
+  // Web Speech API（瀏覽器內建）
   const speech = useSpeech();
-  useEffect(() => { speech.setMuted(muted || !speakerOn); }, [muted, speakerOn, speech]);
+  useEffect(() => {
+    speech.setMuted(muted || voiceMode !== "browser");
+  }, [muted, voiceMode, speech]);
+
+  // Kokoro 進度訂閱
+  useEffect(() => {
+    const off = onKokoroProgress((p: KokoroProgress) => {
+      if (typeof p.progress === "number") setKokoroProgress(Math.round(p.progress));
+    });
+    return off;
+  }, []);
+
+  // 停止目前正在播的本地語音
+  const stopLocalAudio = useCallback(() => {
+    const a = audioRef.current;
+    if (a) {
+      try { a.pause(); a.removeAttribute("src"); a.load(); } catch { /* noop */ }
+    }
+    if (currentAudioCleanupRef.current) {
+      currentAudioCleanupRef.current();
+      currentAudioCleanupRef.current = null;
+    }
+    setIsVoicePlaying(false);
+  }, []);
+
+  // 統一發聲入口
+  const speakNow = useCallback(
+    async (text: string, gender: SpeechGender) => {
+      if (!text || muted || voiceMode === "off") return;
+
+      if (voiceMode === "browser") {
+        speech.speak(text, gender);
+        return;
+      }
+
+      // kokoro
+      const seq = ++synthSeqRef.current;
+      stopLocalAudio();
+
+      // 太長就只合成第一段（避免久等）
+      const chunks = splitTextForTts(text);
+      const target = chunks[0] ?? text.slice(0, 160);
+
+      try {
+        setIsVoiceLoading(true);
+        const voice = gender === "female" ? "zf_001" : gender === "male" ? "zm_001" : undefined;
+        const { audioUrl, cleanup } = await synthesizeLocalSpeech(target, { voice });
+        if (seq !== synthSeqRef.current) { cleanup(); return; } // 已被作廢
+        currentAudioCleanupRef.current = cleanup;
+        const a = audioRef.current;
+        if (!a) { cleanup(); return; }
+        a.src = audioUrl;
+        a.onplay = () => setIsVoicePlaying(true);
+        a.onended = () => { setIsVoicePlaying(false); cleanup(); currentAudioCleanupRef.current = null; };
+        a.onerror = () => { setIsVoicePlaying(false); cleanup(); currentAudioCleanupRef.current = null; };
+        await a.play().catch(() => { /* autoplay 被擋，使用者再點一次即可 */ });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        toast.error(`本地 AI 語音失敗：${msg}，自動切回瀏覽器語音`);
+        setKokoroState("error");
+        setVoiceMode("browser");
+      } finally {
+        setIsVoiceLoading(false);
+      }
+    },
+    [voiceMode, muted, speech, stopLocalAudio],
+  );
 
   // 角色腳本：每換一句就朗讀
   useEffect(() => {
-    if (active) speech.speak(active.script[lineIdx], active.gender);
+    if (active) void speakNow(active.script[lineIdx], active.gender);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, lineIdx]);
+  }, [active, lineIdx, voiceMode]);
 
   // LLM 回覆：每收到新 assistant 訊息就朗讀
   useEffect(() => {
     if (!active || chat.length === 0) return;
     const last = chat[chat.length - 1];
-    if (last.role === "assistant") speech.speak(last.content, active.gender);
+    if (last.role === "assistant") void speakNow(last.content, active.gender);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat]);
 
   // 廣播劇：每換一個節點就朗讀（中性聲音）
   useEffect(() => {
-    if (drama) speech.speak(drama.nodes[dramaIdx]?.line ?? "", "neutral");
+    if (drama) void speakNow(drama.nodes[dramaIdx]?.line ?? "", "neutral");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [drama, dramaIdx]);
+  }, [drama, dramaIdx, voiceMode]);
 
   useEffect(() => {
     if (active || drama) {
@@ -251,14 +328,61 @@ function CallPage() {
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat, asking]);
 
+  // 切換到 kokoro：首次載入模型
+  const enableKokoro = useCallback(async () => {
+    if (kokoroState === "loading") return;
+    const ok = window.confirm(
+      "本地 AI 語音 (Kokoro) 會在你裝置上免費執行。\n首次使用需下載約 100 MB 模型，可能要等 1–3 分鐘並佔用較多記憶體。\n要繼續嗎？",
+    );
+    if (!ok) return;
+    setKokoroState("loading");
+    setKokoroProgress(0);
+    try {
+      await initKokoroTts();
+      setKokoroState("ready");
+      setVoiceMode("kokoro");
+      toast.success("本地 AI 語音已就緒");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setKokoroState("error");
+      toast.error(`本地語音不支援此裝置：${msg}`);
+    }
+  }, [kokoroState]);
+
+  // 卸載元件時清掉音訊
+  useEffect(() => {
+    return () => {
+      stopLocalAudio();
+      synthSeqRef.current++;
+    };
+  }, [stopLocalAudio]);
+
+  const cycleVoiceMode = () => {
+    if (voiceMode === "off") setVoiceMode("browser");
+    else if (voiceMode === "browser") {
+      if (kokoroState === "ready") setVoiceMode("kokoro");
+      else void enableKokoro();
+    } else {
+      setVoiceMode("off");
+      stopLocalAudio();
+    }
+  };
 
   const hangup = () => {
     speech.cancel();
+    stopLocalAudio();
+    synthSeqRef.current++;
     setActive(null); setLineIdx(0);
-    setSeconds(0); setMuted(false); setSpeakerOn(true);
+    setSeconds(0); setMuted(false);
     setChat([]); setQuestion(""); setAsking(false);
   };
-  const exitDrama = () => { speech.cancel(); setDrama(null); setDramaIdx(0); setSeconds(0); };
+  const exitDrama = () => {
+    speech.cancel();
+    stopLocalAudio();
+    synthSeqRef.current++;
+    setDrama(null); setDramaIdx(0); setSeconds(0);
+  };
+
 
   const next = () => active && lineIdx < active.script.length - 1 && setLineIdx((i) => i + 1);
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
