@@ -11,9 +11,12 @@ export const Route = createFileRoute("/_app")({
   component: AppLayout,
 });
 
-const tabs = [
+const leftTabs = [
   { to: "/explore", label: "發現小秘me", icon: Compass },
   { to: "/cafe", label: "職業咖啡館", icon: Coffee },
+] as const;
+
+const rightTabs = [
   { to: "/map", label: "職圖", icon: MapIcon },
   { to: "/call", label: "您撥的號碼是未來", icon: Phone },
 ] as const;
