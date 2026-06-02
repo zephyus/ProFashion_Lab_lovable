@@ -1,14 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Gamepad2,
+  Compass,
   Coffee,
   Map as MapIcon,
   Phone,
   ChevronRight,
-  Zap,
-  FlaskConical,
-  Sparkles,
-  LogIn,
   LogOut,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -18,56 +14,44 @@ import { useAuth } from "@/hooks/useAuth";
 export const Route = createFileRoute("/_app/")({
   head: () => ({
     meta: [
-      { title: "ProFashion Lab 職感實驗室 — 主頁" },
+      { title: "ProFashion Lab — 你的職涯，從這裡開始" },
       {
         name: "description",
         content:
-          "ProFashion Lab 職感實驗室：四大探索站 × 一個主實驗室，重新定義你對職涯的想像。",
+          "四種方式，認識還沒被你看見的自己——測驗、傾聽、地圖、通話。",
       },
     ],
   }),
   component: HomePage,
 });
 
-const sections = [
+const stations = [
   {
     key: "explore",
     title: "發現小秘 me",
-    tagline: "MBTI × UCAN 雙引擎測驗",
-    desc: "8 題互動測驗，融合人格特質與職能傾向，幫你找出最契合的職涯切面。",
-    highlights: ["8 題情境式測驗", "MBTI × UCAN 雙引擎", "個人化職業建議"],
-    icon: Gamepad2,
-    color: "bg-[image:var(--gradient-hero)] text-primary-foreground",
+    desc: "8 個問題，看見你還沒看見的自己。",
+    icon: Compass,
     to: "/explore",
   },
   {
     key: "cafe",
     title: "職業咖啡館",
-    tagline: "真實前輩的心裡話",
-    desc: "像在咖啡館聽故事一樣，閱讀各行各業前輩的職場觀察、留言互動、按讚收藏。",
-    highlights: ["多領域前輩專欄", "留言 × 按讚互動", "收藏你喜歡的故事"],
+    desc: "那些他們在訪談裡不會說的事。",
     icon: Coffee,
-    color: "bg-accent text-accent-foreground",
     to: "/cafe",
   },
   {
     key: "map",
     title: "職圖",
-    tagline: "從學科到職位一目了然",
-    desc: "用視覺化地圖串接「學科 → 能力 → 職位」，點選即可深入每位職涯導師的世界。",
-    highlights: ["視覺化職涯地圖", "分類快速篩選", "導師深度檔案"],
+    desc: "把學科、能力與職位連起來看。",
     icon: MapIcon,
-    color: "bg-secondary text-secondary-foreground",
     to: "/map",
   },
   {
     key: "call",
-    title: "您撥的號碼是未來",
-    tagline: "跨時空 × 沉浸式語音",
-    desc: "與賈伯斯、達文西、AI 倫理偵探對話；體驗職場廣播劇、虛擬實習生 RPG 挑戰。",
-    highlights: ["跨時空名人對談", "5 分鐘職場廣播劇", "虛擬實習生 RPG"],
+    title: "未來來電",
+    desc: "打給未來，也打給過去。",
     icon: Phone,
-    color: "bg-destructive text-destructive-foreground",
     to: "/call",
   },
 ] as const;
@@ -91,139 +75,107 @@ function HomePage() {
   };
 
   return (
-    <div className="px-5 pt-6">
-      {/* Auth pill */}
-      <div className="mb-4 flex justify-end">
+    <div className="px-5">
+      {/* Top nav bar — Apple-style: brand on left, account on right */}
+      <header className="flex h-12 items-center justify-between pt-3">
+        <span className="text-footnote font-semibold tracking-wide text-muted-foreground">
+          ProFashion Lab
+        </span>
         {loading ? (
-          <div className="h-8 w-20 animate-pulse rounded-full bg-muted" />
+          <div className="h-7 w-7 animate-pulse rounded-full bg-muted" />
         ) : user ? (
-          <div className="flex items-center gap-2 rounded-full border border-border bg-card px-2 py-1 shadow-[var(--shadow-card)]">
+          <div className="flex items-center gap-2">
             {avatarUrl ? (
               <img
                 src={avatarUrl}
                 alt={displayName}
-                className="h-6 w-6 rounded-full object-cover"
+                className="h-7 w-7 rounded-full object-cover"
               />
             ) : (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">
                 {displayName.charAt(0).toUpperCase() || "U"}
               </div>
             )}
-            <span className="max-w-[8rem] truncate text-xs font-medium">{displayName}</span>
             <button
               onClick={handleLogout}
               aria-label="登出"
-              className="flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
-              <LogOut className="h-3.5 w-3.5" />
+              <LogOut className="h-4 w-4" strokeWidth={1.7} />
             </button>
           </div>
         ) : (
           <Link
             to="/login"
-            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-card)] transition-transform active:scale-95"
+            className="text-subhead font-semibold text-primary-deep transition-opacity hover:opacity-70"
           >
-            <LogIn className="h-3.5 w-3.5" /> 登入
+            登入
           </Link>
         )}
-      </div>
+      </header>
 
-
-      {/* Lab brand banner — clearly the main hub */}
-      <div className="mb-6 overflow-hidden rounded-3xl bg-[image:var(--gradient-hero)] p-6 text-primary-foreground shadow-[var(--shadow-float)]">
-        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest opacity-90">
-          <FlaskConical className="h-3.5 w-3.5" /> Main Lab · 主實驗室
-        </div>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight">ProFashion Lab</h1>
-        <h2 className="mt-1 text-lg font-semibold tracking-wide opacity-95">
-          職感實驗室
-        </h2>
-        <p className="mt-3 text-sm leading-relaxed opacity-90">
-          這裡是你的職涯總部。從這個主頁出發，走進四個截然不同的探索站——測驗、傾聽、地圖、通話，
-          讓職涯不再只是科系與職缺，而是一場可以親身實驗的旅程。
+      {/* Hero — Large Title */}
+      <section className="pt-8 pb-10">
+        <h1 className="text-large-title text-foreground">
+          今天，
+          <br />
+          想認識哪一個自己？
+        </h1>
+        <p className="mt-4 text-body text-muted-foreground">
+          四種方式探索職涯。挑一個開始。
         </p>
-        <div className="mt-4 flex flex-wrap gap-2 text-[11px]">
-          <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur">
-            <Sparkles className="mr-1 inline h-3 w-3" /> 遊戲化探索
-          </span>
-          <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur">
-            真實前輩故事
-          </span>
-          <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur">
-            跨時空語音
-          </span>
-        </div>
-      </div>
+      </section>
 
-      {/* Stations intro */}
-      <div className="mb-3 flex items-end justify-between">
-        <h3 className="text-base font-bold">四大探索站</h3>
-        <span className="text-[11px] text-muted-foreground">點擊進入體驗</span>
-      </div>
-      <p className="mb-4 text-xs leading-relaxed text-muted-foreground">
-        每一站都有獨特的玩法。Lab 主頁是你的起點，隨時點下方
-        <FlaskConical className="mx-1 inline h-3 w-3" />
-        回到這裡。
-      </p>
-
-      <div className="space-y-3">
-        {sections.map((s) => {
+      {/* 2×2 stations */}
+      <section className="grid grid-cols-2 gap-3">
+        {stations.map((s) => {
           const Icon = s.icon;
           return (
-            <Link key={s.key} to={s.to} className="block w-full">
-              <div className="rounded-3xl bg-card p-4 shadow-[var(--shadow-card)] transition-all hover:shadow-[var(--shadow-float)] active:scale-[0.98]">
-                <div className="flex items-start gap-3">
-                  <div
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${s.color}`}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <h4 className="truncate text-sm font-bold">{s.title}</h4>
-                      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    </div>
-                    <p className="mt-0.5 text-[11px] font-medium text-primary-deep">
-                      {s.tagline}
-                    </p>
-                    <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                      {s.desc}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-1.5 pl-[60px]">
-                  {s.highlights.map((h) => (
-                    <span
-                      key={h}
-                      className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
-                    >
-                      {h}
-                    </span>
-                  ))}
-                </div>
+            <Link
+              key={s.key}
+              to={s.to}
+              className="group flex flex-col justify-between rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/40 active:scale-[0.98]"
+              style={{ minHeight: 148 }}
+            >
+              <Icon
+                className="h-6 w-6 text-primary-deep"
+                strokeWidth={1.6}
+                aria-hidden
+              />
+              <div>
+                <h3 className="text-title-3 text-foreground">{s.title}</h3>
+                <p className="mt-1 text-footnote leading-snug">{s.desc}</p>
               </div>
             </Link>
           );
         })}
-      </div>
+      </section>
 
-      {/* What makes Lab special */}
-      <div className="mt-6 rounded-3xl border border-border bg-card/60 p-4">
-        <div className="flex items-center gap-2 text-xs font-bold text-primary-deep">
-          <Zap className="h-3.5 w-3.5" /> 為什麼是「實驗室」？
+      {/* Single emphasis row — what's new / continue */}
+      <Link
+        to="/explore"
+        className="mt-3 flex items-center justify-between rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted/40"
+      >
+        <div className="min-w-0 pr-3">
+          <p className="text-caption uppercase tracking-wider text-primary-deep">
+            新手建議
+          </p>
+          <p className="mt-1 text-subhead font-medium text-foreground">
+            從一個 3 分鐘的小測驗開始
+          </p>
         </div>
-        <ul className="mt-2 space-y-1.5 text-[11px] leading-relaxed text-muted-foreground">
-          <li>· 不給你標準答案，而是給你試錯的安全空間</li>
-          <li>· 結合測驗、敘事、地圖、語音四種探索語言</li>
-          <li>· 看見傳統職涯規劃看不見的少數職業與未來工種</li>
-        </ul>
-      </div>
+        <ChevronRight
+          className="h-5 w-5 shrink-0 text-muted-foreground"
+          strokeWidth={1.6}
+        />
+      </Link>
 
-      <div className="mt-6 pb-6 text-center">
-        <p className="text-[11px] text-muted-foreground">
-          ProFashion Lab 職感實驗室 · 讓每一次探索都充滿可能
+      {/* Quiet footer */}
+      <footer className="mt-10 pb-8">
+        <p className="text-caption">
+          ProFashion Lab · 不給你標準答案，給你試錯的空間。
         </p>
-      </div>
+      </footer>
     </div>
   );
 }

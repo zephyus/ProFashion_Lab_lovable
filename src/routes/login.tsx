@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { FlaskConical, LogIn, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,8 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "登入 — ProFashion Lab 職感實驗室" },
-      { name: "description", content: "登入 ProFashion Lab 職感實驗室，保留你的測驗結果與收藏。" },
+      { title: "登入 — ProFashion Lab" },
+      { name: "description", content: "登入後，你的探索會一直跟著你。" },
     ],
   }),
   component: LoginPage,
@@ -42,51 +42,46 @@ function LoginPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background px-5 pt-6">
-      <Link
-        to="/"
-        className="inline-flex w-fit items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" /> 返回主頁
-      </Link>
-
-      <div className="mt-10 rounded-3xl bg-[image:var(--gradient-hero)] p-6 text-primary-foreground shadow-[var(--shadow-float)]">
-        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest opacity-90">
-          <FlaskConical className="h-3.5 w-3.5" /> Welcome to the Lab
-        </div>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight">
-          登入 ProFashion Lab
-        </h1>
-        <p className="mt-2 text-sm leading-relaxed opacity-90">
-          登入後可以保存你的職涯測驗結果、收藏前輩故事，並在多個裝置之間同步。
-        </p>
-      </div>
-
-      <div className="mt-6 space-y-3">
-        <button
-          onClick={handleGoogle}
-          disabled={signingIn}
-          className="flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 text-sm font-semibold text-foreground shadow-[var(--shadow-card)] transition-all hover:shadow-[var(--shadow-float)] active:scale-[0.98] disabled:opacity-60"
+    <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background px-6">
+      {/* Top bar */}
+      <header className="flex h-12 items-center pt-3">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1 text-subhead text-primary-deep transition-opacity hover:opacity-70"
         >
-          <GoogleIcon className="h-5 w-5" />
-          {signingIn ? "正在前往 Google…" : "使用 Google 帳號登入"}
-        </button>
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.7} /> 返回
+        </Link>
+      </header>
 
-        <div className="rounded-2xl border border-dashed border-border p-4">
-          <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
-            <LogIn className="h-3.5 w-3.5" /> 為什麼要登入？
-          </div>
-          <ul className="mt-2 space-y-1 text-[11px] leading-relaxed text-muted-foreground">
-            <li>· 保留「發現小秘 me」測驗的歷次結果</li>
-            <li>· 收藏喜歡的職業咖啡館前輩</li>
-            <li>· 跨裝置同步你的探索歷程</li>
-          </ul>
+      {/* Centered content */}
+      <div className="flex flex-1 flex-col justify-center pb-20">
+        {/* Mark */}
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[image:var(--gradient-hero)] text-primary-foreground">
+          <span className="text-title-2 font-semibold">P</span>
+        </div>
+
+        <h1 className="mt-7 text-center text-title-1 text-foreground">登入 ProFashion Lab</h1>
+        <p className="mx-auto mt-2 max-w-[280px] text-center text-subhead text-muted-foreground">
+          保留你的測驗結果與收藏，跨裝置同步你的探索。
+        </p>
+
+        <div className="mx-auto mt-10 w-full max-w-[320px]">
+          <button
+            onClick={handleGoogle}
+            disabled={signingIn}
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-callout font-medium text-foreground transition-colors hover:bg-muted/40 active:scale-[0.99] disabled:opacity-60"
+          >
+            <GoogleIcon className="h-[18px] w-[18px]" />
+            {signingIn ? "正在前往 Google…" : "使用 Google 登入"}
+          </button>
         </div>
       </div>
 
-      <p className="mt-6 text-center text-[10px] leading-relaxed text-muted-foreground">
-        登入即表示同意我們的服務條款與隱私權政策。
-      </p>
+      <footer className="pb-8">
+        <p className="text-center text-caption">
+          登入即表示同意服務條款與隱私權政策
+        </p>
+      </footer>
     </div>
   );
 }
