@@ -4,6 +4,7 @@ import {
   Coffee,
   Map as MapIcon,
   Phone,
+  FlaskConical,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_app")({
