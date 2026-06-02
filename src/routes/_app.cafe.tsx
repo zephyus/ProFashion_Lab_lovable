@@ -52,8 +52,7 @@ function CafePage() {
   return (
     <div className="px-5 pt-10 animate-page">
       <header className="mb-7 animate-rise">
-        <p className="text-caption uppercase tracking-widest text-primary-deep">真實心得</p>
-        <h1 className="mt-1 text-large-title text-foreground">故事</h1>
+        <p className="text-caption uppercase tracking-widest text-primary-deep">職業咖啡館</p>
         <p className="mt-3 text-body text-muted-foreground">
           那些職涯講座不會告訴你的事，由真正在做的人親口說。
         </p>
