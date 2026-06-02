@@ -4,7 +4,6 @@ import {
   Coffee,
   Map as MapIcon,
   Phone,
-  ChevronRight,
   LogOut,
 } from "lucide-react";
 import { toast } from "sonner";
