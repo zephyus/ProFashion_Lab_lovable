@@ -234,7 +234,7 @@ function CallPage() {
   // ===== Persona call active view =====
   if (active) {
     return (
-      <div className={`fixed inset-0 z-[60] mx-auto flex max-w-md flex-col items-center justify-between bg-gradient-to-br ${active.color} px-8 py-12 text-white`}>
+      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col items-center justify-between bg-[image:var(--gradient-morandi)] px-8 py-12 text-primary-foreground">
         <div className="text-center">
           <p className="text-sm opacity-80">
             通話中 · {fmt(seconds)}
