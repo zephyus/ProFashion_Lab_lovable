@@ -1,11 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, useEffect, useRef } from "react";
-import { Phone, PhoneOff, Mic, MicOff, Volume2, Sparkles, Atom, Radio, Send, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Phone, PhoneOff, Mic, MicOff, Volume2, VolumeX, Sparkles, Atom, Radio, Send, Loader2, Cpu, Download,
+} from "lucide-react";
 import { dramaScenes, type DramaScene } from "@/lib/drama-scenes";
 import { askPersona } from "@/lib/persona-chat.functions";
 import { useSpeech, type SpeechGender } from "@/hooks/use-speech";
+import {
+  initKokoroTts, synthesizeLocalSpeech, disposeKokoroTts, onKokoroProgress,
+  type KokoroProgress,
+} from "@/lib/local-tts/kokoroTts";
+import { splitTextForTts } from "@/lib/local-tts/wav";
 import { toast } from "sonner";
+
 
 
 export const Route = createFileRoute("/_app/call")({
@@ -191,7 +199,18 @@ function CallPage() {
   const [lineIdx, setLineIdx] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [muted, setMuted] = useState(false);
-  const [speakerOn, setSpeakerOn] = useState(true);
+
+  // Voice mode: off | browser (Web Speech) | kokoro (local AI)
+  type VoiceMode = "off" | "browser" | "kokoro";
+  const [voiceMode, setVoiceMode] = useState<VoiceMode>("browser");
+  const [kokoroState, setKokoroState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [kokoroProgress, setKokoroProgress] = useState<number>(0);
+  const [isVoiceLoading, setIsVoiceLoading] = useState(false);
+  const [isVoicePlaying, setIsVoicePlaying] = useState(false);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const currentAudioCleanupRef = useRef<(() => void) | null>(null);
+  const synthSeqRef = useRef(0); // 用來作廢過時的合成請求
 
   // Drama state
   const [drama, setDrama] = useState<DramaScene | null>(null);
@@ -208,29 +227,95 @@ function CallPage() {
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Web Speech API
+  // Web Speech API（瀏覽器內建）
   const speech = useSpeech();
-  useEffect(() => { speech.setMuted(muted || !speakerOn); }, [muted, speakerOn, speech]);
+  useEffect(() => {
+    speech.setMuted(muted || voiceMode !== "browser");
+  }, [muted, voiceMode, speech]);
+
+  // Kokoro 進度訂閱
+  useEffect(() => {
+    const off = onKokoroProgress((p: KokoroProgress) => {
+      if (typeof p.progress === "number") setKokoroProgress(Math.round(p.progress));
+    });
+    return off;
+  }, []);
+
+  // 停止目前正在播的本地語音
+  const stopLocalAudio = useCallback(() => {
+    const a = audioRef.current;
+    if (a) {
+      try { a.pause(); a.removeAttribute("src"); a.load(); } catch { /* noop */ }
+    }
+    if (currentAudioCleanupRef.current) {
+      currentAudioCleanupRef.current();
+      currentAudioCleanupRef.current = null;
+    }
+    setIsVoicePlaying(false);
+  }, []);
+
+  // 統一發聲入口
+  const speakNow = useCallback(
+    async (text: string, gender: SpeechGender) => {
+      if (!text || muted || voiceMode === "off") return;
+
+      if (voiceMode === "browser") {
+        speech.speak(text, gender);
+        return;
+      }
+
+      // kokoro
+      const seq = ++synthSeqRef.current;
+      stopLocalAudio();
+
+      // 太長就只合成第一段（避免久等）
+      const chunks = splitTextForTts(text);
+      const target = chunks[0] ?? text.slice(0, 160);
+
+      try {
+        setIsVoiceLoading(true);
+        const voice = gender === "female" ? "zf_001" : gender === "male" ? "zm_001" : undefined;
+        const { audioUrl, cleanup } = await synthesizeLocalSpeech(target, { voice });
+        if (seq !== synthSeqRef.current) { cleanup(); return; } // 已被作廢
+        currentAudioCleanupRef.current = cleanup;
+        const a = audioRef.current;
+        if (!a) { cleanup(); return; }
+        a.src = audioUrl;
+        a.onplay = () => setIsVoicePlaying(true);
+        a.onended = () => { setIsVoicePlaying(false); cleanup(); currentAudioCleanupRef.current = null; };
+        a.onerror = () => { setIsVoicePlaying(false); cleanup(); currentAudioCleanupRef.current = null; };
+        await a.play().catch(() => { /* autoplay 被擋，使用者再點一次即可 */ });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        toast.error(`本地 AI 語音失敗：${msg}，自動切回瀏覽器語音`);
+        setKokoroState("error");
+        setVoiceMode("browser");
+      } finally {
+        setIsVoiceLoading(false);
+      }
+    },
+    [voiceMode, muted, speech, stopLocalAudio],
+  );
 
   // 角色腳本：每換一句就朗讀
   useEffect(() => {
-    if (active) speech.speak(active.script[lineIdx], active.gender);
+    if (active) void speakNow(active.script[lineIdx], active.gender);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, lineIdx]);
+  }, [active, lineIdx, voiceMode]);
 
   // LLM 回覆：每收到新 assistant 訊息就朗讀
   useEffect(() => {
     if (!active || chat.length === 0) return;
     const last = chat[chat.length - 1];
-    if (last.role === "assistant") speech.speak(last.content, active.gender);
+    if (last.role === "assistant") void speakNow(last.content, active.gender);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat]);
 
   // 廣播劇：每換一個節點就朗讀（中性聲音）
   useEffect(() => {
-    if (drama) speech.speak(drama.nodes[dramaIdx]?.line ?? "", "neutral");
+    if (drama) void speakNow(drama.nodes[dramaIdx]?.line ?? "", "neutral");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [drama, dramaIdx]);
+  }, [drama, dramaIdx, voiceMode]);
 
   useEffect(() => {
     if (active || drama) {
@@ -243,14 +328,63 @@ function CallPage() {
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat, asking]);
 
+  // 切換到 kokoro：首次載入模型
+  const enableKokoro = useCallback(async () => {
+    if (kokoroState === "loading") return;
+    const ok = window.confirm(
+      "本地 AI 語音 (Kokoro) 會在你裝置上免費執行。\n首次使用需下載約 100 MB 模型，可能要等 1–3 分鐘並佔用較多記憶體。\n要繼續嗎？",
+    );
+    if (!ok) return;
+    setKokoroState("loading");
+    setKokoroProgress(0);
+    try {
+      await initKokoroTts();
+      setKokoroState("ready");
+      setVoiceMode("kokoro");
+      toast.success("本地 AI 語音已就緒");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setKokoroState("error");
+      toast.error(`本地語音不支援此裝置：${msg}`);
+    }
+  }, [kokoroState]);
+
+  // 卸載元件時清掉音訊與 worker
+  useEffect(() => {
+    return () => {
+      stopLocalAudio();
+      synthSeqRef.current++;
+      disposeKokoroTts();
+    };
+  }, [stopLocalAudio]);
+
+
+  const cycleVoiceMode = () => {
+    if (voiceMode === "off") setVoiceMode("browser");
+    else if (voiceMode === "browser") {
+      if (kokoroState === "ready") setVoiceMode("kokoro");
+      else void enableKokoro();
+    } else {
+      setVoiceMode("off");
+      stopLocalAudio();
+    }
+  };
 
   const hangup = () => {
     speech.cancel();
+    stopLocalAudio();
+    synthSeqRef.current++;
     setActive(null); setLineIdx(0);
-    setSeconds(0); setMuted(false); setSpeakerOn(true);
+    setSeconds(0); setMuted(false);
     setChat([]); setQuestion(""); setAsking(false);
   };
-  const exitDrama = () => { speech.cancel(); setDrama(null); setDramaIdx(0); setSeconds(0); };
+  const exitDrama = () => {
+    speech.cancel();
+    stopLocalAudio();
+    synthSeqRef.current++;
+    setDrama(null); setDramaIdx(0); setSeconds(0);
+  };
+
 
   const next = () => active && lineIdx < active.script.length - 1 && setLineIdx((i) => i + 1);
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
@@ -332,26 +466,65 @@ function CallPage() {
     return (
       <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col px-6 py-8"
         style={{ ...morandiBg(activeIdx), color: morandiInk }}>
+        {/* 隱藏播放器（Kokoro 本地語音） */}
+        <audio ref={audioRef} className="hidden" />
+
         <div className="text-center shrink-0">
           <p className="text-xs opacity-70">
             通話中 · {fmt(seconds)}
             {muted && " · 靜音"}
-            {!speakerOn && " · 聽筒"}
+            {voiceMode === "off" && " · 無聲"}
+            {voiceMode === "kokoro" && " · 本地 AI 語音"}
           </p>
           <h2 className="mt-2 text-2xl font-bold">{active.name}</h2>
           <p className="mt-0.5 text-xs opacity-80">{active.job}</p>
         </div>
 
+        {/* 語音模式切換 */}
+        <div className="mt-3 flex shrink-0 items-center justify-center gap-1.5">
+          {(["off", "browser", "kokoro"] as const).map((m) => {
+            const isActive = voiceMode === m;
+            const label = m === "off" ? "靜" : m === "browser" ? "瀏覽器" : "本地 AI";
+            const onClick = () => {
+              if (m === "kokoro" && kokoroState !== "ready") { void enableKokoro(); return; }
+              setVoiceMode(m);
+              if (m === "off") stopLocalAudio();
+            };
+            return (
+              <button key={m} onClick={onClick}
+                className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold transition ${
+                  isActive ? "bg-black/80 text-white" : "bg-white/50 text-foreground/70"
+                }`}>
+                {m === "kokoro" && <Cpu className="h-3 w-3" />}
+                {label}
+                {m === "kokoro" && kokoroState === "loading" && (
+                  <span className="ml-1 inline-flex items-center gap-0.5">
+                    <Download className="h-3 w-3 animate-pulse" />{kokoroProgress || 0}%
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
         {!scriptEnded && (
           <div className="my-4 flex shrink-0 justify-center">
             <div className="relative">
-              {speakerOn && <div className="absolute inset-0 animate-ping rounded-full bg-white/45" />}
+              {(isVoicePlaying || (voiceMode === "browser" && !muted)) && (
+                <div className="absolute inset-0 animate-ping rounded-full bg-white/45" />
+              )}
               <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-white/40 backdrop-blur-sm">
-                <Volume2 className={`h-11 w-11 ${!speakerOn ? "opacity-40" : ""}`} />
+                {isVoiceLoading
+                  ? <Loader2 className="h-10 w-10 animate-spin" />
+                  : <Volume2 className={`h-11 w-11 ${voiceMode === "off" ? "opacity-40" : ""}`} />}
               </div>
             </div>
+            {voiceMode === "kokoro" && isVoiceLoading && (
+              <p className="absolute mt-28 text-[11px] opacity-70">本地 AI 合成中…</p>
+            )}
           </div>
         )}
+
 
         {/* 對話內容（可捲動） */}
         <div className="flex-1 min-h-0 overflow-y-auto space-y-3 py-2">
@@ -424,10 +597,15 @@ function CallPage() {
           <button onClick={hangup} aria-label="掛斷" className="flex h-14 w-14 items-center justify-center rounded-full bg-red-500 text-white shadow-2xl active:scale-95">
             <PhoneOff className="h-6 w-6" />
           </button>
-          <button onClick={() => setSpeakerOn((s) => !s)} aria-pressed={speakerOn} aria-label={speakerOn ? "切換聽筒" : "切換喇叭"}
-            className={`flex h-12 w-12 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${speakerOn ? "bg-white/40" : "bg-white"}`}>
-            <Volume2 className="h-5 w-5" />
+          <button onClick={cycleVoiceMode} aria-label="切換語音模式"
+            className={`flex h-12 w-12 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${voiceMode === "off" ? "bg-white" : "bg-white/40"}`}>
+            {voiceMode === "off"
+              ? <VolumeX className="h-5 w-5" />
+              : voiceMode === "kokoro"
+                ? <Cpu className="h-5 w-5" />
+                : <Volume2 className="h-5 w-5" />}
           </button>
+
         </div>
       </div>
 
