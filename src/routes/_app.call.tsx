@@ -8,6 +8,21 @@ export const Route = createFileRoute("/_app/call")({
   component: CallPage,
 });
 
+// 莫蘭迪色票 — 全頁子項目統一使用
+const morandiPalette = [
+  { name: "霧灰粉", from: "#D6AEBE", to: "#B98DA0" },
+  { name: "鼠尾草綠", from: "#A7B2A0", to: "#8A9683" },
+  { name: "霧霾藍", from: "#A7C6DA", to: "#7FA8C2" },
+  { name: "奶油米色", from: "#E4DCD2", to: "#C9BDB0" },
+  { name: "雲霧灰", from: "#D0D3D4", to: "#ADB1B3" },
+];
+const morandiBg = (i: number) => ({
+  backgroundImage: `linear-gradient(135deg, ${morandiPalette[i % morandiPalette.length].from}, ${morandiPalette[i % morandiPalette.length].to})`,
+});
+// 文字色 — 莫蘭迪偏淺，採用深墨色保留可讀性
+const morandiInk = "#2b2b2b";
+
+
 type Mode = "real" | "timewarp" | "drama" | "hybrid";
 
 type Persona = {
@@ -164,6 +179,7 @@ const hybridPersonas: Persona[] = [
 function CallPage() {
   const [mode, setMode] = useState<Mode>("real");
   const [active, setActive] = useState<Persona | null>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
   const [lineIdx, setLineIdx] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [muted, setMuted] = useState(false);
@@ -172,6 +188,7 @@ function CallPage() {
   // Drama state
   const [drama, setDrama] = useState<DramaScene | null>(null);
   const [dramaIdx, setDramaIdx] = useState(0);
+  const [dramaListIdx, setDramaListIdx] = useState(0);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -190,41 +207,42 @@ function CallPage() {
   const next = () => active && lineIdx < active.script.length - 1 && setLineIdx((i) => i + 1);
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
-  // ===== Drama immersive view (uses primary color, no random gradients) =====
+  // ===== Drama immersive view =====
   if (drama) {
     const node = drama.nodes[dramaIdx];
     return (
-      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col bg-[image:var(--gradient-morandi)] px-6 py-10 text-primary-foreground">
+      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col px-6 py-10"
+        style={{ ...morandiBg(dramaListIdx), color: morandiInk }}>
         <div className="text-center">
-          <p className="text-xs opacity-80">廣播劇 · {fmt(seconds)}</p>
+          <p className="text-xs opacity-70">廣播劇 · {fmt(seconds)}</p>
           <h2 className="mt-2 text-2xl font-bold">{drama.title}</h2>
-          <p className="mt-1 text-[11px] opacity-80">{drama.tag}</p>
+          <p className="mt-1 text-[11px] opacity-70">{drama.tag}</p>
         </div>
         <div className="mt-8 flex-1 space-y-4 overflow-y-auto">
-          <div className="rounded-2xl bg-white/15 p-4 backdrop-blur-sm">
-            <p className="text-xs opacity-80">{node.speaker}</p>
+          <div className="rounded-2xl bg-white/45 p-4 backdrop-blur-sm">
+            <p className="text-xs opacity-70">{node.speaker}</p>
             <p className="mt-2 text-base leading-relaxed">{node.line}</p>
           </div>
           {node.choices && (
             <div className="space-y-2">
               {node.choices.map((c, i) => (
                 <button key={i} onClick={() => setDramaIdx(c.next)}
-                  className="w-full rounded-2xl bg-white/20 p-4 text-left text-sm font-semibold backdrop-blur-sm active:scale-95">
+                  className="w-full rounded-2xl bg-white/55 p-4 text-left text-sm font-semibold backdrop-blur-sm active:scale-95">
                   {c.label}
                 </button>
               ))}
             </div>
           )}
           {node.ending && (
-            <div className="rounded-2xl border border-white/30 bg-black/15 p-4 text-sm">
+            <div className="rounded-2xl border border-black/10 bg-white/65 p-4 text-sm">
               <p className="font-bold leading-relaxed">{node.ending}</p>
             </div>
           )}
           {!node.choices && !node.ending && dramaIdx < drama.nodes.length - 1 && (
-            <button onClick={() => setDramaIdx(dramaIdx + 1)} className="w-full rounded-2xl bg-white/20 p-3 text-sm font-semibold">繼續 →</button>
+            <button onClick={() => setDramaIdx(dramaIdx + 1)} className="w-full rounded-2xl bg-white/55 p-3 text-sm font-semibold">繼續 →</button>
           )}
         </div>
-        <button onClick={exitDrama} className="mx-auto mt-6 flex h-14 w-14 items-center justify-center rounded-full bg-red-500 shadow-2xl active:scale-95">
+        <button onClick={exitDrama} className="mx-auto mt-6 flex h-14 w-14 items-center justify-center rounded-full bg-red-500 text-white shadow-2xl active:scale-95">
           <PhoneOff className="h-6 w-6" />
         </button>
       </div>
@@ -234,21 +252,22 @@ function CallPage() {
   // ===== Persona call active view =====
   if (active) {
     return (
-      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col items-center justify-between bg-[image:var(--gradient-morandi)] px-8 py-12 text-primary-foreground">
+      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col items-center justify-between px-8 py-12"
+        style={{ ...morandiBg(activeIdx), color: morandiInk }}>
         <div className="text-center">
-          <p className="text-sm opacity-80">
+          <p className="text-sm opacity-70">
             通話中 · {fmt(seconds)}
             {muted && " · 靜音"}
             {!speakerOn && " · 聽筒"}
           </p>
           <h2 className="mt-4 text-4xl font-bold">{active.name}</h2>
-          <p className="mt-1 text-sm opacity-90">{active.job}</p>
+          <p className="mt-1 text-sm opacity-80">{active.job}</p>
         </div>
 
         <div className="flex flex-col items-center">
           <div className="relative">
-            {speakerOn && <div className="absolute inset-0 animate-ping rounded-full bg-white/30" />}
-            <div className="relative flex h-36 w-36 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+            {speakerOn && <div className="absolute inset-0 animate-ping rounded-full bg-white/45" />}
+            <div className="relative flex h-36 w-36 items-center justify-center rounded-full bg-white/40 backdrop-blur-sm">
               <Volume2 className={`h-16 w-16 ${!speakerOn ? "opacity-40" : ""}`} />
             </div>
           </div>
@@ -256,23 +275,23 @@ function CallPage() {
 
         <div className="w-full">
           <button onClick={next}
-            className="min-h-[100px] w-full rounded-3xl bg-white/15 p-5 text-left text-[15px] leading-relaxed backdrop-blur-sm transition-all active:bg-white/25">
+            className="min-h-[100px] w-full rounded-3xl bg-white/50 p-5 text-left text-[15px] leading-relaxed backdrop-blur-sm transition-all active:bg-white/65">
             {active.script[lineIdx]}
           </button>
-          <p className="mt-2 text-center text-xs opacity-70">
+          <p className="mt-2 text-center text-xs opacity-65">
             {lineIdx < active.script.length - 1 ? "點擊繼續聆聽 →" : "對話結束，按紅鈕掛斷"}
           </p>
 
           <div className="mt-6 flex items-center justify-around">
             <button onClick={() => setMuted((m) => !m)} aria-pressed={muted} aria-label={muted ? "取消靜音" : "靜音"}
-              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${muted ? "bg-white text-foreground" : "bg-white/15"}`}>
+              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${muted ? "bg-white" : "bg-white/40"}`}>
               <Mic className="h-6 w-6" />
             </button>
-            <button onClick={hangup} aria-label="掛斷" className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 shadow-2xl active:scale-95">
+            <button onClick={hangup} aria-label="掛斷" className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 text-white shadow-2xl active:scale-95">
               <PhoneOff className="h-7 w-7" />
             </button>
             <button onClick={() => setSpeakerOn((s) => !s)} aria-pressed={speakerOn} aria-label={speakerOn ? "切換聽筒" : "切換喇叭"}
-              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${speakerOn ? "bg-white/15" : "bg-white text-foreground"}`}>
+              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${speakerOn ? "bg-white/40" : "bg-white"}`}>
               <Volume2 className="h-6 w-6" />
             </button>
           </div>
@@ -293,6 +312,7 @@ function CallPage() {
     mode === "real" ? realPersonas :
     mode === "timewarp" ? timewarpPersonas :
     mode === "hybrid" ? hybridPersonas : [];
+
 
   return (
     <div className="px-5 pt-12 pb-24">
@@ -318,16 +338,16 @@ function CallPage() {
       {/* Persona list (real / timewarp / hybrid) */}
       {(mode === "real" || mode === "timewarp" || mode === "hybrid") && (
         <div className="space-y-3">
-          {personaList.map((p) => (
+          {personaList.map((p, i) => (
             <div key={p.id} className="overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-card)]">
-              <div className="bg-[image:var(--gradient-morandi)] px-5 py-4 text-primary-foreground">
-                <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{p.tag}</span>
+              <div className="px-5 py-4" style={{ ...morandiBg(i), color: morandiInk }}>
+                <span className="rounded-full bg-white/55 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{p.tag}</span>
                 <h3 className="mt-2 text-lg font-bold">{p.name}</h3>
-                <p className="text-xs opacity-90">{p.job}</p>
+                <p className="text-xs opacity-80">{p.job}</p>
               </div>
               <div className="flex items-center justify-between gap-3 px-5 py-4">
                 <p className="text-xs text-muted-foreground">{p.intro}</p>
-                <button onClick={() => { setActive(p); setLineIdx(0); setSeconds(0); }}
+                <button onClick={() => { setActive(p); setActiveIdx(i); setLineIdx(0); setSeconds(0); }}
                   className="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-card)] active:scale-95">
                   <Phone className="h-3.5 w-3.5" /> 撥打
                 </button>
@@ -337,22 +357,22 @@ function CallPage() {
         </div>
       )}
 
-      {/* Drama list — 用主色系統一風格 */}
+      {/* Drama list — 同莫蘭迪色票 */}
       {mode === "drama" && (
         <>
           <p className="mb-3 text-xs text-muted-foreground">
             5 分鐘高張力職場片段，在關鍵點做選擇，導向不同結局。全部為寫實向職業情境。
           </p>
           <div className="space-y-3">
-            {dramaScenes.map((d) => (
+            {dramaScenes.map((d, i) => (
               <div key={d.id} className="overflow-hidden rounded-3xl border border-border bg-card shadow-[var(--shadow-card)]">
-                <div className="bg-[image:var(--gradient-morandi)] px-5 py-4 text-primary-foreground">
-                  <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{d.tag}</span>
+                <div className="px-5 py-4" style={{ ...morandiBg(i), color: morandiInk }}>
+                  <span className="rounded-full bg-white/55 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{d.tag}</span>
                   <h3 className="mt-2 text-lg font-bold">{d.title}</h3>
-                  <p className="text-xs opacity-90">{d.intro}</p>
+                  <p className="text-xs opacity-80">{d.intro}</p>
                 </div>
                 <div className="flex items-center justify-end px-5 py-4">
-                  <button onClick={() => { setDrama(d); setDramaIdx(0); setSeconds(0); }}
+                  <button onClick={() => { setDrama(d); setDramaListIdx(i); setDramaIdx(0); setSeconds(0); }}
                     className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground active:scale-95">
                     <Radio className="h-3.5 w-3.5" /> 進入劇情
                   </button>
