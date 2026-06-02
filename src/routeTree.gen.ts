@@ -20,6 +20,7 @@ import { Route as AppJoinRouteImport } from './routes/_app.join'
 import { Route as AppExploreRouteImport } from './routes/_app.explore'
 import { Route as AppCallRouteImport } from './routes/_app.call'
 import { Route as AppCafeRouteImport } from './routes/_app.cafe'
+import { Route as AppTeacherClassroomIdRouteImport } from './routes/_app.teacher.$classroomId'
 import { Route as AppMapMentorIdRouteImport } from './routes/_app.map.$mentorId'
 
 const LoginRoute = LoginRouteImport.update({
@@ -76,6 +77,11 @@ const AppCafeRoute = AppCafeRouteImport.update({
   path: '/cafe',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTeacherClassroomIdRoute = AppTeacherClassroomIdRouteImport.update({
+  id: '/$classroomId',
+  path: '/$classroomId',
+  getParentRoute: () => AppTeacherRoute,
+} as any)
 const AppMapMentorIdRoute = AppMapMentorIdRouteImport.update({
   id: '/$mentorId',
   path: '/$mentorId',
@@ -91,9 +97,10 @@ export interface FileRoutesByFullPath {
   '/join': typeof AppJoinRoute
   '/map': typeof AppMapRouteWithChildren
   '/portfolio': typeof AppPortfolioRoute
-  '/teacher': typeof AppTeacherRoute
+  '/teacher': typeof AppTeacherRouteWithChildren
   '/teacher-signup': typeof AppTeacherSignupRoute
   '/map/$mentorId': typeof AppMapMentorIdRoute
+  '/teacher/$classroomId': typeof AppTeacherClassroomIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -103,10 +110,11 @@ export interface FileRoutesByTo {
   '/join': typeof AppJoinRoute
   '/map': typeof AppMapRouteWithChildren
   '/portfolio': typeof AppPortfolioRoute
-  '/teacher': typeof AppTeacherRoute
+  '/teacher': typeof AppTeacherRouteWithChildren
   '/teacher-signup': typeof AppTeacherSignupRoute
   '/': typeof AppIndexRoute
   '/map/$mentorId': typeof AppMapMentorIdRoute
+  '/teacher/$classroomId': typeof AppTeacherClassroomIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -118,10 +126,11 @@ export interface FileRoutesById {
   '/_app/join': typeof AppJoinRoute
   '/_app/map': typeof AppMapRouteWithChildren
   '/_app/portfolio': typeof AppPortfolioRoute
-  '/_app/teacher': typeof AppTeacherRoute
+  '/_app/teacher': typeof AppTeacherRouteWithChildren
   '/_app/teacher-signup': typeof AppTeacherSignupRoute
   '/_app/': typeof AppIndexRoute
   '/_app/map/$mentorId': typeof AppMapMentorIdRoute
+  '/_app/teacher/$classroomId': typeof AppTeacherClassroomIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/teacher-signup'
     | '/map/$mentorId'
+    | '/teacher/$classroomId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/teacher-signup'
     | '/'
     | '/map/$mentorId'
+    | '/teacher/$classroomId'
   id:
     | '__root__'
     | '/_app'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/_app/teacher-signup'
     | '/_app/'
     | '/_app/map/$mentorId'
+    | '/_app/teacher/$classroomId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -250,6 +262,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCafeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/teacher/$classroomId': {
+      id: '/_app/teacher/$classroomId'
+      path: '/$classroomId'
+      fullPath: '/teacher/$classroomId'
+      preLoaderRoute: typeof AppTeacherClassroomIdRouteImport
+      parentRoute: typeof AppTeacherRoute
+    }
     '/_app/map/$mentorId': {
       id: '/_app/map/$mentorId'
       path: '/$mentorId'
@@ -271,6 +290,18 @@ const AppMapRouteChildren: AppMapRouteChildren = {
 const AppMapRouteWithChildren =
   AppMapRoute._addFileChildren(AppMapRouteChildren)
 
+interface AppTeacherRouteChildren {
+  AppTeacherClassroomIdRoute: typeof AppTeacherClassroomIdRoute
+}
+
+const AppTeacherRouteChildren: AppTeacherRouteChildren = {
+  AppTeacherClassroomIdRoute: AppTeacherClassroomIdRoute,
+}
+
+const AppTeacherRouteWithChildren = AppTeacherRoute._addFileChildren(
+  AppTeacherRouteChildren,
+)
+
 interface AppRouteChildren {
   AppCafeRoute: typeof AppCafeRoute
   AppCallRoute: typeof AppCallRoute
@@ -278,7 +309,7 @@ interface AppRouteChildren {
   AppJoinRoute: typeof AppJoinRoute
   AppMapRoute: typeof AppMapRouteWithChildren
   AppPortfolioRoute: typeof AppPortfolioRoute
-  AppTeacherRoute: typeof AppTeacherRoute
+  AppTeacherRoute: typeof AppTeacherRouteWithChildren
   AppTeacherSignupRoute: typeof AppTeacherSignupRoute
   AppIndexRoute: typeof AppIndexRoute
 }
@@ -290,7 +321,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppJoinRoute: AppJoinRoute,
   AppMapRoute: AppMapRouteWithChildren,
   AppPortfolioRoute: AppPortfolioRoute,
-  AppTeacherRoute: AppTeacherRoute,
+  AppTeacherRoute: AppTeacherRouteWithChildren,
   AppTeacherSignupRoute: AppTeacherSignupRoute,
   AppIndexRoute: AppIndexRoute,
 }
