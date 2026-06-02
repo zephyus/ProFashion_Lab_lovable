@@ -103,7 +103,7 @@ function TeacherDashboard() {
       </Link>
       <header className="mt-5 flex items-end justify-between">
         <div>
-          <p className="text-caption uppercase tracking-widest text-primary-deep">教師後台</p>
+          <p className="text-caption font-bold uppercase tracking-widest text-primary-deep">教師後台</p>
           <h1 className="mt-1 text-large-title text-foreground">我的班級</h1>
         </div>
         <button

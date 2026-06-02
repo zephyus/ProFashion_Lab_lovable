@@ -33,7 +33,7 @@ function ExplorePage() {
   return (
     <div className="px-5 pt-10 pb-8 animate-page">
       <header className="mb-7 animate-rise">
-        <p className="text-caption uppercase tracking-widest text-primary-deep">
+        <p className="text-caption font-bold uppercase tracking-widest text-primary-deep">
           發現小秘me
         </p>
         <p className="mt-3 text-body text-muted-foreground">
