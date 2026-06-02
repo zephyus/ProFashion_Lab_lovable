@@ -408,10 +408,10 @@ function CallPage() {
 
   // ===== List view =====
   const tabs: { id: Mode; label: string; icon: typeof Phone }[] = [
-    { id: "real", label: "真實職人", icon: Phone },
-    { id: "timewarp", label: "跨時空", icon: Sparkles },
-    { id: "drama", label: "職場廣播劇", icon: Radio },
-    { id: "hybrid", label: "跨界混合", icon: Atom },
+    { id: "real", gender: "neutral", label: "真實職人", icon: Phone },
+    { id: "timewarp", gender: "neutral", label: "跨時空", icon: Sparkles },
+    { id: "drama", gender: "neutral", label: "職場廣播劇", icon: Radio },
+    { id: "hybrid", gender: "neutral", label: "跨界混合", icon: Atom },
   ];
 
   const personaList: Persona[] =
