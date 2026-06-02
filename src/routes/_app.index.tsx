@@ -87,6 +87,11 @@ function HomePage() {
           <div className="h-7 w-7 animate-pulse rounded-full bg-muted" />
         ) : user ? (
           <div className="flex items-center gap-2">
+            <div className="hidden items-center gap-1.5 rounded-full bg-primary-soft px-2.5 py-1 text-[10px] font-semibold text-primary-deep sm:flex">
+              <span className="opacity-70">{tierName}</span>
+              <span className="tabular-nums">{xp} XP</span>
+              {completed > 0 && <span className="opacity-60">· {completed} 關</span>}
+            </div>
             {avatarUrl ? (
               <img
                 src={avatarUrl}
@@ -115,6 +120,26 @@ function HomePage() {
           </Link>
         )}
       </header>
+
+      {/* 登入後的經驗值卡片（手機可見） */}
+      {user && (
+        <Link
+          to="/explore"
+          className="mt-2 flex items-center justify-between rounded-2xl border border-border bg-card p-3 transition-colors hover:bg-muted/30 sm:hidden"
+        >
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              你的職涯帳號
+            </p>
+            <p className="mt-0.5 text-sm font-semibold text-foreground">
+              {tierName} · {xp} XP
+            </p>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            {completed > 0 ? `已完成 ${completed} 關` : "前往虛擬實習 →"}
+          </p>
+        </Link>
+      )}
 
       {/* Hero — Large Title */}
       <section className="pt-8 pb-10">
