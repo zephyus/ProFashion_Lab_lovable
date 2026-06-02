@@ -464,26 +464,65 @@ function CallPage() {
     return (
       <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col px-6 py-8"
         style={{ ...morandiBg(activeIdx), color: morandiInk }}>
+        {/* 隱藏播放器（Kokoro 本地語音） */}
+        <audio ref={audioRef} className="hidden" />
+
         <div className="text-center shrink-0">
           <p className="text-xs opacity-70">
             通話中 · {fmt(seconds)}
             {muted && " · 靜音"}
-            {!speakerOn && " · 聽筒"}
+            {voiceMode === "off" && " · 無聲"}
+            {voiceMode === "kokoro" && " · 本地 AI 語音"}
           </p>
           <h2 className="mt-2 text-2xl font-bold">{active.name}</h2>
           <p className="mt-0.5 text-xs opacity-80">{active.job}</p>
         </div>
 
+        {/* 語音模式切換 */}
+        <div className="mt-3 flex shrink-0 items-center justify-center gap-1.5">
+          {(["off", "browser", "kokoro"] as const).map((m) => {
+            const isActive = voiceMode === m;
+            const label = m === "off" ? "靜" : m === "browser" ? "瀏覽器" : "本地 AI";
+            const onClick = () => {
+              if (m === "kokoro" && kokoroState !== "ready") { void enableKokoro(); return; }
+              setVoiceMode(m);
+              if (m === "off") stopLocalAudio();
+            };
+            return (
+              <button key={m} onClick={onClick}
+                className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold transition ${
+                  isActive ? "bg-black/80 text-white" : "bg-white/50 text-foreground/70"
+                }`}>
+                {m === "kokoro" && <Cpu className="h-3 w-3" />}
+                {label}
+                {m === "kokoro" && kokoroState === "loading" && (
+                  <span className="ml-1 inline-flex items-center gap-0.5">
+                    <Download className="h-3 w-3 animate-pulse" />{kokoroProgress || 0}%
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
         {!scriptEnded && (
           <div className="my-4 flex shrink-0 justify-center">
             <div className="relative">
-              {speakerOn && <div className="absolute inset-0 animate-ping rounded-full bg-white/45" />}
+              {(isVoicePlaying || (voiceMode === "browser" && !muted)) && (
+                <div className="absolute inset-0 animate-ping rounded-full bg-white/45" />
+              )}
               <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-white/40 backdrop-blur-sm">
-                <Volume2 className={`h-11 w-11 ${!speakerOn ? "opacity-40" : ""}`} />
+                {isVoiceLoading
+                  ? <Loader2 className="h-10 w-10 animate-spin" />
+                  : <Volume2 className={`h-11 w-11 ${voiceMode === "off" ? "opacity-40" : ""}`} />}
               </div>
             </div>
+            {voiceMode === "kokoro" && isVoiceLoading && (
+              <p className="absolute mt-28 text-[11px] opacity-70">本地 AI 合成中…</p>
+            )}
           </div>
         )}
+
 
         {/* 對話內容（可捲動） */}
         <div className="flex-1 min-h-0 overflow-y-auto space-y-3 py-2">
