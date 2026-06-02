@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { MapPin, Calendar, Users, Sparkles } from "lucide-react";
+import { MapPin, Calendar, Users, Sparkles, X, CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/_app/match")({
   head: () => ({ meta: [{ title: "媒你不行" }] }),
@@ -28,7 +28,27 @@ const items: Item[] = [
 
 function MatchPage() {
   const [filter, setFilter] = useState<"全部" | "體驗" | "實習">("全部");
+  const [signup, setSignup] = useState<Item | null>(null);
+  const [form, setForm] = useState({ name: "", contact: "", note: "" });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [done, setDone] = useState(false);
+
   const list = filter === "全部" ? items : items.filter((i) => i.type === filter);
+
+  const openSignup = (it: Item) => {
+    setSignup(it);
+    setForm({ name: "", contact: "", note: "" });
+    setErrors({});
+    setDone(false);
+  };
+  const close = () => { setSignup(null); setDone(false); };
+  const submit = () => {
+    const e: Record<string, string> = {};
+    if (!form.name.trim()) e.name = "請輸入姓名";
+    if (!form.contact.trim()) e.contact = "請輸入聯絡方式";
+    setErrors(e);
+    if (Object.keys(e).length === 0) setDone(true);
+  };
 
   return (
     <div className="px-5 pt-12">
@@ -65,7 +85,10 @@ function MatchPage() {
                 <h3 className="mt-2 text-base font-bold leading-snug">{it.title}</h3>
                 <p className="mt-0.5 text-xs text-muted-foreground">{it.company}</p>
               </div>
-              <button className="shrink-0 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-card)] active:scale-95">
+              <button
+                onClick={() => openSignup(it)}
+                className="shrink-0 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-card)] active:scale-95"
+              >
                 報名
               </button>
             </div>
@@ -82,6 +105,78 @@ function MatchPage() {
           </article>
         ))}
       </div>
+
+      {signup && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40" onClick={close}>
+          <div
+            className="mx-auto w-full max-w-md rounded-t-3xl bg-card p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {!done ? (
+              <>
+                <div className="mb-4 flex items-start justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground">{signup.company} · {signup.date}</p>
+                    <h3 className="mt-1 text-lg font-bold">{signup.title}</h3>
+                  </div>
+                  <button onClick={close} aria-label="關閉" className="rounded-full p-1.5 hover:bg-muted">
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <input
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      placeholder="姓名"
+                      className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+                    />
+                    {errors.name && <p className="mt-1 text-xs text-destructive">{errors.name}</p>}
+                  </div>
+                  <div>
+                    <input
+                      value={form.contact}
+                      onChange={(e) => setForm({ ...form, contact: e.target.value })}
+                      placeholder="Email 或手機"
+                      className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+                    />
+                    {errors.contact && <p className="mt-1 text-xs text-destructive">{errors.contact}</p>}
+                  </div>
+                  <textarea
+                    value={form.note}
+                    onChange={(e) => setForm({ ...form, note: e.target.value })}
+                    placeholder="想跟主辦方說的話（選填）"
+                    rows={3}
+                    className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+
+                <button
+                  onClick={submit}
+                  className="mt-5 w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground active:scale-[0.98]"
+                >
+                  確認報名
+                </button>
+              </>
+            ) : (
+              <div className="py-4 text-center">
+                <CheckCircle2 className="mx-auto h-14 w-14 text-primary" />
+                <h3 className="mt-3 text-lg font-bold">報名成功！</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  我們已收到你的報名，{signup.company} 將透過 {form.contact} 與你聯繫。
+                </p>
+                <button
+                  onClick={close}
+                  className="mt-5 w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground active:scale-[0.98]"
+                >
+                  完成
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
