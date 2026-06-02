@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect, useRef } from "react";
-import { Phone, PhoneOff, Mic, Volume2, Sparkles, Atom, Radio, Send, Loader2 } from "lucide-react";
+import { Phone, PhoneOff, Mic, MicOff, Volume2, Sparkles, Atom, Radio, Send, Loader2 } from "lucide-react";
 import { dramaScenes, type DramaScene } from "@/lib/drama-scenes";
 import { askPersona } from "@/lib/persona-chat.functions";
+import { useSpeech, type SpeechGender } from "@/hooks/use-speech";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_app/call")({
   head: () => ({ meta: [{ title: "對話 — 職感 Zhígǎn" }] }),
@@ -36,12 +38,14 @@ type Persona = {
   tag: string;
   color: string;
   intro: string;
+  gender: SpeechGender;
   script: string[];
 };
 
+
 const realPersonas: Persona[] = [
   {
-    id: "av", name: "綾瀨小姐", job: "AV 女優", tag: "成人產業",
+    id: "av", gender: "female", name: "綾瀨小姐", job: "AV 女優", tag: "成人產業",
     color: "from-rose-400 to-pink-500",
     intro: "從業 6 年，公開分享產業真實面",
     script: [
@@ -53,7 +57,7 @@ const realPersonas: Persona[] = [
     ],
   },
   {
-    id: "mortician", name: "阿明師傅", job: "禮儀師", tag: "生命產業",
+    id: "mortician", gender: "male", name: "阿明師傅", job: "禮儀師", tag: "生命產業",
     color: "from-slate-500 to-zinc-700",
     intro: "送行 20 年，把告別變成禮物",
     script: [
@@ -65,7 +69,7 @@ const realPersonas: Persona[] = [
     ],
   },
   {
-    id: "esports", name: "Ray", job: "電競選手", tag: "新興職業",
+    id: "esports", gender: "male", name: "Ray", job: "電競選手", tag: "新興職業",
     color: "from-teal-400 to-cyan-500",
     intro: "前職業隊隊長，現為教練",
     script: [
@@ -77,7 +81,7 @@ const realPersonas: Persona[] = [
     ],
   },
   {
-    id: "deepsea", name: "老陳", job: "遠洋漁工", tag: "傳統產業",
+    id: "deepsea", gender: "male", name: "老陳", job: "遠洋漁工", tag: "傳統產業",
     color: "from-blue-500 to-indigo-600",
     intro: "出海 15 年，跑過三大洋",
     script: [
@@ -89,7 +93,7 @@ const realPersonas: Persona[] = [
     ],
   },
   {
-    id: "perfumer", name: "Élise", job: "調香師", tag: "藝術職業",
+    id: "perfumer", gender: "female", name: "Élise", job: "調香師", tag: "藝術職業",
     color: "from-amber-400 to-orange-500",
     intro: "巴黎學成，自創香水品牌",
     script: [
@@ -104,7 +108,7 @@ const realPersonas: Persona[] = [
 
 const timewarpPersonas: Persona[] = [
   {
-    id: "jobs", name: "Steve Jobs", job: "Apple 創辦人 · 1985", tag: "歷史名人",
+    id: "jobs", gender: "male", name: "Steve Jobs", job: "Apple 創辦人 · 1985", tag: "歷史名人",
     color: "from-neutral-700 to-neutral-900",
     intro: "與賈伯斯聊產品開發哲學",
     script: [
@@ -116,7 +120,7 @@ const timewarpPersonas: Persona[] = [
     ],
   },
   {
-    id: "davinci", name: "達文西", job: "文藝復興斜槓王 · 1503", tag: "歷史名人",
+    id: "davinci", gender: "male", name: "達文西", job: "文藝復興斜槓王 · 1503", tag: "歷史名人",
     color: "from-amber-600 to-yellow-700",
     intro: "聊斜槓人生與跨領域學習",
     script: [
@@ -128,7 +132,7 @@ const timewarpPersonas: Persona[] = [
     ],
   },
   {
-    id: "asteroid", name: "K-7 號採礦員", job: "小行星採礦工程師 · 2087", tag: "未來職業",
+    id: "asteroid", gender: "neutral", name: "K-7 號採礦員", job: "小行星採礦工程師 · 2087", tag: "未來職業",
     color: "from-zinc-600 to-slate-800",
     intro: "在木星軌道採稀土礦",
     script: [
@@ -140,7 +144,7 @@ const timewarpPersonas: Persona[] = [
     ],
   },
   {
-    id: "meta-shrink", name: "Dr. Vex", job: "元宇宙心理醫生 · 2045", tag: "未來職業",
+    id: "meta-shrink", gender: "female", name: "Dr. Vex", job: "元宇宙心理醫生 · 2045", tag: "未來職業",
     color: "from-purple-500 to-fuchsia-600",
     intro: "治療虛擬人格分裂與沉浸症候群",
     script: [
@@ -155,7 +159,7 @@ const timewarpPersonas: Persona[] = [
 
 const hybridPersonas: Persona[] = [
   {
-    id: "ai-detective", name: "林探員", job: "AI 倫理偵探", tag: "跨界混合",
+    id: "ai-detective", gender: "neutral", name: "林探員", job: "AI 倫理偵探", tag: "跨界混合",
     color: "from-emerald-500 to-teal-700",
     intro: "調查 AI 偏見與演算法歧視案件",
     script: [
@@ -167,7 +171,7 @@ const hybridPersonas: Persona[] = [
     ],
   },
   {
-    id: "legacy-restorer", name: "Maya", job: "數位遺產修復師", tag: "跨界混合",
+    id: "legacy-restorer", gender: "female", name: "Maya", job: "數位遺產修復師", tag: "跨界混合",
     color: "from-rose-500 to-purple-600",
     intro: "重建逝者的社群帳號與數位記憶",
     script: [
@@ -204,6 +208,30 @@ function CallPage() {
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Web Speech API
+  const speech = useSpeech();
+  useEffect(() => { speech.setMuted(muted || !speakerOn); }, [muted, speakerOn, speech]);
+
+  // 角色腳本：每換一句就朗讀
+  useEffect(() => {
+    if (active) speech.speak(active.script[lineIdx], active.gender);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, lineIdx]);
+
+  // LLM 回覆：每收到新 assistant 訊息就朗讀
+  useEffect(() => {
+    if (!active || chat.length === 0) return;
+    const last = chat[chat.length - 1];
+    if (last.role === "assistant") speech.speak(last.content, active.gender);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chat]);
+
+  // 廣播劇：每換一個節點就朗讀（中性聲音）
+  useEffect(() => {
+    if (drama) speech.speak(drama.nodes[dramaIdx]?.line ?? "", "neutral");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drama, dramaIdx]);
+
   useEffect(() => {
     if (active || drama) {
       timerRef.current = setInterval(() => setSeconds((s) => s + 1), 1000);
@@ -215,12 +243,15 @@ function CallPage() {
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat, asking]);
 
+
   const hangup = () => {
+    speech.cancel();
     setActive(null); setLineIdx(0);
     setSeconds(0); setMuted(false); setSpeakerOn(true);
     setChat([]); setQuestion(""); setAsking(false);
   };
-  const exitDrama = () => { setDrama(null); setDramaIdx(0); setSeconds(0); };
+  const exitDrama = () => { speech.cancel(); setDrama(null); setDramaIdx(0); setSeconds(0); };
+
   const next = () => active && lineIdx < active.script.length - 1 && setLineIdx((i) => i + 1);
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
@@ -387,8 +418,9 @@ function CallPage() {
         <div className="mt-4 flex shrink-0 items-center justify-around">
           <button onClick={() => setMuted((m) => !m)} aria-pressed={muted} aria-label={muted ? "取消靜音" : "靜音"}
             className={`flex h-12 w-12 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${muted ? "bg-white" : "bg-white/40"}`}>
-            <Mic className="h-5 w-5" />
+            {muted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
           </button>
+
           <button onClick={hangup} aria-label="掛斷" className="flex h-14 w-14 items-center justify-center rounded-full bg-red-500 text-white shadow-2xl active:scale-95">
             <PhoneOff className="h-6 w-6" />
           </button>
@@ -408,6 +440,7 @@ function CallPage() {
     { id: "timewarp", label: "跨時空", icon: Sparkles },
     { id: "drama", label: "職場廣播劇", icon: Radio },
     { id: "hybrid", label: "跨界混合", icon: Atom },
+
   ];
 
   const personaList: Persona[] =
