@@ -22,6 +22,11 @@ function LoginPage() {
   const { user } = useAuth();
   const { xp, completed, tierName } = useXp();
   const [signingIn, setSigningIn] = useState(false);
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -41,6 +46,43 @@ function LoginPage() {
     if (result.redirected) return;
     toast.success("登入成功");
     navigate({ to: "/", replace: true });
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      toast.error("請輸入 Email 與密碼");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("密碼至少 6 個字元");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: { full_name: name || email.split("@")[0] },
+          },
+        });
+        if (error) throw error;
+        toast.success("註冊成功，請至信箱完成驗證");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        toast.success("登入成功");
+        navigate({ to: "/", replace: true });
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "發生錯誤";
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -105,12 +147,59 @@ function LoginPage() {
           </>
         ) : (
           <>
-            <h1 className="mt-7 text-center text-title-1 text-foreground">登入</h1>
+            <h1 className="mt-7 text-center text-title-1 text-foreground">
+              {mode === "signin" ? "登入" : "註冊"}
+            </h1>
             <p className="mx-auto mt-2 max-w-[280px] text-center text-subhead text-muted-foreground">
               紀錄會跟著你，不會因為換裝置消失。
             </p>
 
-            <div className="mx-auto mt-10 w-full max-w-[320px]">
+            <div className="mx-auto mt-8 w-full max-w-[320px]">
+              <form onSubmit={handleEmailSubmit} className="flex flex-col gap-2.5">
+                {mode === "signup" && (
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="暱稱（選填）"
+                    maxLength={40}
+                    className="rounded-xl border border-border bg-card px-4 py-3 text-callout text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                )}
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
+                  autoComplete="email"
+                  required
+                  className="rounded-xl border border-border bg-card px-4 py-3 text-callout text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="密碼（至少 6 字元）"
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                  required
+                  minLength={6}
+                  className="rounded-xl border border-border bg-card px-4 py-3 text-callout text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="press mt-1 rounded-xl bg-primary px-4 py-3 text-callout font-semibold text-primary-foreground disabled:opacity-60"
+                >
+                  {submitting ? "處理中…" : mode === "signin" ? "登入" : "建立帳號"}
+                </button>
+              </form>
+
+              <div className="my-4 flex items-center gap-3 text-caption text-muted-foreground">
+                <div className="h-px flex-1 bg-border" />
+                <span>或</span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+
               <button
                 onClick={handleGoogle}
                 disabled={signingIn}
@@ -119,11 +208,19 @@ function LoginPage() {
                 <GoogleIcon className="h-[18px] w-[18px]" />
                 {signingIn ? "正在前往 Google…" : "使用 Google 繼續"}
               </button>
-              {/* 訪客也可累積經驗值 */}
-              <p className="mt-3 text-center text-caption">
+
+              <p className="mt-4 text-center text-caption">
+                {mode === "signin" ? "還沒有帳號？" : "已經有帳號？"}
+                <button
+                  type="button"
+                  onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+                  className="ml-1 text-primary-deep underline-offset-2 hover:underline"
+                >
+                  {mode === "signin" ? "註冊新帳號" : "改為登入"}
+                </button>
+              </p>
+              <p className="mt-2 text-center text-caption">
                 目前以訪客身份累積 {xp} XP（{tierName}）
-                <br />
-                登入後跨裝置保留紀錄。
               </p>
             </div>
           </>
