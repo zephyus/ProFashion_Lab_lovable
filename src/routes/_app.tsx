@@ -4,7 +4,6 @@ import {
   Coffee,
   Map as MapIcon,
   Phone,
-  Sparkles,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_app")({
