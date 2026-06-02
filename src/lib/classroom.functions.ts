@@ -116,10 +116,12 @@ export const joinClassroom = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ code: z.string().min(1).max(20) }).parse(d))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { userId } = context;
     const code = data.code.trim().toUpperCase();
 
-    const { data: room, error: lookupErr } = await supabase
+    // 用 admin 查邀請碼（RLS 不開放任意查詢，避免洩漏其他班級）
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: room, error: lookupErr } = await supabaseAdmin
       .from("classrooms")
       .select("id, name, school_name")
       .eq("invite_code", code)
@@ -127,7 +129,8 @@ export const joinClassroom = createServerFn({ method: "POST" })
     if (lookupErr) throw new Error(lookupErr.message);
     if (!room) throw new Error("找不到此邀請碼對應的班級");
 
-    const { error: joinErr } = await supabase
+    // 用 admin 寫入加入記錄（避免依賴使用者端 RLS INSERT 的後續查詢）
+    const { error: joinErr } = await supabaseAdmin
       .from("classroom_members")
       .insert({ classroom_id: room.id, student_id: userId });
     if (joinErr && !joinErr.message.includes("duplicate")) throw new Error(joinErr.message);
