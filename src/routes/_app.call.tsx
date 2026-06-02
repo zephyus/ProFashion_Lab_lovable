@@ -224,6 +224,7 @@ function CallPage() {
   const [question, setQuestion] = useState("");
   const [asking, setAsking] = useState(false);
   const askPersonaFn = useServerFn(askPersona);
+  const saveCallFn = useServerFn(saveCallSession);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
