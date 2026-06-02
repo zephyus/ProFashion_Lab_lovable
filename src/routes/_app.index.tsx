@@ -10,6 +10,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useXp } from "@/hooks/useXp";
 
 export const Route = createFileRoute("/_app/")({
   head: () => ({
@@ -49,8 +50,8 @@ const stations = [
   },
   {
     key: "call",
-    title: "未來來電",
-    desc: "打給未來，也打給過去。",
+    title: "您撥的號碼是未來",
+    desc: "打給未來、過去，或走進一場職場廣播劇。",
     icon: Phone,
     to: "/call",
   },
@@ -58,6 +59,7 @@ const stations = [
 
 function HomePage() {
   const { user, loading } = useAuth();
+  const { xp, completed, tierName } = useXp();
   const displayName =
     (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ??
     (user?.user_metadata as { name?: string } | undefined)?.name ??
