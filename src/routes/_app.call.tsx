@@ -338,16 +338,16 @@ function CallPage() {
       {/* Persona list (real / timewarp / hybrid) */}
       {(mode === "real" || mode === "timewarp" || mode === "hybrid") && (
         <div className="space-y-3">
-          {personaList.map((p) => (
+          {personaList.map((p, i) => (
             <div key={p.id} className="overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-card)]">
-              <div className="bg-[image:var(--gradient-morandi)] px-5 py-4 text-primary-foreground">
-                <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{p.tag}</span>
+              <div className="px-5 py-4" style={{ ...morandiBg(i), color: morandiInk }}>
+                <span className="rounded-full bg-white/55 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{p.tag}</span>
                 <h3 className="mt-2 text-lg font-bold">{p.name}</h3>
-                <p className="text-xs opacity-90">{p.job}</p>
+                <p className="text-xs opacity-80">{p.job}</p>
               </div>
               <div className="flex items-center justify-between gap-3 px-5 py-4">
                 <p className="text-xs text-muted-foreground">{p.intro}</p>
-                <button onClick={() => { setActive(p); setLineIdx(0); setSeconds(0); }}
+                <button onClick={() => { setActive(p); setActiveIdx(i); setLineIdx(0); setSeconds(0); }}
                   className="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-card)] active:scale-95">
                   <Phone className="h-3.5 w-3.5" /> 撥打
                 </button>
@@ -357,22 +357,22 @@ function CallPage() {
         </div>
       )}
 
-      {/* Drama list — 用主色系統一風格 */}
+      {/* Drama list — 同莫蘭迪色票 */}
       {mode === "drama" && (
         <>
           <p className="mb-3 text-xs text-muted-foreground">
             5 分鐘高張力職場片段，在關鍵點做選擇，導向不同結局。全部為寫實向職業情境。
           </p>
           <div className="space-y-3">
-            {dramaScenes.map((d) => (
+            {dramaScenes.map((d, i) => (
               <div key={d.id} className="overflow-hidden rounded-3xl border border-border bg-card shadow-[var(--shadow-card)]">
-                <div className="bg-[image:var(--gradient-morandi)] px-5 py-4 text-primary-foreground">
-                  <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{d.tag}</span>
+                <div className="px-5 py-4" style={{ ...morandiBg(i), color: morandiInk }}>
+                  <span className="rounded-full bg-white/55 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{d.tag}</span>
                   <h3 className="mt-2 text-lg font-bold">{d.title}</h3>
-                  <p className="text-xs opacity-90">{d.intro}</p>
+                  <p className="text-xs opacity-80">{d.intro}</p>
                 </div>
                 <div className="flex items-center justify-end px-5 py-4">
-                  <button onClick={() => { setDrama(d); setDramaIdx(0); setSeconds(0); }}
+                  <button onClick={() => { setDrama(d); setDramaListIdx(i); setDramaIdx(0); setSeconds(0); }}
                     className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground active:scale-95">
                     <Radio className="h-3.5 w-3.5" /> 進入劇情
                   </button>
