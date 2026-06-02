@@ -1,74 +1,20 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { Gamepad2, Radio, PhoneOff, ChevronRight } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Gamepad2, Trophy, ChevronRight, Briefcase, RefreshCw } from "lucide-react";
 import ExploreQuiz from "../components/ExploreQuiz";
-import { dramaScenes, type DramaScene } from "../lib/drama-scenes";
+import { internMissions } from "../lib/intern-missions";
+import { useXp } from "@/hooks/useXp";
 
 export const Route = createFileRoute("/_app/explore")({
   head: () => ({ meta: [{ title: "發現小秘 me · ProFashion Lab" }] }),
   component: ExplorePage,
 });
 
-type Game = "menu" | "quiz" | "drama";
+type Game = "menu" | "quiz" | "intern";
 
 function ExplorePage() {
   const navigate = useNavigate();
   const [game, setGame] = useState<Game>("menu");
-  const [drama, setDrama] = useState<DramaScene | null>(null);
-  const [dramaIdx, setDramaIdx] = useState(0);
-  const [seconds, setSeconds] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    if (drama) {
-      timerRef.current = setInterval(() => setSeconds((s) => s + 1), 1000);
-      return () => { if (timerRef.current) clearInterval(timerRef.current); };
-    }
-  }, [drama]);
-
-  const exitDrama = () => { setDrama(null); setDramaIdx(0); setSeconds(0); };
-  const fmt = (s: number) =>
-    `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
-
-  // —— 廣播劇沉浸全屏 ——
-  if (drama) {
-    const node = drama.nodes[dramaIdx];
-    return (
-      <div className={`fixed inset-0 z-[60] mx-auto flex max-w-md flex-col bg-gradient-to-br ${drama.color} px-6 py-10 text-white`}>
-        <div className="text-center">
-          <p className="text-xs opacity-80">廣播劇 · {fmt(seconds)}</p>
-          <h2 className="mt-2 text-2xl font-bold">{drama.title}</h2>
-        </div>
-        <div className="mt-8 flex-1 space-y-4 overflow-y-auto">
-          <div className="rounded-2xl bg-white/15 p-4 backdrop-blur-sm">
-            <p className="text-xs opacity-80">{node.speaker}</p>
-            <p className="mt-2 text-base leading-relaxed">{node.line}</p>
-          </div>
-          {node.choices && (
-            <div className="space-y-2">
-              {node.choices.map((c, i) => (
-                <button key={i} onClick={() => setDramaIdx(c.next)}
-                  className="w-full rounded-2xl bg-white/20 p-4 text-left text-sm font-semibold backdrop-blur-sm active:scale-95">
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          )}
-          {node.ending && (
-            <div className="rounded-2xl border border-white/30 bg-black/20 p-4 text-sm">
-              <p className="font-bold">{node.ending}</p>
-            </div>
-          )}
-          {!node.choices && !node.ending && dramaIdx < drama.nodes.length - 1 && (
-            <button onClick={() => setDramaIdx(dramaIdx + 1)} className="w-full rounded-2xl bg-white/20 p-3 text-sm font-semibold">繼續 →</button>
-          )}
-        </div>
-        <button onClick={exitDrama} className="mx-auto mt-6 flex h-14 w-14 items-center justify-center rounded-full bg-red-500 shadow-2xl active:scale-95">
-          <PhoneOff className="h-6 w-6" />
-        </button>
-      </div>
-    );
-  }
 
   // —— 測驗 ——
   if (game === "quiz") {
@@ -79,45 +25,12 @@ function ExplorePage() {
     );
   }
 
-  // —— 廣播劇列表 ——
-  if (game === "drama") {
-    return (
-      <div className="px-5 pt-8 pb-8">
-        <button onClick={() => setGame("menu")}
-          className="mb-4 text-sm font-medium text-muted-foreground hover:text-foreground">
-          ← 返回探索選單
-        </button>
-        <header className="mb-5">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-xs font-medium text-primary-deep">
-            <Radio className="h-3 w-3" /> 職場廣播劇
-          </div>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight">一日實境</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            5 分鐘高張力職場片段，在關鍵點做選擇，導向不同結局。
-          </p>
-        </header>
-        <div className="space-y-3">
-          {dramaScenes.map((d) => (
-            <div key={d.id} className="overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-card)]">
-              <div className={`bg-gradient-to-r ${d.color} px-5 py-4 text-white`}>
-                <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{d.tag}</span>
-                <h3 className="mt-2 text-lg font-bold">{d.title}</h3>
-                <p className="text-xs opacity-90">{d.intro}</p>
-              </div>
-              <div className="flex items-center justify-end px-5 py-4">
-                <button onClick={() => { setDrama(d); setDramaIdx(0); setSeconds(0); }}
-                  className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground active:scale-95">
-                  <Radio className="h-3.5 w-3.5" /> 進入劇情
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+  // —— 虛擬實習 ——
+  if (game === "intern") {
+    return <InternGame onBack={() => setGame("menu")} />;
   }
 
-  // —— 選單：兩款遊戲 ——
+  // —— 選單 ——
   return (
     <div className="px-5 pt-8 pb-8">
       <button onClick={() => navigate({ to: "/" })}
@@ -130,7 +43,7 @@ function ExplorePage() {
         </p>
         <h1 className="mt-1 text-3xl font-bold tracking-tight">發現小秘 me</h1>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          兩款互動遊戲，從不同角度認識自己——做測驗找出職涯傾向，或走進職場現場親身選擇。
+          兩種方式認識自己——做測驗看出你的職涯傾向，或走進虛擬實習，一關一關累積經驗值。
         </p>
       </header>
 
@@ -152,23 +65,117 @@ function ExplorePage() {
           </div>
         </button>
 
-        <button onClick={() => setGame("drama")}
+        <button onClick={() => setGame("intern")}
           className="block w-full overflow-hidden rounded-3xl bg-card text-left shadow-[var(--shadow-card)] transition-all hover:shadow-[var(--shadow-float)] active:scale-[0.98]">
-          <div className="bg-gradient-to-r from-rose-500 to-red-600 px-5 py-5 text-white">
+          <div className="bg-[image:var(--gradient-hero)] px-5 py-5 text-primary-foreground">
             <div className="flex items-center gap-2 text-[11px] font-bold opacity-90">
-              <Radio className="h-3.5 w-3.5" /> GAME 02 · 沉浸式體驗
+              <Trophy className="h-3.5 w-3.5" /> GAME 02 · 虛擬實習
             </div>
-            <h3 className="mt-2 text-xl font-bold">職場廣播劇</h3>
-            <p className="mt-1 text-xs opacity-90">5 分鐘高張力片段 · 多重結局</p>
+            <h3 className="mt-2 text-xl font-bold">魔王經理 · 林總監</h3>
+            <p className="mt-1 text-xs opacity-90">無上限關卡 · 一關 30 秒</p>
           </div>
           <div className="flex items-center justify-between px-5 py-4">
             <p className="pr-3 text-xs leading-relaxed text-muted-foreground">
-              急診室、跨國併購桌邊——在關鍵時刻做選擇，看看你會走向什麼結局。
+              經歷職場上最常發生的小決策，做出選擇、累積經驗值，看看你能從新鮮人升到總監嗎？
             </p>
             <ChevronRight className="h-5 w-5 shrink-0 text-primary-deep" />
           </div>
         </button>
       </div>
+    </div>
+  );
+}
+
+// —— 虛擬實習遊戲 ——
+function InternGame({ onBack }: { onBack: () => void }) {
+  const { xp, completed, addXp, reset, tierName } = useXp();
+  const [step, setStep] = useState(0); // 當前 session 的關數
+  const [result, setResult] = useState<{ text: string; gain: number } | null>(null);
+
+  // 用 completed 當作種子，輪流出不同題；同時讓玩家不會重複連續看到同一題
+  const mission = useMemo(() => {
+    const idx = (completed + step) % internMissions.length;
+    return internMissions[idx];
+  }, [completed, step]);
+
+  const choose = (which: "A" | "B") => {
+    const gain = which === "A" ? mission.rewardA : mission.rewardB;
+    const text = which === "A" ? mission.successA : mission.successB;
+    addXp(gain);
+    setResult({ text, gain });
+  };
+
+  const nextMission = () => {
+    setResult(null);
+    setStep((s) => s + 1);
+  };
+
+  return (
+    <div className="px-5 pt-8 pb-8">
+      <button onClick={onBack}
+        className="mb-4 text-sm font-medium text-muted-foreground hover:text-foreground">
+        ← 返回探索選單
+      </button>
+
+      {/* XP 顯示卡 */}
+      <div className="rounded-3xl bg-[image:var(--gradient-hero)] p-5 text-primary-foreground shadow-[var(--shadow-card)]">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[11px] opacity-90">目前職等</p>
+            <h3 className="text-xl font-bold">{tierName}</h3>
+            <p className="mt-1 text-[11px] opacity-80">已完成 {completed} 關</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] opacity-80">總經驗值</p>
+            <p className="text-3xl font-bold tabular-nums">{xp}</p>
+            <p className="text-[10px] opacity-80">XP</p>
+          </div>
+        </div>
+        <button onClick={reset}
+          className="mt-3 inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-[11px] font-semibold backdrop-blur-sm active:scale-95">
+          <RefreshCw className="h-3 w-3" /> 重設紀錄
+        </button>
+      </div>
+
+      {/* 任務卡 */}
+      <div className="mt-4 rounded-3xl bg-card p-5 shadow-[var(--shadow-card)]">
+        <div className="mb-3 flex items-center gap-2">
+          <Briefcase className="h-4 w-4 text-primary" />
+          <p className="text-xs font-semibold text-primary">第 {completed + 1} 關</p>
+        </div>
+        <h4 className="text-base font-bold leading-snug">{mission.title}</h4>
+        <div className="mt-3 rounded-2xl bg-muted/60 p-3">
+          <p className="text-[11px] text-muted-foreground">📞 經理語音</p>
+          <p className="mt-1 text-sm">{mission.manager}</p>
+        </div>
+
+        {result ? (
+          <div className="mt-4">
+            <p className="rounded-2xl bg-primary/10 p-3 text-sm font-medium leading-relaxed">
+              {result.text}
+            </p>
+            <button onClick={nextMission}
+              className="mt-3 w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground active:scale-95">
+              下一關 →
+            </button>
+          </div>
+        ) : (
+          <div className="mt-4 space-y-2">
+            <button onClick={() => choose("A")}
+              className="w-full rounded-2xl bg-emerald-500 px-4 py-3 text-left text-sm font-semibold text-white active:scale-95">
+              {mission.optionA}
+            </button>
+            <button onClick={() => choose("B")}
+              className="w-full rounded-2xl bg-rose-400 px-4 py-3 text-left text-sm font-semibold text-white active:scale-95">
+              {mission.optionB}
+            </button>
+          </div>
+        )}
+      </div>
+
+      <p className="mt-4 text-center text-[11px] text-muted-foreground">
+        每完成一關自動累積經驗值 · 經驗值會同步顯示在你的個人檔案
+      </p>
     </div>
   );
 }
