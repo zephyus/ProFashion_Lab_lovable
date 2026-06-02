@@ -418,8 +418,9 @@ function CallPage() {
         <div className="mt-4 flex shrink-0 items-center justify-around">
           <button onClick={() => setMuted((m) => !m)} aria-pressed={muted} aria-label={muted ? "取消靜音" : "靜音"}
             className={`flex h-12 w-12 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${muted ? "bg-white" : "bg-white/40"}`}>
-            <Mic className="h-5 w-5" />
+            {muted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
           </button>
+
           <button onClick={hangup} aria-label="掛斷" className="flex h-14 w-14 items-center justify-center rounded-full bg-red-500 text-white shadow-2xl active:scale-95">
             <PhoneOff className="h-6 w-6" />
           </button>
