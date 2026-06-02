@@ -78,8 +78,20 @@ function LoginPage() {
         navigate({ to: "/", replace: true });
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "發生錯誤";
+      const raw = err instanceof Error ? err.message : "發生錯誤";
+      const code = (err as { code?: string })?.code;
+      let msg = raw;
+      if (code === "weak_password" || /weak|pwned/i.test(raw)) {
+        msg = "這組密碼太常見或曾外洩，請換一組（建議混合英數＋符號）";
+      } else if (code === "invalid_credentials" || /invalid login/i.test(raw)) {
+        msg = "Email 或密碼錯誤，或此帳號尚未註冊";
+      } else if (code === "user_already_exists" || /already registered/i.test(raw)) {
+        msg = "這個 Email 已註冊過，請改用登入";
+      } else if (code === "email_not_confirmed" || /not confirmed/i.test(raw)) {
+        msg = "請先到信箱完成驗證後再登入";
+      }
       toast.error(msg);
+
     } finally {
       setSubmitting(false);
     }
