@@ -595,10 +595,15 @@ function CallPage() {
           <button onClick={hangup} aria-label="掛斷" className="flex h-14 w-14 items-center justify-center rounded-full bg-red-500 text-white shadow-2xl active:scale-95">
             <PhoneOff className="h-6 w-6" />
           </button>
-          <button onClick={() => setSpeakerOn((s) => !s)} aria-pressed={speakerOn} aria-label={speakerOn ? "切換聽筒" : "切換喇叭"}
-            className={`flex h-12 w-12 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${speakerOn ? "bg-white/40" : "bg-white"}`}>
-            <Volume2 className="h-5 w-5" />
+          <button onClick={cycleVoiceMode} aria-label="切換語音模式"
+            className={`flex h-12 w-12 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${voiceMode === "off" ? "bg-white" : "bg-white/40"}`}>
+            {voiceMode === "off"
+              ? <VolumeX className="h-5 w-5" />
+              : voiceMode === "kokoro"
+                ? <Cpu className="h-5 w-5" />
+                : <Volume2 className="h-5 w-5" />}
           </button>
+
         </div>
       </div>
 
