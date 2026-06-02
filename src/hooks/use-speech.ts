@@ -48,18 +48,33 @@ function pickVoice(voices: SpeechSynthesisVoice[], gender: SpeechGender) {
   return ranked[0];
 }
 
+function detectIsEdge() {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  // Chromium Edge 的 UA 一定包含 "Edg/"（避免誤判舊版 Edge "Edge/"）
+  return /\bEdg\//.test(ua);
+}
+
 export function useSpeech() {
   const [supported, setSupported] = useState(false);
+  const [isEdge, setIsEdge] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const mutedRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    const edge = detectIsEdge();
+    setIsEdge(edge);
+    if (!edge) {
+      // 非 Edge 一律關閉語音（其他瀏覽器只有機器人 SAPI 聲，品質太差）
+      // eslint-disable-next-line no-console
+      console.info("[TTS] 非 Edge 瀏覽器，已自動停用語音");
+      return;
+    }
     setSupported(true);
     const load = () => {
       const list = window.speechSynthesis.getVoices();
       setVoices(list);
-      // 開發時方便查看到底有哪些聲音可用
       if (list.length && typeof console !== "undefined") {
         // eslint-disable-next-line no-console
         console.info(
