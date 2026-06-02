@@ -131,6 +131,7 @@
 
     --gradient-hero: linear-gradient(135deg, oklch(0.56 0.1 188), oklch(0.42 0.1 205));
     --gradient-soft: linear-gradient(180deg, oklch(0.16 0.014 220), oklch(0.14 0.012 220));
+    --gradient-morandi: linear-gradient(135deg, oklch(0.5 0.035 190), oklch(0.4 0.03 200));
 
     --shadow-card: 0 0 0 1px oklch(0.26 0.012 220);
     --shadow-float: 0 12px 32px -16px oklch(0 0 0 / 0.5), 0 0 0 1px oklch(0.26 0.012 220);
