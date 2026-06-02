@@ -10,8 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "登入 — ProFashion Lab" },
-      { name: "description", content: "登入後，你的探索會一直跟著你。" },
+      { title: "登入 — 職感 Zhígǎn" },
+      { name: "description", content: "登入後，紀錄會跟著你，不會因為換裝置消失。" },
     ],
   }),
   component: LoginPage,
@@ -44,14 +44,14 @@ function LoginPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background px-6">
+    <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background px-6 animate-page">
       {/* Top bar */}
       <header className="flex h-12 items-center pt-3">
         <Link
           to="/"
           className="inline-flex items-center gap-1 text-subhead text-primary-deep transition-opacity hover:opacity-70"
         >
-          <ArrowLeft className="h-4 w-4" strokeWidth={1.7} /> 返回
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.85} /> 返回
         </Link>
       </header>
 
@@ -59,7 +59,7 @@ function LoginPage() {
       <div className="flex flex-1 flex-col justify-center pb-20">
         {/* Mark */}
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[image:var(--gradient-hero)] text-primary-foreground">
-          <span className="text-title-2 font-semibold">P</span>
+          <span className="text-title-2 font-semibold">職</span>
         </div>
 
         {user ? (
@@ -68,7 +68,7 @@ function LoginPage() {
               嗨，{user.user_metadata?.full_name || user.email?.split("@")[0]}
             </h1>
             <p className="mx-auto mt-2 max-w-[280px] text-center text-subhead text-muted-foreground">
-              你的職涯帳號已同步。
+              你的職涯紀錄已同步。
             </p>
 
             <div className="mx-auto mt-8 w-full max-w-[320px] rounded-3xl bg-[image:var(--gradient-hero)] p-5 text-primary-foreground shadow-[var(--shadow-card)]">
@@ -91,9 +91,9 @@ function LoginPage() {
             <div className="mx-auto mt-6 flex w-full max-w-[320px] flex-col gap-2">
               <button
                 onClick={() => navigate({ to: "/explore" })}
-                className="rounded-xl bg-primary px-4 py-3 text-callout font-semibold text-primary-foreground active:scale-[0.99]"
+                className="press rounded-xl bg-primary px-4 py-3 text-callout font-semibold text-primary-foreground"
               >
-                繼續挑戰虛擬實習 →
+                繼續挑戰 →
               </button>
               <button
                 onClick={handleSignOut}
@@ -105,24 +105,25 @@ function LoginPage() {
           </>
         ) : (
           <>
-            <h1 className="mt-7 text-center text-title-1 text-foreground">登入 ProFashion Lab</h1>
+            <h1 className="mt-7 text-center text-title-1 text-foreground">登入</h1>
             <p className="mx-auto mt-2 max-w-[280px] text-center text-subhead text-muted-foreground">
-              保留你的測驗結果、收藏與經驗值，跨裝置同步你的探索。
+              紀錄會跟著你，不會因為換裝置消失。
             </p>
 
             <div className="mx-auto mt-10 w-full max-w-[320px]">
               <button
                 onClick={handleGoogle}
                 disabled={signingIn}
-                className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-callout font-medium text-foreground transition-colors hover:bg-muted/40 active:scale-[0.99] disabled:opacity-60"
+                className="press flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-callout font-medium text-foreground transition-colors hover:bg-muted/40 disabled:opacity-60"
               >
                 <GoogleIcon className="h-[18px] w-[18px]" />
-                {signingIn ? "正在前往 Google…" : "使用 Google 登入"}
+                {signingIn ? "正在前往 Google…" : "使用 Google 繼續"}
               </button>
               {/* 訪客也可累積經驗值 */}
-              <p className="mt-3 text-center text-[11px] text-muted-foreground">
-                目前以訪客身份累積 {xp} XP（{tierName}）<br />
-                登入後可跨裝置保留紀錄。
+              <p className="mt-3 text-center text-caption">
+                目前以訪客身份累積 {xp} XP（{tierName}）
+                <br />
+                登入後跨裝置保留紀錄。
               </p>
             </div>
           </>

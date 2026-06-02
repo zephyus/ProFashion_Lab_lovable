@@ -4,7 +4,7 @@ import { Phone, PhoneOff, Mic, Volume2, Sparkles, Atom, Radio } from "lucide-rea
 import { dramaScenes, type DramaScene } from "@/lib/drama-scenes";
 
 export const Route = createFileRoute("/_app/call")({
-  head: () => ({ meta: [{ title: "您撥的號碼是未來" }] }),
+  head: () => ({ meta: [{ title: "對話 — 職感 Zhígǎn" }] }),
   component: CallPage,
 });
 
@@ -315,10 +315,13 @@ function CallPage() {
 
 
   return (
-    <div className="px-5 pt-12 pb-24">
-      <header className="mb-5">
-        <h1 className="text-3xl font-bold tracking-tight">您撥的號碼<br />是<span className="text-primary-deep">未來</span></h1>
-        <p className="mt-2 text-sm text-muted-foreground">撥通電話，聽見職業的真實聲音——或走進一場 5 分鐘的職場廣播劇。</p>
+    <div className="px-5 pt-10 pb-24 animate-page">
+      <header className="mb-6 animate-rise">
+        <p className="text-caption uppercase tracking-widest text-primary-deep">您撥的號碼是未來</p>
+        <h1 className="mt-1 text-large-title text-foreground">對話</h1>
+        <p className="mt-3 text-body text-muted-foreground">
+          撥一通電話聽真實的職人，或走進五分鐘廣播劇，先把未來走一遍。
+        </p>
       </header>
 
       {/* Mode tabs */}
@@ -360,8 +363,8 @@ function CallPage() {
       {/* Drama list — 同莫蘭迪色票 */}
       {mode === "drama" && (
         <>
-          <p className="mb-3 text-xs text-muted-foreground">
-            5 分鐘高張力職場片段，在關鍵點做選擇，導向不同結局。全部為寫實向職業情境。
+          <p className="mb-3 text-caption">
+            五分鐘高張力職場片段，在關鍵點做選擇，導向不同結局。
           </p>
           <div className="space-y-3">
             {dramaScenes.map((d, i) => (
@@ -383,8 +386,8 @@ function CallPage() {
         </>
       )}
 
-      <p className="mt-6 text-center text-[11px] text-muted-foreground">
-        所有對話皆為模擬訪談或情境劇本，內容經當事人同意改編或為創作虛構。
+      <p className="mt-6 text-center text-caption">
+        所有對話為模擬訪談或情境劇本，內容經當事人同意改編，或為創作虛構。
       </p>
     </div>
   );

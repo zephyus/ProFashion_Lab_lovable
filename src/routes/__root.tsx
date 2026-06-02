@@ -76,18 +76,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ProFashion Lab 職感實驗室" },
-      { name: "description", content: "探索職涯無限可能，帶你發現最適合的職業方向。" },
-      { property: "og:title", content: "ProFashion Lab 職感實驗室" },
-      { property: "og:description", content: "探索職涯無限可能，帶你發現最適合的職業方向。" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { title: "職感 Zhígǎn — 在還沒選擇之前，先認識自己" },
+      { name: "description", content: "四個方向，把模糊的『未來』變成具體的下一步。" },
+      { property: "og:title", content: "職感 Zhígǎn" },
+      { property: "og:description", content: "在還沒選擇之前，先認識自己。" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "ProFashion Lab 職感實驗室" },
-      { name: "twitter:description", content: "探索職涯無限可能，帶你發現最適合的職業方向。" },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0d780d1f-e906-4857-ac75-6234f04e943c/id-preview-1551257f--87d70d7b-1fbf-42fd-8b99-81fd7f89b685.lovable.app-1780385947872.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/0d780d1f-e906-4857-ac75-6234f04e943c/id-preview-1551257f--87d70d7b-1fbf-42fd-8b99-81fd7f89b685.lovable.app-1780385947872.png" },
+      { name: "twitter:title", content: "職感 Zhígǎn" },
+      { name: "twitter:description", content: "在還沒選擇之前，先認識自己。" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -110,7 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="zh-Hant">
       <head>
         <HeadContent />
       </head>

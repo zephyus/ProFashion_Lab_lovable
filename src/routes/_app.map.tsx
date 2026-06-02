@@ -12,7 +12,7 @@ import { CATEGORY_META, MENTORS, MentorCategory } from "@/lib/mentors";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/map")({
-  head: () => ({ meta: [{ title: "職圖" }] }),
+  head: () => ({ meta: [{ title: "地圖 — 職感 Zhígǎn" }] }),
   component: MapPage,
 });
 
@@ -80,12 +80,12 @@ function MapPage() {
   }
 
   return (
-    <div className="px-5 pt-10">
+    <div className="px-5 pt-10 animate-page">
       <header className="mb-5 animate-rise">
         <p className="text-caption uppercase tracking-widest text-primary-deep">職涯地圖</p>
-        <h1 className="mt-1 text-large-title text-foreground">職圖</h1>
-        <p className="mt-2 text-body text-muted-foreground">
-          探索職人地圖，預約一場真實的職涯體驗。
+        <h1 className="mt-1 text-large-title text-foreground">地圖</h1>
+        <p className="mt-3 text-body text-muted-foreground">
+          把職業、地點、人都連起來。挑一位，看見一條真實走過的路。
         </p>
       </header>
 
@@ -171,8 +171,9 @@ function MapPage() {
         })}
 
         {mentors.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
-            這個分類尚未上線職人
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-center">
+            <p className="text-subhead font-semibold text-foreground">這個分類還在路上</p>
+            <p className="text-caption">先看看其他分類，新職人會持續加入。</p>
           </div>
         )}
       </div>
@@ -236,8 +237,8 @@ function MapPage() {
       )}
 
       {selected && (
-        <p className="mt-4 text-center text-[11px] text-muted-foreground">
-          {selectedIdx + 1} / {mentors.length} · 滑動或點選地圖切換
+        <p className="mt-4 text-center text-caption">
+          {selectedIdx + 1} / {mentors.length} · 滑動或點地圖切換
         </p>
       )}
     </div>
