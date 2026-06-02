@@ -69,9 +69,14 @@ function HomePage() {
     <div className="px-5 animate-page">
       {/* Top bar */}
       <header className="flex h-12 items-center justify-between pt-3">
-        <span className="text-footnote font-semibold tracking-wide text-foreground/80">
-          ProFashion <span className="text-muted-foreground">Lab</span>
-        </span>
+        <div className="flex flex-col">
+          <span className="text-footnote font-semibold tracking-wide text-foreground/80">
+            ProFashion <span className="text-muted-foreground">Lab</span>
+          </span>
+          <span className="text-[10px] tracking-widest text-muted-foreground">
+            職感實驗室
+          </span>
+        </div>
         {loading ? (
           <div className="h-7 w-7 animate-pulse rounded-full bg-muted" />
         ) : user ? (
