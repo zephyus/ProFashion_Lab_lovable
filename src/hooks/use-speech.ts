@@ -85,7 +85,7 @@ export function useSpeech() {
       const u = new SpeechSynthesisUtterance(text);
       // 若挑到 Natural / 雲端聲，pitch 維持 1（雲端聲自帶情緒，調 pitch 反而失真）
       const isNatural = v ? NATURAL_HINT.test(v.name) || !v.localService : false;
-      u.lang = v?.lang ?? "zh-TW";
+      u.lang = v?.lang && !CANTONESE_LANG.test(v.lang) ? v.lang : "zh-TW";
       u.rate = 1;
       u.pitch = isNatural ? 1 : gender === "female" ? 1.15 : gender === "male" ? 0.85 : 1;
       if (v) u.voice = v;
