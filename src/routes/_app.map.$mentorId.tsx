@@ -42,25 +42,55 @@ export const Route = createFileRoute("/_app/map/$mentorId")({
   component: MentorDetailPage,
 });
 
-type Step = "idle" | "slot" | "form" | "done";
+type Step = "idle" | "type" | "slot" | "form" | "done";
 
 function MentorDetailPage() {
   const { mentorId } = Route.useParams();
   const mentor = getMentor(mentorId)!;
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("idle");
+  const [bookingType, setBookingType] = useState<BookingType | null>(null);
   const [slot, setSlot] = useState<MentorSlot | null>(null);
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
-  const [errors, setErrors] = useState<{ name?: string; contact?: string }>({});
+  const [school, setSchool] = useState("");
+  const [className, setClassName] = useState("");
+  const [studentCount, setStudentCount] = useState("");
+  const [errors, setErrors] = useState<{
+    name?: string;
+    contact?: string;
+    school?: string;
+    className?: string;
+    studentCount?: string;
+  }>({});
 
   const tone = CATEGORY_META[mentor.category].tone;
+
+  const resetAll = () => {
+    setStep("idle");
+    setBookingType(null);
+    setSlot(null);
+    setName("");
+    setContact("");
+    setSchool("");
+    setClassName("");
+    setStudentCount("");
+    setErrors({});
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const errs: typeof errors = {};
-    if (!name.trim()) errs.name = "請輸入姓名";
+    if (!name.trim()) errs.name = bookingType === "class" ? "請輸入老師姓名" : "請輸入姓名";
     if (!contact.trim()) errs.contact = "請輸入聯絡方式";
+    if (bookingType === "class") {
+      if (!school.trim()) errs.school = "請輸入學校名稱";
+      if (!className.trim()) errs.className = "請輸入班級";
+      const n = Number(studentCount);
+      if (!studentCount.trim() || !Number.isFinite(n) || n < 1) {
+        errs.studentCount = "請輸入有效人數";
+      }
+    }
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
     setStep("done");
