@@ -325,29 +325,6 @@ function CallPage() {
         </div>
       )}
 
-      {/* Drama scenes */}
-      {mode === "drama" && (
-        <div className="space-y-3">
-          <p className="rounded-2xl bg-muted/60 p-3 text-xs text-muted-foreground">
-            🎧 5 分鐘的高張力廣播劇。在關鍵點做選擇，導向不同結局。
-          </p>
-          {dramaScenes.map((d) => (
-            <div key={d.id} className="overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-card)]">
-              <div className={`bg-gradient-to-r ${d.color} px-5 py-4 text-white`}>
-                <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{d.tag}</span>
-                <h3 className="mt-2 text-lg font-bold">{d.title}</h3>
-                <p className="text-xs opacity-90">{d.intro}</p>
-              </div>
-              <div className="flex items-center justify-end px-5 py-4">
-                <button onClick={() => { setDrama(d); setDramaIdx(0); setSeconds(0); }}
-                  className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground active:scale-95">
-                  <Radio className="h-3.5 w-3.5" /> 進入劇情
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
 
       {/* Intern challenge */}
       {mode === "intern" && (
