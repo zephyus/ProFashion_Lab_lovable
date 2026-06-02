@@ -44,7 +44,7 @@ export const askPersona = createServerFn({ method: "POST" })
         "Lovable-API-Key": apiKey,
       },
       body: JSON.stringify({
-        model: "openai/gpt-5-nano",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: system },
           ...data.history,
