@@ -84,6 +84,8 @@ function CallPage() {
   const [active, setActive] = useState<Persona | null>(null);
   const [lineIdx, setLineIdx] = useState(0);
   const [seconds, setSeconds] = useState(0);
+  const [muted, setMuted] = useState(false);
+  const [speakerOn, setSpeakerOn] = useState(true);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -93,25 +95,29 @@ function CallPage() {
     }
   }, [active]);
 
-  const hangup = () => { setActive(null); setLineIdx(0); setSeconds(0); };
+  const hangup = () => { setActive(null); setLineIdx(0); setSeconds(0); setMuted(false); setSpeakerOn(true); };
   const next = () => active && lineIdx < active.script.length - 1 && setLineIdx((i) => i + 1);
 
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
   if (active) {
     return (
-      <div className={`fixed inset-0 z-50 mx-auto flex max-w-md flex-col items-center justify-between bg-gradient-to-br ${active.color} px-8 py-16 text-white`}>
+      <div className={`fixed inset-0 z-[60] mx-auto flex max-w-md flex-col items-center justify-between bg-gradient-to-br ${active.color} px-8 py-12 text-white`}>
         <div className="text-center">
-          <p className="text-sm opacity-80">通話中 · {fmt(seconds)}</p>
+          <p className="text-sm opacity-80">
+            通話中 · {fmt(seconds)}
+            {muted && " · 靜音"}
+            {!speakerOn && " · 聽筒"}
+          </p>
           <h2 className="mt-4 text-4xl font-bold">{active.name}</h2>
           <p className="mt-1 text-sm opacity-90">{active.job}</p>
         </div>
 
         <div className="flex flex-col items-center">
           <div className="relative">
-            <div className="absolute inset-0 animate-ping rounded-full bg-white/30" />
+            {speakerOn && <div className="absolute inset-0 animate-ping rounded-full bg-white/30" />}
             <div className="relative flex h-36 w-36 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-              <Volume2 className="h-16 w-16" />
+              <Volume2 className={`h-16 w-16 ${!speakerOn ? "opacity-40" : ""}`} />
             </div>
           </div>
         </div>
@@ -124,17 +130,27 @@ function CallPage() {
             {active.script[lineIdx]}
           </button>
           <p className="mt-2 text-center text-xs opacity-70">
-            {lineIdx < active.script.length - 1 ? "點擊繼續聆聽 →" : "對話結束"}
+            {lineIdx < active.script.length - 1 ? "點擊繼續聆聽 →" : "對話結束，按紅鈕掛斷"}
           </p>
 
           <div className="mt-6 flex items-center justify-around">
-            <button className="flex h-14 w-14 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm">
+            <button
+              onClick={() => setMuted((m) => !m)}
+              aria-pressed={muted}
+              aria-label={muted ? "取消靜音" : "靜音"}
+              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${muted ? "bg-white text-foreground" : "bg-white/15"}`}
+            >
               <Mic className="h-6 w-6" />
             </button>
-            <button onClick={hangup} className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 shadow-2xl active:scale-95">
+            <button onClick={hangup} aria-label="掛斷" className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 shadow-2xl active:scale-95">
               <PhoneOff className="h-7 w-7" />
             </button>
-            <button className="flex h-14 w-14 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm">
+            <button
+              onClick={() => setSpeakerOn((s) => !s)}
+              aria-pressed={speakerOn}
+              aria-label={speakerOn ? "切換聽筒" : "切換喇叭"}
+              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${speakerOn ? "bg-white/15" : "bg-white text-foreground"}`}
+            >
               <Volume2 className="h-6 w-6" />
             </button>
           </div>
