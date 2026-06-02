@@ -1,103 +1,123 @@
 
-# 真實語音通話 — 深度構思
+# MVP 變現功能開發計畫
 
-目前「撥打」只是逐句點擊文字劇本，加上腳本結束後的文字 LLM Q&A。要讓它「真的像在講電話」，有三條技術路線，差別在沉浸感、延遲、與成本。先講清楚差別，再選一條落地。
+## 為什麼挑這兩個
 
----
+你的策略文件把 B2B 學校授權列為主力（NT$15K–150K/校/年），而學校會買單的真正理由只有兩個：**108 課綱學習歷程**和**教師管理工具**。其他功能（金流、AI 計量、Freemium）都可以等學校願意付錢之後再做。
 
-## 三條路線比較
+所以 MVP 範圍鎖定：
 
-### A. TTS 朗讀（最快落地，建議起手）
-- 角色每句台詞 → 用 ElevenLabs Text-to-Speech 串流播放
-- 使用者「點擊繼續」改成「自動播完下一句 / 可手動跳過」
-- 腳本結束後的 LLM 回覆，也用 TTS 念出來
-- 麥克風？沒有。使用者仍用打字提問。
-- **沉浸感**：★★★☆☆（有聲音、像語音留言/單向廣播）
-- **延遲**：首字 ~500ms（turbo v2.5 串流）
-- **成本**：很低，每次通話幾分錢
+1. **學習歷程 PDF 匯出**（學生端／賣點 #1）
+2. **教師後台 Dashboard**（教師端／賣點 #2）
 
-### B. TTS + STT（雙向，使用者可開口問）
-- A 的所有功能
-- ＋ 使用者按住麥克風講話 → ElevenLabs Scribe 即時轉文字 → 丟給 LLM → TTS 念回來
-- **沉浸感**：★★★★☆（真的能對話）
-- **延遲**：使用者講完後 ~1.5–2.5 秒回應
-- **成本**：中等
-- **要求**：使用者需授權麥克風
-
-### C. ElevenLabs Conversational Agent（端到端語音對話）
-- 用 ElevenLabs Agents Platform，建立每個角色的 agent（system prompt = 該角色的人設與腳本）
-- WebRTC 直連，使用者一按「撥打」就進入連續語音對話，可隨時打斷
-- 不再有「逐句點擊腳本」這件事，腳本變成 agent 的知識
-- **沉浸感**：★★★★★（最接近真的講電話、可被打斷）
-- **延遲**：~300–500ms
-- **成本**：較高，且需在 ElevenLabs 後台預先建好每個 agent（或用 overrides 動態注入 prompt）
-- **要求**：ELEVENLABS_API_KEY、麥克風授權
+金流、Freemium 計量列為 Phase 2，不在這次範圍。
 
 ---
 
-## 我的建議：分兩階段
+## Phase 1A：學習歷程匯出（學生端）
 
-**階段一（這次做）：路線 A — TTS 朗讀**
-理由：
-1. 改動最小、風險最低，先把「聲音」這層體驗補上
-2. 不需要使用者授權麥克風，門檻最低
-3. 現有的「逐句點擊腳本」與「文字 Q&A」結構幾乎不用動，只在每句出現時觸發 TTS
-4. 為每個角色指派不同 ElevenLabs voiceId（綾瀨小姐→女聲、阿明師傅→沉穩男聲、Ray→年輕男聲、老陳→粗獷男聲、Élise→法式女聲、賈伯斯→中年男聲…）→ 角色立刻立體
-5. 之後要升級到 B 或 C，這層 TTS 仍能沿用
+### 使用者故事
+學生在 ProFashion Lab 玩了幾週後，可以一鍵下載一份 PDF：
+- 個人測驗結果與職涯傾向
+- 完成的虛擬實習關卡與反思
+- 撥打過的職人通話記錄與重點
+- 累積 XP 與職等
+- 時間軸（首次登入 → 最後活動）
 
-**階段二（之後再說）：升級成路線 C**
-等階段一上線、確定使用者喜歡聲音版本後，再為「真實職人」分頁的角色升級到 Conversational Agent，做出「真的能打斷、能對話」的旗艦體驗。
+格式對齊教育部「學習歷程檔案 — 多元表現」欄位（標題／時間／內容描述／反思）。
+
+### 後端
+- 新表：
+  - `exploration_events` — 統一記錄使用者每一個探索動作（type, payload, created_at, user_id）。目前 XP/關卡都存在 localStorage，要先搬到雲端否則匯出沒資料。
+  - `quiz_results` — 測驗結果快照（answers, archetype, summary）。
+  - `call_sessions` — 通話記錄（persona_id, persona_name, script_lines_played, llm_messages）。
+- 一個 server function `exportLearningPortfolio()` 聚合上述資料、回傳結構化 JSON。
+- PDF 由前端用 `@react-pdf/renderer` 在瀏覽器產生（Cloudflare Worker 環境不適合跑 PDF binary）。
+
+### 前端
+- 個人頁新增「我的學習歷程」分頁，預覽 + 下載 PDF。
+- 既有 `useXp` 從 localStorage 改為 Supabase 來源（保留 localStorage 作為訪客回退）。
+- 既有測驗／通話完成事件要寫入新表。
 
 ---
 
-## 階段一 實作步驟（這次的範圍）
+## Phase 1B：教師後台 Dashboard
 
-### 1. 後端：兩個 server function
-- `src/lib/tts.functions.ts`
-  - `synthesizePersonaLine({ voiceId, text })` → 呼叫 ElevenLabs `/v1/text-to-speech/{voiceId}/stream`，模型 `eleven_turbo_v2_5`，回傳 base64 MP3
-  - 用 `requireSupabaseAuth` 中介，避免被當免費 TTS 接口濫用
-  - 讀 `process.env.ELEVENLABS_API_KEY`
+### 使用者故事
+教師建立一個「班級」、邀請學生加入，可以：
+- 看到全班學生清單（姓名、最後活動、XP、完成關卡數）
+- 點進單一學生看其探索摘要（職涯傾向、玩過的職人、通話次數）
+- 匯出全班的 CSV / 個別學生的 PDF
+- 不能看到學生的 AI 對話原文（隱私）
 
-### 2. 角色 → voiceId 對應
-在 `realPersonas` / `timewarpPersonas` / `hybridPersonas` 每個物件加 `voiceId` 欄位，挑選預設 voice：
-- 女聲：Sarah、Alice、Matilda、Lily
-- 男聲：George、Brian、Liam、Bill、Daniel
-- 例：綾瀨小姐 → Sarah、阿明師傅 → Brian、Ray → Liam、老陳 → Bill、Élise → Matilda、賈伯斯 → Daniel、達文西 → George…
+### 角色系統
+- 新增 `app_role` enum：`student`、`teacher`、`admin`
+- 新表 `user_roles`（依照系統規範分離存放）
+- `has_role()` security-definer 函式
+- 註冊流程預設 student；teacher 需邀請碼或管理員指派
 
-### 3. 前端：`src/routes/_app.call.tsx` 通話畫面
-- 加入一個 `<audio ref>` 元素
-- 進入通話、或 `lineIdx` 變動時：
-  - 呼叫 server fn 拿 MP3 base64
-  - 透過 `data:audio/mpeg;base64,...` 設給 audio 並 play
-  - 播放中：把目前的「外圈 ping 動畫」與 `Volume2` 圖示亮起，呼應 `isPlaying`
-- 控制：
-  - 「點擊繼續聆聽 →」改成：播完自動可進下一句，或使用者點擊跳到下一句
-  - 麥克風按鈕（目前的 Mic）保留為「靜音 = 暫停語音」
-  - 喇叭按鈕切換音量（speakerOn=1.0、off=0.0）
-- 腳本結束後的 LLM Q&A：
-  - 收到 assistant 文字回覆後，自動再叫一次 TTS 播出
-- 載入中狀態：在台詞區塊顯示小 loading spinner
+### 班級 / 邀請
+- 新表 `classrooms`（teacher_id, name, school_name, invite_code）
+- 新表 `classroom_members`（classroom_id, student_id, joined_at）
+- 學生輸入邀請碼加入
 
-### 4. 錯誤處理
-- 沒設 API key：toast 提示「語音功能未啟用」，仍可用文字模式（fallback 到目前體驗）
-- TTS 失敗（429 / 402 / 網路錯）：toast 提示，且保留文字顯示
-- 自動播放被瀏覽器擋：首次點「撥打」時是 user gesture，沒問題；之後切換句子也都在 user gesture 鏈內
+### 教師後台路由
+- `/_authenticated/teacher`（用 has_role 守門，非教師導回首頁）
+- 班級列表 / 新增班級 / 班級詳情 / 學生詳情
+- 蒐集匯出：整班 CSV、單人 PDF
 
-### 5. 廣播劇模式（drama）
-同樣對 `node.line` 套用 TTS，不同 speaker 可用不同 voiceId（在 drama-scenes.ts 為 speaker 加對應表）。本次先做 persona 通話，廣播劇下一輪再加。
+---
+
+## 不做的事（明確排除）
+
+- **金流／體驗預約付費**：等真正有第一間學校付錢再做 Stripe/綠界
+- **AI 對話額度與 Freemium 鎖**：先讓功能完整、收集真實使用數據再決定上限
+- **AI 加值服務**（模擬面試、自傳助手）：Phase 3
+- **企業／縣市方案**：商業談判，不是產品問題
+
+---
+
+## 技術細節（給工程脈絡）
+
+### 資料庫遷移
+所有新表都要 RLS：
+- `exploration_events` / `quiz_results` / `call_sessions`：學生只能讀寫自己；教師可讀同班學生的（透過 `classroom_members` join + `has_role('teacher')`）。
+- `user_roles`：用戶可讀自己的角色；只有 service_role 可寫。
+- `classrooms`：teacher 可 CRUD 自己的；學生可讀自己加入的（透過 `classroom_members`）。
+- `classroom_members`：學生用邀請碼加入（INSERT 政策驗證 invite_code）；teacher 可看自己班級的。
+
+每張表都要附 `GRANT` 給 authenticated 角色。
+
+### 既有程式碼影響
+- `src/hooks/useXp.ts` — 改成讀 Supabase；保留 localStorage 作為未登入者的暫存。
+- `src/routes/_app.call.tsx` — 通話開始／結束時寫 `call_sessions`。
+- `src/components/ExploreQuiz.tsx` — 測驗完成寫 `quiz_results` + `exploration_events`。
+- 新增 `src/lib/portfolio.functions.ts`、`src/lib/classroom.functions.ts`（server functions）。
+
+### PDF
+- 安裝 `@react-pdf/renderer`
+- 元件 `src/components/portfolio/PortfolioDocument.tsx`
+- 套用既有 design tokens（中文字型用 Noto Sans TC，需另載入）
+
+### 教師邀請碼
+- 8 碼大寫英數隨機碼
+- 教師後台顯示可複製連結 `/join?code=ABC12345`
+
+---
+
+## 建議實作順序
+
+1. 角色系統 + user_roles 表（基礎建設）
+2. exploration_events / quiz_results / call_sessions 表 + 把現有事件寫進去
+3. 學習歷程 PDF 匯出（學生立刻有感）
+4. classrooms / 邀請碼 / 教師後台 Dashboard
+5. 教師端 CSV / PDF 匯出
+
+每一步都可獨立 ship，不會卡住下一步。
 
 ---
 
 ## 需要你確認的兩件事
 
-1. **同意走階段一（TTS 朗讀）嗎？** 還是你想直接上路線 C（端到端可打斷的真實對話，較複雜、成本較高）？
-2. **ELEVENLABS_API_KEY**：階段一與 C 都需要。確認方向後我會請你貼上金鑰（去 elevenlabs.io → Profile → API Keys 取得）。
-
----
-
-## 技術備註（給工程脈絡）
-
-- ElevenLabs TTS 必須走 server function，金鑰不可進前端 bundle
-- 回傳格式採 base64 + JSON，前端用 `data:audio/mpeg;base64,...` 直接餵 `<audio>`，避免 Worker runtime 處理 binary stream 的麻煩
-- Server runtime（Cloudflare Worker + nodejs_compat）支援 `fetch` / `Buffer`，TTS 整段 base64 編碼用 `Buffer.from(buf).toString('base64')`，**不可**用 `btoa(String.fromCharCode(...))`（會 stack overflow）
-- `eleven_turbo_v2_5` 是延遲與品質的甜蜜點，且支援多語言（綾瀨小姐、Élise 的中文台詞也念得自然）
+1. **教師身份認證**：MVP 階段允許「任何人輸入特殊註冊碼成為教師」，還是先寫死由管理員手動指派？前者快、後者安全。建議 MVP 用「教師註冊碼」（一個共用密碼，登入後自助升級），上線後再換成審核制。
+2. **PDF 中文字型**：可接受用 Google Fonts 的 Noto Sans TC（檔案約 2MB，第一次下載稍慢）嗎？還是要用更精簡的本地字型？
