@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Trophy, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
+import { useXp } from "@/hooks/useXp";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -17,14 +19,14 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
+  const { xp, completed, tierName } = useXp();
   const [signingIn, setSigningIn] = useState(false);
 
-  useEffect(() => {
-    if (!loading && user) {
-      navigate({ to: "/", replace: true });
-    }
-  }, [user, loading, navigate]);
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast.success("已登出");
+  };
 
   const handleGoogle = async () => {
     setSigningIn(true);
@@ -60,22 +62,73 @@ function LoginPage() {
           <span className="text-title-2 font-semibold">P</span>
         </div>
 
-        <h1 className="mt-7 text-center text-title-1 text-foreground">登入 ProFashion Lab</h1>
-        <p className="mx-auto mt-2 max-w-[280px] text-center text-subhead text-muted-foreground">
-          保留你的測驗結果與收藏，跨裝置同步你的探索。
-        </p>
+        {user ? (
+          <>
+            <h1 className="mt-7 text-center text-title-1 text-foreground">
+              嗨，{user.user_metadata?.full_name || user.email?.split("@")[0]}
+            </h1>
+            <p className="mx-auto mt-2 max-w-[280px] text-center text-subhead text-muted-foreground">
+              你的職涯帳號已同步。
+            </p>
 
-        <div className="mx-auto mt-10 w-full max-w-[320px]">
-          <button
-            onClick={handleGoogle}
-            disabled={signingIn}
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-callout font-medium text-foreground transition-colors hover:bg-muted/40 active:scale-[0.99] disabled:opacity-60"
-          >
-            <GoogleIcon className="h-[18px] w-[18px]" />
-            {signingIn ? "正在前往 Google…" : "使用 Google 登入"}
-          </button>
-        </div>
+            <div className="mx-auto mt-8 w-full max-w-[320px] rounded-3xl bg-[image:var(--gradient-hero)] p-5 text-primary-foreground shadow-[var(--shadow-card)]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 text-[11px] opacity-90">
+                    <Trophy className="h-3 w-3" /> 目前職等
+                  </div>
+                  <p className="mt-1 text-xl font-bold">{tierName}</p>
+                  <p className="mt-1 text-[11px] opacity-80">已完成 {completed} 關</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] opacity-80">總經驗值</p>
+                  <p className="text-3xl font-bold tabular-nums">{xp}</p>
+                  <p className="text-[10px] opacity-80">XP</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mx-auto mt-6 flex w-full max-w-[320px] flex-col gap-2">
+              <button
+                onClick={() => navigate({ to: "/explore" })}
+                className="rounded-xl bg-primary px-4 py-3 text-callout font-semibold text-primary-foreground active:scale-[0.99]"
+              >
+                繼續挑戰虛擬實習 →
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-callout font-medium text-muted-foreground transition-colors hover:bg-muted/40 active:scale-[0.99]"
+              >
+                <LogOut className="h-4 w-4" /> 登出
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h1 className="mt-7 text-center text-title-1 text-foreground">登入 ProFashion Lab</h1>
+            <p className="mx-auto mt-2 max-w-[280px] text-center text-subhead text-muted-foreground">
+              保留你的測驗結果、收藏與經驗值，跨裝置同步你的探索。
+            </p>
+
+            <div className="mx-auto mt-10 w-full max-w-[320px]">
+              <button
+                onClick={handleGoogle}
+                disabled={signingIn}
+                className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-card px-4 py-3 text-callout font-medium text-foreground transition-colors hover:bg-muted/40 active:scale-[0.99] disabled:opacity-60"
+              >
+                <GoogleIcon className="h-[18px] w-[18px]" />
+                {signingIn ? "正在前往 Google…" : "使用 Google 登入"}
+              </button>
+              {/* 訪客也可累積經驗值 */}
+              <p className="mt-3 text-center text-[11px] text-muted-foreground">
+                目前以訪客身份累積 {xp} XP（{tierName}）<br />
+                登入後可跨裝置保留紀錄。
+              </p>
+            </div>
+          </>
+        )}
       </div>
+
 
       <footer className="pb-8">
         <p className="text-center text-caption">

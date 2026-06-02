@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
-import { Phone, PhoneOff, Mic, Volume2, Sparkles, Briefcase, Atom, Trophy } from "lucide-react";
+import { Phone, PhoneOff, Mic, Volume2, Sparkles, Atom, Radio } from "lucide-react";
+import { dramaScenes, type DramaScene } from "@/lib/drama-scenes";
 
 export const Route = createFileRoute("/_app/call")({
   head: () => ({ meta: [{ title: "您撥的號碼是未來" }] }),
   component: CallPage,
 });
 
-type Mode = "real" | "timewarp" | "intern" | "hybrid";
+type Mode = "real" | "timewarp" | "drama" | "hybrid";
 
 type Persona = {
   id: string;
@@ -160,35 +161,6 @@ const hybridPersonas: Persona[] = [
   },
 ];
 
-
-type Mission = { id: string; title: string; manager: string; reply: string; reward: number; success: string; fail: string };
-const missions: Mission[] = [
-  {
-    id: "m1", title: "Day 1：影印機卡紙了，全辦公室在看你",
-    manager: "（不耐煩）新來的，去處理一下。十分鐘內。",
-    reply: "選一個回應 →",
-    reward: 50,
-    success: "✅ 你冷靜拆開、清紙、重啟。經理點頭。+50 經驗值",
-    fail: "❌ 你慌張按錯按鈕，影印機冒煙。經理嘆氣。-10 信任值",
-  },
-  {
-    id: "m2", title: "Day 7：客戶突然來電飆罵，經理在開會",
-    manager: "（短訊）你接，我等下處理。記住——別承諾任何事。",
-    reply: "選一個回應 →",
-    reward: 100,
-    success: "✅ 你傾聽、記錄、承諾回電。客戶情緒平復。+100 經驗值",
-    fail: "❌ 你為了息事寧人答應全額退款。經理回來臉色鐵青。-30 信任值",
-  },
-  {
-    id: "m3", title: "Day 30：提案會議，老闆問你的看法",
-    manager: "（眼神）你說。三句話以內。",
-    reply: "選一個回應 →",
-    reward: 200,
-    success: "✅ 你提出市場切角，老闆當場拍桌：『就用這個』。+200 經驗值 🏆 升職為正職",
-    fail: "❌ 你緊張地說『沒意見』。會後經理把你拉到角落。-50 信任值",
-  },
-];
-
 function CallPage() {
   const [mode, setMode] = useState<Mode>("real");
   const [active, setActive] = useState<Persona | null>(null);
@@ -197,27 +169,67 @@ function CallPage() {
   const [muted, setMuted] = useState(false);
   const [speakerOn, setSpeakerOn] = useState(true);
 
-  // Intern state
-  const [internStep, setInternStep] = useState(0);
-  const [xp, setXp] = useState(0);
-  const [internResult, setInternResult] = useState<string | null>(null);
+  // Drama state
+  const [drama, setDrama] = useState<DramaScene | null>(null);
+  const [dramaIdx, setDramaIdx] = useState(0);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (active) {
+    if (active || drama) {
       timerRef.current = setInterval(() => setSeconds((s) => s + 1), 1000);
       return () => { if (timerRef.current) clearInterval(timerRef.current); };
     }
-  }, [active]);
+  }, [active, drama]);
 
   const hangup = () => {
     setActive(null); setLineIdx(0);
     setSeconds(0); setMuted(false); setSpeakerOn(true);
   };
+  const exitDrama = () => { setDrama(null); setDramaIdx(0); setSeconds(0); };
   const next = () => active && lineIdx < active.script.length - 1 && setLineIdx((i) => i + 1);
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
+  // ===== Drama immersive view (uses primary color, no random gradients) =====
+  if (drama) {
+    const node = drama.nodes[dramaIdx];
+    return (
+      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col bg-[image:var(--gradient-hero)] px-6 py-10 text-primary-foreground">
+        <div className="text-center">
+          <p className="text-xs opacity-80">廣播劇 · {fmt(seconds)}</p>
+          <h2 className="mt-2 text-2xl font-bold">{drama.title}</h2>
+          <p className="mt-1 text-[11px] opacity-80">{drama.tag}</p>
+        </div>
+        <div className="mt-8 flex-1 space-y-4 overflow-y-auto">
+          <div className="rounded-2xl bg-white/15 p-4 backdrop-blur-sm">
+            <p className="text-xs opacity-80">{node.speaker}</p>
+            <p className="mt-2 text-base leading-relaxed">{node.line}</p>
+          </div>
+          {node.choices && (
+            <div className="space-y-2">
+              {node.choices.map((c, i) => (
+                <button key={i} onClick={() => setDramaIdx(c.next)}
+                  className="w-full rounded-2xl bg-white/20 p-4 text-left text-sm font-semibold backdrop-blur-sm active:scale-95">
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          )}
+          {node.ending && (
+            <div className="rounded-2xl border border-white/30 bg-black/15 p-4 text-sm">
+              <p className="font-bold leading-relaxed">{node.ending}</p>
+            </div>
+          )}
+          {!node.choices && !node.ending && dramaIdx < drama.nodes.length - 1 && (
+            <button onClick={() => setDramaIdx(dramaIdx + 1)} className="w-full rounded-2xl bg-white/20 p-3 text-sm font-semibold">繼續 →</button>
+          )}
+        </div>
+        <button onClick={exitDrama} className="mx-auto mt-6 flex h-14 w-14 items-center justify-center rounded-full bg-red-500 shadow-2xl active:scale-95">
+          <PhoneOff className="h-6 w-6" />
+        </button>
+      </div>
+    );
+  }
 
   // ===== Persona call active view =====
   if (active) {
@@ -273,7 +285,7 @@ function CallPage() {
   const tabs: { id: Mode; label: string; icon: typeof Phone }[] = [
     { id: "real", label: "真實職人", icon: Phone },
     { id: "timewarp", label: "跨時空", icon: Sparkles },
-    { id: "intern", label: "虛擬實習", icon: Trophy },
+    { id: "drama", label: "職場廣播劇", icon: Radio },
     { id: "hybrid", label: "跨界混合", icon: Atom },
   ];
 
@@ -286,7 +298,7 @@ function CallPage() {
     <div className="px-5 pt-12 pb-24">
       <header className="mb-5">
         <h1 className="text-3xl font-bold tracking-tight">您撥的號碼<br />是<span className="text-primary-deep">未來</span></h1>
-        <p className="mt-2 text-sm text-muted-foreground">撥通電話，聽見職業的真實聲音——或穿越時空。</p>
+        <p className="mt-2 text-sm text-muted-foreground">撥通電話，聽見職業的真實聲音——或走進一場 5 分鐘的職場廣播劇。</p>
       </header>
 
       {/* Mode tabs */}
@@ -325,73 +337,30 @@ function CallPage() {
         </div>
       )}
 
-
-      {/* Intern challenge */}
-      {mode === "intern" && (
-        <div className="space-y-4">
-          <div className="rounded-3xl bg-gradient-to-br from-amber-400 to-orange-500 p-5 text-white shadow-[var(--shadow-card)]">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs opacity-90">虛擬實習生</p>
-                <h3 className="text-xl font-bold">魔王經理 · 林總監</h3>
+      {/* Drama list — 用主色系統一風格 */}
+      {mode === "drama" && (
+        <>
+          <p className="mb-3 text-xs text-muted-foreground">
+            5 分鐘高張力職場片段，在關鍵點做選擇，導向不同結局。全部為寫實向職業情境。
+          </p>
+          <div className="space-y-3">
+            {dramaScenes.map((d) => (
+              <div key={d.id} className="overflow-hidden rounded-3xl border border-border bg-card shadow-[var(--shadow-card)]">
+                <div className="bg-[image:var(--gradient-hero)] px-5 py-4 text-primary-foreground">
+                  <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{d.tag}</span>
+                  <h3 className="mt-2 text-lg font-bold">{d.title}</h3>
+                  <p className="text-xs opacity-90">{d.intro}</p>
+                </div>
+                <div className="flex items-center justify-end px-5 py-4">
+                  <button onClick={() => { setDrama(d); setDramaIdx(0); setSeconds(0); }}
+                    className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground active:scale-95">
+                    <Radio className="h-3.5 w-3.5" /> 進入劇情
+                  </button>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-[10px] opacity-80">經驗值</p>
-                <p className="text-2xl font-bold">{xp} XP</p>
-              </div>
-            </div>
+            ))}
           </div>
-
-          {internStep < missions.length ? (
-            <div className="rounded-3xl bg-card p-5 shadow-[var(--shadow-card)]">
-              <div className="mb-3 flex items-center gap-2">
-                <Briefcase className="h-4 w-4 text-primary" />
-                <p className="text-xs font-semibold text-primary">任務 {internStep + 1} / {missions.length}</p>
-              </div>
-              <h4 className="text-base font-bold">{missions[internStep].title}</h4>
-              <div className="mt-3 rounded-2xl bg-muted/60 p-3">
-                <p className="text-[11px] text-muted-foreground">📞 經理語音</p>
-                <p className="mt-1 text-sm">{missions[internStep].manager}</p>
-              </div>
-
-              {internResult ? (
-                <div className="mt-4">
-                  <p className="rounded-2xl bg-primary/10 p-3 text-sm font-medium">{internResult}</p>
-                  <button onClick={() => { setInternResult(null); setInternStep(internStep + 1); }}
-                    className="mt-3 w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground active:scale-95">
-                    下一個任務 →
-                  </button>
-                </div>
-              ) : (
-                <div className="mt-4 space-y-2">
-                  <button onClick={() => { setXp(xp + missions[internStep].reward); setInternResult(missions[internStep].success); }}
-                    className="w-full rounded-2xl bg-emerald-500 px-4 py-3 text-left text-sm font-semibold text-white active:scale-95">
-                    🅰️ 冷靜應對，按 SOP 處理
-                  </button>
-                  <button onClick={() => setInternResult(missions[internStep].fail)}
-                    className="w-full rounded-2xl bg-rose-400 px-4 py-3 text-left text-sm font-semibold text-white active:scale-95">
-                    🅱️ 憑直覺反應
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="rounded-3xl bg-gradient-to-br from-primary to-primary/70 p-6 text-center text-primary-foreground shadow-[var(--shadow-card)]">
-              <Trophy className="mx-auto h-12 w-12" />
-              <h3 className="mt-3 text-xl font-bold">實習結束</h3>
-              <p className="mt-1 text-sm opacity-90">總經驗值 {xp} XP</p>
-              <p className="mt-3 text-xs opacity-80">
-                {xp >= 300 ? "🏆 林總監：『下週開始，你就是正職。』" :
-                 xp >= 150 ? "👍 林總監：『還行，回去再練。』" :
-                 "😐 林總監：『……感謝你的付出。』"}
-              </p>
-              <button onClick={() => { setInternStep(0); setXp(0); setInternResult(null); }}
-                className="mt-4 rounded-full bg-white px-5 py-2 text-sm font-semibold text-primary active:scale-95">
-                再挑戰一次
-              </button>
-            </div>
-          )}
-        </div>
+        </>
       )}
 
       <p className="mt-6 text-center text-[11px] text-muted-foreground">
