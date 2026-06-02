@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppMapRouteImport } from './routes/_app.map'
@@ -17,6 +18,11 @@ import { Route as AppCallRouteImport } from './routes/_app.call'
 import { Route as AppCafeRouteImport } from './routes/_app.cafe'
 import { Route as AppMapMentorIdRouteImport } from './routes/_app.map.$mentorId'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -54,6 +60,7 @@ const AppMapMentorIdRoute = AppMapMentorIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/login': typeof LoginRoute
   '/cafe': typeof AppCafeRoute
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
@@ -61,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/map/$mentorId': typeof AppMapMentorIdRoute
 }
 export interface FileRoutesByTo {
+  '/login': typeof LoginRoute
   '/cafe': typeof AppCafeRoute
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
@@ -71,6 +79,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
   '/_app/cafe': typeof AppCafeRoute
   '/_app/call': typeof AppCallRoute
   '/_app/explore': typeof AppExploreRoute
@@ -80,12 +89,27 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cafe' | '/call' | '/explore' | '/map' | '/map/$mentorId'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/cafe'
+    | '/call'
+    | '/explore'
+    | '/map'
+    | '/map/$mentorId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/cafe' | '/call' | '/explore' | '/map' | '/' | '/map/$mentorId'
+  to:
+    | '/login'
+    | '/cafe'
+    | '/call'
+    | '/explore'
+    | '/map'
+    | '/'
+    | '/map/$mentorId'
   id:
     | '__root__'
     | '/_app'
+    | '/login'
     | '/_app/cafe'
     | '/_app/call'
     | '/_app/explore'
@@ -96,10 +120,18 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -183,6 +215,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
