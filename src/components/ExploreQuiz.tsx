@@ -170,11 +170,29 @@ export default function ExploreQuiz({ onBack }: ExploreQuizProps) {
   const done = step >= QUESTIONS.length;
   const progress = (step / QUESTIONS.length) * 100;
 
+  const saveQuiz = useServerFn(saveQuizResult);
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (!done || savedRef.current) return;
+    savedRef.current = true;
+    const r = analyze(scores);
+    saveQuiz({
+      data: {
+        archetype: r.typeName,
+        summary: `主要核心職能：${r.core[0].key}；推薦方向：${r.careers.slice(0, 4).join("、")}`,
+        answers: scores,
+      },
+    }).catch(() => {
+      // 未登入或網路錯誤都靜默；學生未必有帳號
+    });
+  }, [done, scores, saveQuiz]);
+
   const choose = (axis: Axis, weight: number) => {
     setScores((s) => ({ ...s, [axis]: s[axis] + weight }));
     setStep((s) => s + 1);
   };
-  const reset = () => { setStep(0); setScores({ ...EMPTY_SCORES }); };
+  const reset = () => { setStep(0); setScores({ ...EMPTY_SCORES }); savedRef.current = false; };
+
 
   return (
     <div>
