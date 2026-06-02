@@ -82,7 +82,7 @@ function MapPage() {
   return (
     <div className="px-5 pt-10 animate-page">
       <header className="mb-5 animate-rise">
-        <p className="text-caption uppercase tracking-widest text-primary-deep">職圖</p>
+        <p className="text-caption font-bold uppercase tracking-widest text-primary-deep">職圖</p>
         <p className="mt-3 text-body text-muted-foreground">
           把職業、地點、人都連起來。挑一位，看見一條真實走過的路。
         </p>
