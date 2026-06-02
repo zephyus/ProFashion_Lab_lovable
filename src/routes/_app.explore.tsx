@@ -103,6 +103,15 @@ function InternGame({ onBack }: { onBack: () => void }) {
     return internMissions[idx];
   }, [completed, step]);
 
+  // 隨機決定上下哪個是 A（正確/穩健派），避免玩家用位置記憶答題
+  const swap = useMemo(() => Math.random() < 0.5, [completed, step]);
+
+  const stripPrefix = (s: string) => s.replace(/^\s*(?:🅰️|🅱️)\s*/u, "");
+  const topLabel = stripPrefix(swap ? mission.optionB : mission.optionA);
+  const bottomLabel = stripPrefix(swap ? mission.optionA : mission.optionB);
+  const topChoice: "A" | "B" = swap ? "B" : "A";
+  const bottomChoice: "A" | "B" = swap ? "A" : "B";
+
   const choose = (which: "A" | "B") => {
     const gain = which === "A" ? mission.rewardA : mission.rewardB;
     const text = which === "A" ? mission.successA : mission.successB;
@@ -114,6 +123,7 @@ function InternGame({ onBack }: { onBack: () => void }) {
     setResult(null);
     setStep((s) => s + 1);
   };
+
 
   return (
     <div className="px-5 pt-8 pb-8 animate-page">
