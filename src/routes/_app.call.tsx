@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_app/call")({
   component: CallPage,
 });
 
-type Mode = "real" | "timewarp" | "drama" | "intern" | "hybrid";
+type Mode = "real" | "timewarp" | "intern" | "hybrid";
 
 type Persona = {
   id: string;
