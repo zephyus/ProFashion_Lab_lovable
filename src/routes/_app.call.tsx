@@ -194,6 +194,14 @@ function CallPage() {
   const [dramaIdx, setDramaIdx] = useState(0);
   const [dramaListIdx, setDramaListIdx] = useState(0);
 
+  // 即時 Q&A（角色用 LLM 回應）
+  type ChatMsg = { role: "user" | "assistant"; content: string };
+  const [chat, setChat] = useState<ChatMsg[]>([]);
+  const [question, setQuestion] = useState("");
+  const [asking, setAsking] = useState(false);
+  const askPersonaFn = useServerFn(askPersona);
+  const chatBottomRef = useRef<HTMLDivElement | null>(null);
+
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -203,13 +211,47 @@ function CallPage() {
     }
   }, [active, drama]);
 
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chat, asking]);
+
   const hangup = () => {
     setActive(null); setLineIdx(0);
     setSeconds(0); setMuted(false); setSpeakerOn(true);
+    setChat([]); setQuestion(""); setAsking(false);
   };
   const exitDrama = () => { setDrama(null); setDramaIdx(0); setSeconds(0); };
   const next = () => active && lineIdx < active.script.length - 1 && setLineIdx((i) => i + 1);
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+
+  const sendQuestion = async () => {
+    if (!active || asking) return;
+    const q = question.trim();
+    if (!q) return;
+    setQuestion("");
+    const prevChat = chat;
+    setChat([...prevChat, { role: "user", content: q }]);
+    setAsking(true);
+    try {
+      const { reply } = await askPersonaFn({
+        data: {
+          personaName: active.name,
+          personaJob: active.job,
+          personaIntro: active.intro,
+          scriptLines: active.script,
+          history: prevChat,
+          userMessage: q,
+        },
+      });
+      setChat((c) => [...c, { role: "assistant", content: reply }]);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "AI 回覆失敗";
+      toast.error(msg);
+    } finally {
+      setAsking(false);
+    }
+  };
+
 
   // ===== Drama immersive view =====
   if (drama) {
