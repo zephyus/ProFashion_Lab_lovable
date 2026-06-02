@@ -8,6 +8,21 @@ export const Route = createFileRoute("/_app/call")({
   component: CallPage,
 });
 
+// 莫蘭迪色票 — 全頁子項目統一使用
+const morandiPalette = [
+  { name: "霧灰粉", from: "#D6AEBE", to: "#B98DA0" },
+  { name: "鼠尾草綠", from: "#A7B2A0", to: "#8A9683" },
+  { name: "霧霾藍", from: "#A7C6DA", to: "#7FA8C2" },
+  { name: "奶油米色", from: "#E4DCD2", to: "#C9BDB0" },
+  { name: "雲霧灰", from: "#D0D3D4", to: "#ADB1B3" },
+];
+const morandiBg = (i: number) => ({
+  backgroundImage: `linear-gradient(135deg, ${morandiPalette[i % morandiPalette.length].from}, ${morandiPalette[i % morandiPalette.length].to})`,
+});
+// 文字色 — 莫蘭迪偏淺，採用深墨色保留可讀性
+const morandiInk = "#2b2b2b";
+
+
 type Mode = "real" | "timewarp" | "drama" | "hybrid";
 
 type Persona = {
