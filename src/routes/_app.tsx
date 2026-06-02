@@ -66,7 +66,7 @@ function AppLayout() {
         <Outlet />
       </main>
 
-      <nav className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-border bg-card/85 backdrop-blur-xl">
+      <nav className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-border bg-card/85 backdrop-blur-xl print:hidden">
         <ul className="grid grid-cols-5 px-1">
           {leftTabs.map(renderTab)}
           <li key="lab-home">

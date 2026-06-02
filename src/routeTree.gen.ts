@@ -12,10 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppTeacherSignupRouteImport } from './routes/_app.teacher-signup'
+import { Route as AppPortfolioRouteImport } from './routes/_app.portfolio'
 import { Route as AppMapRouteImport } from './routes/_app.map'
+import { Route as AppJoinRouteImport } from './routes/_app.join'
 import { Route as AppExploreRouteImport } from './routes/_app.explore'
 import { Route as AppCallRouteImport } from './routes/_app.call'
 import { Route as AppCafeRouteImport } from './routes/_app.cafe'
+import { Route as AppTeacherIndexRouteImport } from './routes/_app.teacher.index'
+import { Route as AppTeacherClassroomIdRouteImport } from './routes/_app.teacher.$classroomId'
 import { Route as AppMapMentorIdRouteImport } from './routes/_app.map.$mentorId'
 
 const LoginRoute = LoginRouteImport.update({
@@ -32,9 +37,24 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTeacherSignupRoute = AppTeacherSignupRouteImport.update({
+  id: '/teacher-signup',
+  path: '/teacher-signup',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPortfolioRoute = AppPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMapRoute = AppMapRouteImport.update({
   id: '/map',
   path: '/map',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppJoinRoute = AppJoinRouteImport.update({
+  id: '/join',
+  path: '/join',
   getParentRoute: () => AppRoute,
 } as any)
 const AppExploreRoute = AppExploreRouteImport.update({
@@ -52,6 +72,16 @@ const AppCafeRoute = AppCafeRouteImport.update({
   path: '/cafe',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTeacherIndexRoute = AppTeacherIndexRouteImport.update({
+  id: '/teacher/',
+  path: '/teacher/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeacherClassroomIdRoute = AppTeacherClassroomIdRouteImport.update({
+  id: '/teacher/$classroomId',
+  path: '/teacher/$classroomId',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMapMentorIdRoute = AppMapMentorIdRouteImport.update({
   id: '/$mentorId',
   path: '/$mentorId',
@@ -64,17 +94,27 @@ export interface FileRoutesByFullPath {
   '/cafe': typeof AppCafeRoute
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
+  '/join': typeof AppJoinRoute
   '/map': typeof AppMapRouteWithChildren
+  '/portfolio': typeof AppPortfolioRoute
+  '/teacher-signup': typeof AppTeacherSignupRoute
   '/map/$mentorId': typeof AppMapMentorIdRoute
+  '/teacher/$classroomId': typeof AppTeacherClassroomIdRoute
+  '/teacher/': typeof AppTeacherIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/cafe': typeof AppCafeRoute
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
+  '/join': typeof AppJoinRoute
   '/map': typeof AppMapRouteWithChildren
+  '/portfolio': typeof AppPortfolioRoute
+  '/teacher-signup': typeof AppTeacherSignupRoute
   '/': typeof AppIndexRoute
   '/map/$mentorId': typeof AppMapMentorIdRoute
+  '/teacher/$classroomId': typeof AppTeacherClassroomIdRoute
+  '/teacher': typeof AppTeacherIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -83,9 +123,14 @@ export interface FileRoutesById {
   '/_app/cafe': typeof AppCafeRoute
   '/_app/call': typeof AppCallRoute
   '/_app/explore': typeof AppExploreRoute
+  '/_app/join': typeof AppJoinRoute
   '/_app/map': typeof AppMapRouteWithChildren
+  '/_app/portfolio': typeof AppPortfolioRoute
+  '/_app/teacher-signup': typeof AppTeacherSignupRoute
   '/_app/': typeof AppIndexRoute
   '/_app/map/$mentorId': typeof AppMapMentorIdRoute
+  '/_app/teacher/$classroomId': typeof AppTeacherClassroomIdRoute
+  '/_app/teacher/': typeof AppTeacherIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -95,17 +140,27 @@ export interface FileRouteTypes {
     | '/cafe'
     | '/call'
     | '/explore'
+    | '/join'
     | '/map'
+    | '/portfolio'
+    | '/teacher-signup'
     | '/map/$mentorId'
+    | '/teacher/$classroomId'
+    | '/teacher/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/cafe'
     | '/call'
     | '/explore'
+    | '/join'
     | '/map'
+    | '/portfolio'
+    | '/teacher-signup'
     | '/'
     | '/map/$mentorId'
+    | '/teacher/$classroomId'
+    | '/teacher'
   id:
     | '__root__'
     | '/_app'
@@ -113,9 +168,14 @@ export interface FileRouteTypes {
     | '/_app/cafe'
     | '/_app/call'
     | '/_app/explore'
+    | '/_app/join'
     | '/_app/map'
+    | '/_app/portfolio'
+    | '/_app/teacher-signup'
     | '/_app/'
     | '/_app/map/$mentorId'
+    | '/_app/teacher/$classroomId'
+    | '/_app/teacher/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -146,11 +206,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/teacher-signup': {
+      id: '/_app/teacher-signup'
+      path: '/teacher-signup'
+      fullPath: '/teacher-signup'
+      preLoaderRoute: typeof AppTeacherSignupRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/portfolio': {
+      id: '/_app/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof AppPortfolioRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/map': {
       id: '/_app/map'
       path: '/map'
       fullPath: '/map'
       preLoaderRoute: typeof AppMapRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/join': {
+      id: '/_app/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof AppJoinRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/explore': {
@@ -172,6 +253,20 @@ declare module '@tanstack/react-router' {
       path: '/cafe'
       fullPath: '/cafe'
       preLoaderRoute: typeof AppCafeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/teacher/': {
+      id: '/_app/teacher/'
+      path: '/teacher'
+      fullPath: '/teacher/'
+      preLoaderRoute: typeof AppTeacherIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/teacher/$classroomId': {
+      id: '/_app/teacher/$classroomId'
+      path: '/teacher/$classroomId'
+      fullPath: '/teacher/$classroomId'
+      preLoaderRoute: typeof AppTeacherClassroomIdRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/map/$mentorId': {
@@ -199,16 +294,26 @@ interface AppRouteChildren {
   AppCafeRoute: typeof AppCafeRoute
   AppCallRoute: typeof AppCallRoute
   AppExploreRoute: typeof AppExploreRoute
+  AppJoinRoute: typeof AppJoinRoute
   AppMapRoute: typeof AppMapRouteWithChildren
+  AppPortfolioRoute: typeof AppPortfolioRoute
+  AppTeacherSignupRoute: typeof AppTeacherSignupRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppTeacherClassroomIdRoute: typeof AppTeacherClassroomIdRoute
+  AppTeacherIndexRoute: typeof AppTeacherIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppCafeRoute: AppCafeRoute,
   AppCallRoute: AppCallRoute,
   AppExploreRoute: AppExploreRoute,
+  AppJoinRoute: AppJoinRoute,
   AppMapRoute: AppMapRouteWithChildren,
+  AppPortfolioRoute: AppPortfolioRoute,
+  AppTeacherSignupRoute: AppTeacherSignupRoute,
   AppIndexRoute: AppIndexRoute,
+  AppTeacherClassroomIdRoute: AppTeacherClassroomIdRoute,
+  AppTeacherIndexRoute: AppTeacherIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -220,13 +325,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

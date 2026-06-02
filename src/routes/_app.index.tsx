@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut } from "lucide-react";
+import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut, FileText, GraduationCap, Users } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useXp } from "@/hooks/useXp";
+import { useRoles } from "@/hooks/useRoles";
 
 export const Route = createFileRoute("/_app/")({
   head: () => ({
@@ -48,6 +49,7 @@ const stations = [
 
 function HomePage() {
   const { user, loading } = useAuth();
+  const { isTeacher } = useRoles();
   const { xp, completed, tierName } = useXp();
   const displayName =
     (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ??
@@ -154,6 +156,63 @@ function HomePage() {
           );
         })}
       </div>
+
+      {/* 已登入：學習歷程 + 教師入口 */}
+      {user && (
+        <div className="mt-4 space-y-2.5 animate-rise" style={{ animationDelay: "150ms" }}>
+          <Link
+            to="/portfolio"
+            className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
+                <FileText className="h-[18px] w-[18px]" strokeWidth={1.9} />
+              </div>
+              <div>
+                <p className="text-subhead font-semibold text-foreground">我的學習歷程</p>
+                <p className="text-caption text-muted-foreground">匯出 108 課綱 PDF</p>
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+
+          <Link
+            to={isTeacher ? "/teacher" : "/teacher-signup"}
+            className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
+                <GraduationCap className="h-[18px] w-[18px]" strokeWidth={1.9} />
+              </div>
+              <div>
+                <p className="text-subhead font-semibold text-foreground">
+                  {isTeacher ? "教師後台" : "我是老師"}
+                </p>
+                <p className="text-caption text-muted-foreground">
+                  {isTeacher ? "管理班級、查看學員進度" : "輸入註冊碼升級為教師"}
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+
+          <Link
+            to="/join"
+            className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
+                <Users className="h-[18px] w-[18px]" strokeWidth={1.9} />
+              </div>
+              <div>
+                <p className="text-subhead font-semibold text-foreground">加入班級</p>
+                <p className="text-caption text-muted-foreground">輸入老師給的邀請碼</p>
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+        </div>
+      )}
 
       {/* Guest CTA */}
       {!user && !loading && (

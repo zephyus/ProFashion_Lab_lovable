@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { dramaScenes, type DramaScene } from "@/lib/drama-scenes";
 import { askPersona } from "@/lib/persona-chat.functions";
+import { saveCallSession } from "@/lib/portfolio.functions";
 import { useSpeech, type SpeechGender } from "@/hooks/use-speech";
 import {
   initKokoroTts, synthesizeLocalSpeech, disposeKokoroTts, onKokoroProgress,
@@ -223,6 +224,7 @@ function CallPage() {
   const [question, setQuestion] = useState("");
   const [asking, setAsking] = useState(false);
   const askPersonaFn = useServerFn(askPersona);
+  const saveCallFn = useServerFn(saveCallSession);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -374,6 +376,19 @@ function CallPage() {
     speech.cancel();
     stopLocalAudio();
     synthSeqRef.current++;
+    // 留存通話紀錄（至少聽完一句才記）；未登入或失敗都靜默
+    if (active && (lineIdx > 0 || chat.length > 0)) {
+      void saveCallFn({
+        data: {
+          persona_id: active.id,
+          persona_name: active.name,
+          persona_job: active.job,
+          script_lines_played: lineIdx + 1,
+          message_count: chat.length,
+          duration_seconds: seconds,
+        },
+      }).catch(() => { /* 訪客或斷線都不打擾 */ });
+    }
     setActive(null); setLineIdx(0);
     setSeconds(0); setMuted(false);
     setChat([]); setQuestion(""); setAsking(false);
