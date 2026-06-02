@@ -8,7 +8,12 @@ import {
   Zap,
   FlaskConical,
   Sparkles,
+  LogIn,
+  LogOut,
 } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_app/")({
   head: () => ({
@@ -68,8 +73,62 @@ const sections = [
 ] as const;
 
 function HomePage() {
+  const { user, loading } = useAuth();
+  const displayName =
+    (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ??
+    (user?.user_metadata as { name?: string } | undefined)?.name ??
+    user?.email?.split("@")[0] ??
+    "";
+  const avatarUrl = (user?.user_metadata as { avatar_url?: string } | undefined)?.avatar_url;
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("登出失敗，請再試一次");
+      return;
+    }
+    toast.success("已登出");
+  };
+
   return (
-    <div className="px-5 pt-8">
+    <div className="px-5 pt-6">
+      {/* Auth pill */}
+      <div className="mb-4 flex justify-end">
+        {loading ? (
+          <div className="h-8 w-20 animate-pulse rounded-full bg-muted" />
+        ) : user ? (
+          <div className="flex items-center gap-2 rounded-full border border-border bg-card px-2 py-1 shadow-[var(--shadow-card)]">
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={displayName}
+                className="h-6 w-6 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                {displayName.charAt(0).toUpperCase() || "U"}
+              </div>
+            )}
+            <span className="max-w-[8rem] truncate text-xs font-medium">{displayName}</span>
+            <button
+              onClick={handleLogout}
+              aria-label="登出"
+              className="flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ) : (
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-card)] transition-transform active:scale-95"
+          >
+            <LogIn className="h-3.5 w-3.5" /> 登入
+          </Link>
+        )}
+      </div>
+
+
       {/* Lab brand banner — clearly the main hub */}
       <div className="mb-6 overflow-hidden rounded-3xl bg-[image:var(--gradient-hero)] p-6 text-primary-foreground shadow-[var(--shadow-float)]">
         <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest opacity-90">
