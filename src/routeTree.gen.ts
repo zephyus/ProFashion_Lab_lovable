@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppTeacherSignupRouteImport } from './routes/_app.teacher-signup'
 import { Route as AppMapRouteImport } from './routes/_app.map'
 import { Route as AppExploreRouteImport } from './routes/_app.explore'
 import { Route as AppCallRouteImport } from './routes/_app.call'
@@ -30,6 +31,11 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeacherSignupRoute = AppTeacherSignupRouteImport.update({
+  id: '/teacher-signup',
+  path: '/teacher-signup',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMapRoute = AppMapRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
   '/map': typeof AppMapRouteWithChildren
+  '/teacher-signup': typeof AppTeacherSignupRoute
   '/map/$mentorId': typeof AppMapMentorIdRoute
 }
 export interface FileRoutesByTo {
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
   '/map': typeof AppMapRouteWithChildren
+  '/teacher-signup': typeof AppTeacherSignupRoute
   '/': typeof AppIndexRoute
   '/map/$mentorId': typeof AppMapMentorIdRoute
 }
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/_app/call': typeof AppCallRoute
   '/_app/explore': typeof AppExploreRoute
   '/_app/map': typeof AppMapRouteWithChildren
+  '/_app/teacher-signup': typeof AppTeacherSignupRoute
   '/_app/': typeof AppIndexRoute
   '/_app/map/$mentorId': typeof AppMapMentorIdRoute
 }
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/call'
     | '/explore'
     | '/map'
+    | '/teacher-signup'
     | '/map/$mentorId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/call'
     | '/explore'
     | '/map'
+    | '/teacher-signup'
     | '/'
     | '/map/$mentorId'
   id:
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/_app/call'
     | '/_app/explore'
     | '/_app/map'
+    | '/_app/teacher-signup'
     | '/_app/'
     | '/_app/map/$mentorId'
   fileRoutesById: FileRoutesById
@@ -144,6 +156,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/teacher-signup': {
+      id: '/_app/teacher-signup'
+      path: '/teacher-signup'
+      fullPath: '/teacher-signup'
+      preLoaderRoute: typeof AppTeacherSignupRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/map': {
@@ -200,6 +219,7 @@ interface AppRouteChildren {
   AppCallRoute: typeof AppCallRoute
   AppExploreRoute: typeof AppExploreRoute
   AppMapRoute: typeof AppMapRouteWithChildren
+  AppTeacherSignupRoute: typeof AppTeacherSignupRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
@@ -208,6 +228,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCallRoute: AppCallRoute,
   AppExploreRoute: AppExploreRoute,
   AppMapRoute: AppMapRouteWithChildren,
+  AppTeacherSignupRoute: AppTeacherSignupRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
@@ -220,3 +241,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
