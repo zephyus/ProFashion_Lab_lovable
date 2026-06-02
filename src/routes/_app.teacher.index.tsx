@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRoles } from "@/hooks/useRoles";
 import { createClassroom, getMyClassrooms } from "@/lib/classroom.functions";
 
-export const Route = createFileRoute("/_app/teacher")({
+export const Route = createFileRoute("/_app/teacher/")({
   head: () => ({ meta: [{ title: "教師後台 — ProFashion Lab" }] }),
   component: TeacherDashboard,
 });
