@@ -273,7 +273,6 @@ function CallPage() {
   const tabs: { id: Mode; label: string; icon: typeof Phone }[] = [
     { id: "real", label: "真實職人", icon: Phone },
     { id: "timewarp", label: "跨時空", icon: Sparkles },
-    { id: "drama", label: "一日實境", icon: Radio },
     { id: "intern", label: "虛擬實習", icon: Trophy },
     { id: "hybrid", label: "跨界混合", icon: Atom },
   ];
