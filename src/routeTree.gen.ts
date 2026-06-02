@@ -13,6 +13,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppMatchRouteImport } from './routes/_app.match'
 import { Route as AppMapRouteImport } from './routes/_app.map'
+import { Route as AppExploreRouteImport } from './routes/_app.explore'
 import { Route as AppCallRouteImport } from './routes/_app.call'
 import { Route as AppCafeRouteImport } from './routes/_app.cafe'
 import { Route as AppMapMentorIdRouteImport } from './routes/_app.map.$mentorId'
@@ -36,6 +37,11 @@ const AppMapRoute = AppMapRouteImport.update({
   path: '/map',
   getParentRoute: () => AppRoute,
 } as any)
+const AppExploreRoute = AppExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCallRoute = AppCallRouteImport.update({
   id: '/call',
   path: '/call',
@@ -56,6 +62,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/cafe': typeof AppCafeRoute
   '/call': typeof AppCallRoute
+  '/explore': typeof AppExploreRoute
   '/map': typeof AppMapRouteWithChildren
   '/match': typeof AppMatchRoute
   '/map/$mentorId': typeof AppMapMentorIdRoute
@@ -63,6 +70,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/cafe': typeof AppCafeRoute
   '/call': typeof AppCallRoute
+  '/explore': typeof AppExploreRoute
   '/map': typeof AppMapRouteWithChildren
   '/match': typeof AppMatchRoute
   '/': typeof AppIndexRoute
@@ -73,6 +81,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_app/cafe': typeof AppCafeRoute
   '/_app/call': typeof AppCallRoute
+  '/_app/explore': typeof AppExploreRoute
   '/_app/map': typeof AppMapRouteWithChildren
   '/_app/match': typeof AppMatchRoute
   '/_app/': typeof AppIndexRoute
@@ -80,14 +89,29 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cafe' | '/call' | '/map' | '/match' | '/map/$mentorId'
+  fullPaths:
+    | '/'
+    | '/cafe'
+    | '/call'
+    | '/explore'
+    | '/map'
+    | '/match'
+    | '/map/$mentorId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/cafe' | '/call' | '/map' | '/match' | '/' | '/map/$mentorId'
+  to:
+    | '/cafe'
+    | '/call'
+    | '/explore'
+    | '/map'
+    | '/match'
+    | '/'
+    | '/map/$mentorId'
   id:
     | '__root__'
     | '/_app'
     | '/_app/cafe'
     | '/_app/call'
+    | '/_app/explore'
     | '/_app/map'
     | '/_app/match'
     | '/_app/'
@@ -128,6 +152,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMapRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/explore': {
+      id: '/_app/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof AppExploreRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/call': {
       id: '/_app/call'
       path: '/call'
@@ -166,6 +197,7 @@ const AppMapRouteWithChildren =
 interface AppRouteChildren {
   AppCafeRoute: typeof AppCafeRoute
   AppCallRoute: typeof AppCallRoute
+  AppExploreRoute: typeof AppExploreRoute
   AppMapRoute: typeof AppMapRouteWithChildren
   AppMatchRoute: typeof AppMatchRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -174,6 +206,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppCafeRoute: AppCafeRoute,
   AppCallRoute: AppCallRoute,
+  AppExploreRoute: AppExploreRoute,
   AppMapRoute: AppMapRouteWithChildren,
   AppMatchRoute: AppMatchRoute,
   AppIndexRoute: AppIndexRoute,
@@ -187,3 +220,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
