@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { dramaScenes, type DramaScene } from "@/lib/drama-scenes";
 import { askPersona } from "@/lib/persona-chat.functions";
+import { saveCallSession } from "@/lib/portfolio.functions";
 import { useSpeech, type SpeechGender } from "@/hooks/use-speech";
 import {
   initKokoroTts, synthesizeLocalSpeech, disposeKokoroTts, onKokoroProgress,
