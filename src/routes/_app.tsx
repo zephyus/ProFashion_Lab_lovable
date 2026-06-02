@@ -39,7 +39,9 @@ function AppLayout() {
                 >
                   <div
                     className={`flex h-9 w-9 items-center justify-center rounded-2xl transition-all ${
-                      active ? "bg-primary text-primary-foreground shadow-[var(--shadow-card)]" : ""
+                      to === "/"
+                        ? `ring-2 ring-primary ring-offset-2 ring-offset-card ${active ? "bg-primary text-primary-foreground shadow-[var(--shadow-card)]" : "bg-primary-soft text-primary-deep"}`
+                        : active ? "bg-primary text-primary-foreground shadow-[var(--shadow-card)]" : ""
                     }`}
                   >
                     <Icon className="h-4 w-4" />
