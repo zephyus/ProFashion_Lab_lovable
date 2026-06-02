@@ -4,7 +4,6 @@ import {
   Coffee,
   Map as MapIcon,
   Phone,
-  ChevronRight,
   LogOut,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -30,28 +29,28 @@ const stations = [
   {
     key: "explore",
     title: "發現小秘 me",
-    desc: "8 個問題，看見你還沒看見的自己。",
+    desc: "不知道自己適合什麼？從測驗到虛擬實習，用關卡累積真實經驗，逐步看見你的職涯輪廓。",
     icon: Compass,
     to: "/explore",
   },
   {
     key: "cafe",
     title: "職業咖啡館",
-    desc: "那些他們在訪談裡不會說的事。",
+    desc: "選擇前，先看見真相。聽職場人親口說的日常，了解那些履歷表寫不出來的真實工作樣貌。",
     icon: Coffee,
     to: "/cafe",
   },
   {
     key: "map",
     title: "職圖",
-    desc: "把學科、能力與職位連起來看。",
+    desc: "串連各職業與你之間的關聯，進行了解、媒合與實習。讓學科、能力與職位彼此對話，找到你的路徑。",
     icon: MapIcon,
     to: "/map",
   },
   {
     key: "call",
     title: "您撥的號碼是未來",
-    desc: "打給未來、過去，或走進一場職場廣播劇。",
+    desc: "與其想像職場，不如進入職場。透過廣播劇與角色通話，在故事裡預演決策，練習未來的每個關鍵時刻。",
     icon: Phone,
     to: "/call",
   },
@@ -178,25 +177,6 @@ function HomePage() {
         })}
       </section>
 
-      {/* Single emphasis row — what's new / continue */}
-      <Link
-        to="/explore"
-        className="press mt-3 flex items-center justify-between rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted/40 animate-rise"
-        style={{ animationDelay: "320ms" }}
-      >
-        <div className="min-w-0 pr-3">
-          <p className="text-caption uppercase tracking-wider text-primary-deep">
-            新手建議
-          </p>
-          <p className="mt-1 text-subhead font-medium text-foreground">
-            從一個 3 分鐘的小測驗開始
-          </p>
-        </div>
-        <ChevronRight
-          className="h-5 w-5 shrink-0 text-muted-foreground"
-          strokeWidth={1.6}
-        />
-      </Link>
 
       {/* Quiet footer */}
       <footer className="mt-10 pb-8">
