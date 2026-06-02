@@ -9,6 +9,8 @@ import {
   Heart,
   CheckCircle2,
   Calendar,
+  User,
+  Users,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CATEGORY_META, MentorSlot, getMentor } from "@/lib/mentors";
 import { cn } from "@/lib/utils";
+
+type BookingType = "individual" | "class";
 
 export const Route = createFileRoute("/_app/map/$mentorId")({
   head: ({ params }) => {
@@ -38,25 +42,55 @@ export const Route = createFileRoute("/_app/map/$mentorId")({
   component: MentorDetailPage,
 });
 
-type Step = "idle" | "slot" | "form" | "done";
+type Step = "idle" | "type" | "slot" | "form" | "done";
 
 function MentorDetailPage() {
   const { mentorId } = Route.useParams();
   const mentor = getMentor(mentorId)!;
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("idle");
+  const [bookingType, setBookingType] = useState<BookingType | null>(null);
   const [slot, setSlot] = useState<MentorSlot | null>(null);
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
-  const [errors, setErrors] = useState<{ name?: string; contact?: string }>({});
+  const [school, setSchool] = useState("");
+  const [className, setClassName] = useState("");
+  const [studentCount, setStudentCount] = useState("");
+  const [errors, setErrors] = useState<{
+    name?: string;
+    contact?: string;
+    school?: string;
+    className?: string;
+    studentCount?: string;
+  }>({});
 
   const tone = CATEGORY_META[mentor.category].tone;
+
+  const resetAll = () => {
+    setStep("idle");
+    setBookingType(null);
+    setSlot(null);
+    setName("");
+    setContact("");
+    setSchool("");
+    setClassName("");
+    setStudentCount("");
+    setErrors({});
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const errs: typeof errors = {};
-    if (!name.trim()) errs.name = "請輸入姓名";
+    if (!name.trim()) errs.name = bookingType === "class" ? "請輸入老師姓名" : "請輸入姓名";
     if (!contact.trim()) errs.contact = "請輸入聯絡方式";
+    if (bookingType === "class") {
+      if (!school.trim()) errs.school = "請輸入學校名稱";
+      if (!className.trim()) errs.className = "請輸入班級";
+      const n = Number(studentCount);
+      if (!studentCount.trim() || !Number.isFinite(n) || n < 1) {
+        errs.studentCount = "請輸入有效人數";
+      }
+    }
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
     setStep("done");
@@ -157,7 +191,7 @@ function MentorDetailPage() {
           <Button
             className="w-full bg-[image:var(--gradient-hero)] text-base shadow-[var(--shadow-float)]"
             size="lg"
-            onClick={() => setStep("slot")}
+            onClick={() => setStep("type")}
             disabled={!mentor.available}
           >
             {mentor.available ? "報名體驗" : "目前無可預約時段"}
@@ -169,18 +203,68 @@ function MentorDetailPage() {
       {step !== "idle" && (
         <div
           className="fixed inset-0 z-50 bg-foreground/30 backdrop-blur-sm"
-          onClick={() => step !== "done" && setStep("idle")}
+          onClick={() => step !== "done" && resetAll()}
         >
           <div
-            className="absolute bottom-0 left-1/2 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-card p-6 shadow-[var(--shadow-float)]"
+            className="absolute bottom-0 left-1/2 max-h-[90vh] w-full max-w-md -translate-x-1/2 overflow-y-auto rounded-t-3xl bg-card p-6 shadow-[var(--shadow-float)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-muted" />
 
+            {step === "type" && (
+              <div>
+                <h2 className="text-lg font-bold">選擇預約方式</h2>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  你是個人想體驗，還是老師幫班級報名？
+                </p>
+                <div className="mt-4 space-y-2">
+                  <button
+                    onClick={() => {
+                      setBookingType("individual");
+                      setStep("slot");
+                    }}
+                    className="flex w-full items-center gap-3 rounded-xl border border-border bg-background p-4 text-left transition-all hover:border-primary hover:bg-primary-soft"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-soft">
+                      <User className="h-5 w-5 text-primary-deep" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold">個人預約</div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">
+                        以個人身分參加一場職涯體驗
+                      </div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setBookingType("class");
+                      setStep("slot");
+                    }}
+                    className="flex w-full items-center gap-3 rounded-xl border border-border bg-background p-4 text-left transition-all hover:border-primary hover:bg-primary-soft"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-soft">
+                      <Users className="h-5 w-5 text-primary-deep" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold">老師幫班級預約</div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">
+                        為班級安排一場團體職涯體驗
+                      </div>
+                    </div>
+                  </button>
+                </div>
+                <Button variant="ghost" className="mt-4 w-full" onClick={resetAll}>
+                  取消
+                </Button>
+              </div>
+            )}
+
             {step === "slot" && (
               <div>
                 <h2 className="text-lg font-bold">選擇體驗時段</h2>
-                <p className="mt-1 text-xs text-muted-foreground">與 {mentor.name} 一起的時間</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {bookingType === "class" ? "為班級安排與" : "與"} {mentor.name} 的時間
+                </p>
                 <div className="mt-4 space-y-2">
                   {mentor.slots.map((s) => (
                     <button
@@ -199,26 +283,30 @@ function MentorDetailPage() {
                     </button>
                   ))}
                 </div>
-                <Button variant="ghost" className="mt-4 w-full" onClick={() => setStep("idle")}>
-                  取消
+                <Button variant="ghost" className="mt-4 w-full" onClick={() => setStep("type")}>
+                  上一步
                 </Button>
               </div>
             )}
 
             {step === "form" && slot && (
               <form onSubmit={handleSubmit}>
-                <h2 className="text-lg font-bold">填寫報名資料</h2>
+                <h2 className="text-lg font-bold">
+                  {bookingType === "class" ? "填寫班級報名資料" : "填寫報名資料"}
+                </h2>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {slot.date} · {slot.time}
                 </p>
                 <div className="mt-4 space-y-3">
                   <div>
-                    <Label htmlFor="name">姓名</Label>
+                    <Label htmlFor="name">
+                      {bookingType === "class" ? "帶隊老師姓名" : "姓名"}
+                    </Label>
                     <Input
                       id="name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="您的姓名"
+                      placeholder={bookingType === "class" ? "老師姓名" : "您的姓名"}
                       className="mt-1"
                     />
                     {errors.name && <p className="mt-1 text-xs text-destructive">{errors.name}</p>}
@@ -236,6 +324,54 @@ function MentorDetailPage() {
                       <p className="mt-1 text-xs text-destructive">{errors.contact}</p>
                     )}
                   </div>
+
+                  {bookingType === "class" && (
+                    <>
+                      <div>
+                        <Label htmlFor="school">學校</Label>
+                        <Input
+                          id="school"
+                          value={school}
+                          onChange={(e) => setSchool(e.target.value)}
+                          placeholder="例：明德高中"
+                          className="mt-1"
+                        />
+                        {errors.school && (
+                          <p className="mt-1 text-xs text-destructive">{errors.school}</p>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="className">班級</Label>
+                          <Input
+                            id="className"
+                            value={className}
+                            onChange={(e) => setClassName(e.target.value)}
+                            placeholder="例：二年三班"
+                            className="mt-1"
+                          />
+                          {errors.className && (
+                            <p className="mt-1 text-xs text-destructive">{errors.className}</p>
+                          )}
+                        </div>
+                        <div>
+                          <Label htmlFor="studentCount">學生人數</Label>
+                          <Input
+                            id="studentCount"
+                            type="number"
+                            min={1}
+                            value={studentCount}
+                            onChange={(e) => setStudentCount(e.target.value)}
+                            placeholder="例：30"
+                            className="mt-1"
+                          />
+                          {errors.studentCount && (
+                            <p className="mt-1 text-xs text-destructive">{errors.studentCount}</p>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
                 <div className="mt-5 flex gap-2">
                   <Button type="button" variant="outline" className="flex-1" onClick={() => setStep("slot")}>
@@ -256,22 +392,26 @@ function MentorDetailPage() {
                 <h2 className="mt-4 text-lg font-bold">報名成功！</h2>
                 <p className="mt-1 text-xs text-muted-foreground">我們會盡快與你聯繫確認細節</p>
                 <div className="mt-5 rounded-xl bg-primary-soft p-4 text-left text-sm">
+                  <Row
+                    label="預約類型"
+                    value={bookingType === "class" ? "老師・班級預約" : "個人預約"}
+                  />
                   <Row label="職人" value={`${mentor.name}・${mentor.job}`} />
                   <Row label="時段" value={`${slot.date} ${slot.time}`} />
-                  <Row label="姓名" value={name} />
+                  <Row
+                    label={bookingType === "class" ? "帶隊老師" : "姓名"}
+                    value={name}
+                  />
                   <Row label="聯絡" value={contact} />
+                  {bookingType === "class" && (
+                    <>
+                      <Row label="學校" value={school} />
+                      <Row label="班級" value={`${className}・${studentCount} 人`} />
+                    </>
+                  )}
                 </div>
                 <div className="mt-5 flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => {
-                      setStep("idle");
-                      setSlot(null);
-                      setName("");
-                      setContact("");
-                    }}
-                  >
+                  <Button variant="outline" className="flex-1" onClick={resetAll}>
                     關閉
                   </Button>
                   <Button
