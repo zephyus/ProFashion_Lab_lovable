@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
-import { Route as AppMatchRouteImport } from './routes/_app.match'
 import { Route as AppMapRouteImport } from './routes/_app.map'
 import { Route as AppExploreRouteImport } from './routes/_app.explore'
 import { Route as AppCallRouteImport } from './routes/_app.call'
@@ -25,11 +24,6 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppMatchRoute = AppMatchRouteImport.update({
-  id: '/match',
-  path: '/match',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMapRoute = AppMapRouteImport.update({
@@ -64,7 +58,6 @@ export interface FileRoutesByFullPath {
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
   '/map': typeof AppMapRouteWithChildren
-  '/match': typeof AppMatchRoute
   '/map/$mentorId': typeof AppMapMentorIdRoute
 }
 export interface FileRoutesByTo {
@@ -72,7 +65,6 @@ export interface FileRoutesByTo {
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
   '/map': typeof AppMapRouteWithChildren
-  '/match': typeof AppMatchRoute
   '/': typeof AppIndexRoute
   '/map/$mentorId': typeof AppMapMentorIdRoute
 }
@@ -83,29 +75,14 @@ export interface FileRoutesById {
   '/_app/call': typeof AppCallRoute
   '/_app/explore': typeof AppExploreRoute
   '/_app/map': typeof AppMapRouteWithChildren
-  '/_app/match': typeof AppMatchRoute
   '/_app/': typeof AppIndexRoute
   '/_app/map/$mentorId': typeof AppMapMentorIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/cafe'
-    | '/call'
-    | '/explore'
-    | '/map'
-    | '/match'
-    | '/map/$mentorId'
+  fullPaths: '/' | '/cafe' | '/call' | '/explore' | '/map' | '/map/$mentorId'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/cafe'
-    | '/call'
-    | '/explore'
-    | '/map'
-    | '/match'
-    | '/'
-    | '/map/$mentorId'
+  to: '/cafe' | '/call' | '/explore' | '/map' | '/' | '/map/$mentorId'
   id:
     | '__root__'
     | '/_app'
@@ -113,7 +90,6 @@ export interface FileRouteTypes {
     | '/_app/call'
     | '/_app/explore'
     | '/_app/map'
-    | '/_app/match'
     | '/_app/'
     | '/_app/map/$mentorId'
   fileRoutesById: FileRoutesById
@@ -136,13 +112,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/match': {
-      id: '/_app/match'
-      path: '/match'
-      fullPath: '/match'
-      preLoaderRoute: typeof AppMatchRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/map': {
@@ -199,7 +168,6 @@ interface AppRouteChildren {
   AppCallRoute: typeof AppCallRoute
   AppExploreRoute: typeof AppExploreRoute
   AppMapRoute: typeof AppMapRouteWithChildren
-  AppMatchRoute: typeof AppMatchRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
@@ -208,7 +176,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppCallRoute: AppCallRoute,
   AppExploreRoute: AppExploreRoute,
   AppMapRoute: AppMapRouteWithChildren,
-  AppMatchRoute: AppMatchRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
@@ -220,13 +187,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
