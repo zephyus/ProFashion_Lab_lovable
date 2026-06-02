@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
-import { Phone, PhoneOff, Mic, Volume2, Sparkles, Radio, Briefcase, Atom, Trophy } from "lucide-react";
+import { Phone, PhoneOff, Mic, Volume2, Sparkles, Briefcase, Atom, Trophy } from "lucide-react";
 
 export const Route = createFileRoute("/_app/call")({
   head: () => ({ meta: [{ title: "您撥的號碼是未來" }] }),
