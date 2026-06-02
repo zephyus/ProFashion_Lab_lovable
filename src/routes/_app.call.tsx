@@ -179,6 +179,7 @@ const hybridPersonas: Persona[] = [
 function CallPage() {
   const [mode, setMode] = useState<Mode>("real");
   const [active, setActive] = useState<Persona | null>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
   const [lineIdx, setLineIdx] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [muted, setMuted] = useState(false);
@@ -187,6 +188,7 @@ function CallPage() {
   // Drama state
   const [drama, setDrama] = useState<DramaScene | null>(null);
   const [dramaIdx, setDramaIdx] = useState(0);
+  const [dramaListIdx, setDramaListIdx] = useState(0);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -205,41 +207,42 @@ function CallPage() {
   const next = () => active && lineIdx < active.script.length - 1 && setLineIdx((i) => i + 1);
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
-  // ===== Drama immersive view (uses primary color, no random gradients) =====
+  // ===== Drama immersive view =====
   if (drama) {
     const node = drama.nodes[dramaIdx];
     return (
-      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col bg-[image:var(--gradient-morandi)] px-6 py-10 text-primary-foreground">
+      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col px-6 py-10"
+        style={{ ...morandiBg(dramaListIdx), color: morandiInk }}>
         <div className="text-center">
-          <p className="text-xs opacity-80">廣播劇 · {fmt(seconds)}</p>
+          <p className="text-xs opacity-70">廣播劇 · {fmt(seconds)}</p>
           <h2 className="mt-2 text-2xl font-bold">{drama.title}</h2>
-          <p className="mt-1 text-[11px] opacity-80">{drama.tag}</p>
+          <p className="mt-1 text-[11px] opacity-70">{drama.tag}</p>
         </div>
         <div className="mt-8 flex-1 space-y-4 overflow-y-auto">
-          <div className="rounded-2xl bg-white/15 p-4 backdrop-blur-sm">
-            <p className="text-xs opacity-80">{node.speaker}</p>
+          <div className="rounded-2xl bg-white/45 p-4 backdrop-blur-sm">
+            <p className="text-xs opacity-70">{node.speaker}</p>
             <p className="mt-2 text-base leading-relaxed">{node.line}</p>
           </div>
           {node.choices && (
             <div className="space-y-2">
               {node.choices.map((c, i) => (
                 <button key={i} onClick={() => setDramaIdx(c.next)}
-                  className="w-full rounded-2xl bg-white/20 p-4 text-left text-sm font-semibold backdrop-blur-sm active:scale-95">
+                  className="w-full rounded-2xl bg-white/55 p-4 text-left text-sm font-semibold backdrop-blur-sm active:scale-95">
                   {c.label}
                 </button>
               ))}
             </div>
           )}
           {node.ending && (
-            <div className="rounded-2xl border border-white/30 bg-black/15 p-4 text-sm">
+            <div className="rounded-2xl border border-black/10 bg-white/65 p-4 text-sm">
               <p className="font-bold leading-relaxed">{node.ending}</p>
             </div>
           )}
           {!node.choices && !node.ending && dramaIdx < drama.nodes.length - 1 && (
-            <button onClick={() => setDramaIdx(dramaIdx + 1)} className="w-full rounded-2xl bg-white/20 p-3 text-sm font-semibold">繼續 →</button>
+            <button onClick={() => setDramaIdx(dramaIdx + 1)} className="w-full rounded-2xl bg-white/55 p-3 text-sm font-semibold">繼續 →</button>
           )}
         </div>
-        <button onClick={exitDrama} className="mx-auto mt-6 flex h-14 w-14 items-center justify-center rounded-full bg-red-500 shadow-2xl active:scale-95">
+        <button onClick={exitDrama} className="mx-auto mt-6 flex h-14 w-14 items-center justify-center rounded-full bg-red-500 text-white shadow-2xl active:scale-95">
           <PhoneOff className="h-6 w-6" />
         </button>
       </div>
@@ -249,21 +252,22 @@ function CallPage() {
   // ===== Persona call active view =====
   if (active) {
     return (
-      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col items-center justify-between bg-[image:var(--gradient-morandi)] px-8 py-12 text-primary-foreground">
+      <div className="fixed inset-0 z-[60] mx-auto flex max-w-md flex-col items-center justify-between px-8 py-12"
+        style={{ ...morandiBg(activeIdx), color: morandiInk }}>
         <div className="text-center">
-          <p className="text-sm opacity-80">
+          <p className="text-sm opacity-70">
             通話中 · {fmt(seconds)}
             {muted && " · 靜音"}
             {!speakerOn && " · 聽筒"}
           </p>
           <h2 className="mt-4 text-4xl font-bold">{active.name}</h2>
-          <p className="mt-1 text-sm opacity-90">{active.job}</p>
+          <p className="mt-1 text-sm opacity-80">{active.job}</p>
         </div>
 
         <div className="flex flex-col items-center">
           <div className="relative">
-            {speakerOn && <div className="absolute inset-0 animate-ping rounded-full bg-white/30" />}
-            <div className="relative flex h-36 w-36 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+            {speakerOn && <div className="absolute inset-0 animate-ping rounded-full bg-white/45" />}
+            <div className="relative flex h-36 w-36 items-center justify-center rounded-full bg-white/40 backdrop-blur-sm">
               <Volume2 className={`h-16 w-16 ${!speakerOn ? "opacity-40" : ""}`} />
             </div>
           </div>
@@ -271,23 +275,23 @@ function CallPage() {
 
         <div className="w-full">
           <button onClick={next}
-            className="min-h-[100px] w-full rounded-3xl bg-white/15 p-5 text-left text-[15px] leading-relaxed backdrop-blur-sm transition-all active:bg-white/25">
+            className="min-h-[100px] w-full rounded-3xl bg-white/50 p-5 text-left text-[15px] leading-relaxed backdrop-blur-sm transition-all active:bg-white/65">
             {active.script[lineIdx]}
           </button>
-          <p className="mt-2 text-center text-xs opacity-70">
+          <p className="mt-2 text-center text-xs opacity-65">
             {lineIdx < active.script.length - 1 ? "點擊繼續聆聽 →" : "對話結束，按紅鈕掛斷"}
           </p>
 
           <div className="mt-6 flex items-center justify-around">
             <button onClick={() => setMuted((m) => !m)} aria-pressed={muted} aria-label={muted ? "取消靜音" : "靜音"}
-              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${muted ? "bg-white text-foreground" : "bg-white/15"}`}>
+              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${muted ? "bg-white" : "bg-white/40"}`}>
               <Mic className="h-6 w-6" />
             </button>
-            <button onClick={hangup} aria-label="掛斷" className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 shadow-2xl active:scale-95">
+            <button onClick={hangup} aria-label="掛斷" className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 text-white shadow-2xl active:scale-95">
               <PhoneOff className="h-7 w-7" />
             </button>
             <button onClick={() => setSpeakerOn((s) => !s)} aria-pressed={speakerOn} aria-label={speakerOn ? "切換聽筒" : "切換喇叭"}
-              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${speakerOn ? "bg-white/15" : "bg-white text-foreground"}`}>
+              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${speakerOn ? "bg-white/40" : "bg-white"}`}>
               <Volume2 className="h-6 w-6" />
             </button>
           </div>
@@ -308,6 +312,7 @@ function CallPage() {
     mode === "real" ? realPersonas :
     mode === "timewarp" ? timewarpPersonas :
     mode === "hybrid" ? hybridPersonas : [];
+
 
   return (
     <div className="px-5 pt-12 pb-24">
