@@ -22,6 +22,11 @@ function LoginPage() {
   const { user } = useAuth();
   const { xp, completed, tierName } = useXp();
   const [signingIn, setSigningIn] = useState(false);
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -41,6 +46,43 @@ function LoginPage() {
     if (result.redirected) return;
     toast.success("登入成功");
     navigate({ to: "/", replace: true });
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      toast.error("請輸入 Email 與密碼");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("密碼至少 6 個字元");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: { full_name: name || email.split("@")[0] },
+          },
+        });
+        if (error) throw error;
+        toast.success("註冊成功，請至信箱完成驗證");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        toast.success("登入成功");
+        navigate({ to: "/", replace: true });
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "發生錯誤";
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
