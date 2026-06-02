@@ -1,11 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, useEffect, useRef } from "react";
-import { Phone, PhoneOff, Mic, MicOff, Volume2, Sparkles, Atom, Radio, Send, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Phone, PhoneOff, Mic, MicOff, Volume2, VolumeX, Sparkles, Atom, Radio, Send, Loader2, Cpu, Download,
+} from "lucide-react";
 import { dramaScenes, type DramaScene } from "@/lib/drama-scenes";
 import { askPersona } from "@/lib/persona-chat.functions";
 import { useSpeech, type SpeechGender } from "@/hooks/use-speech";
+import {
+  initKokoroTts, synthesizeLocalSpeech, disposeKokoroTts, onKokoroProgress,
+  type KokoroProgress,
+} from "@/lib/local-tts/kokoroTts";
+import { splitTextForTts } from "@/lib/local-tts/wav";
 import { toast } from "sonner";
+
 
 
 export const Route = createFileRoute("/_app/call")({
