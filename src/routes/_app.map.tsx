@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link, Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
 import { MapPin, Sparkles, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -28,10 +28,15 @@ const FILTERS: { key: Filter; label: string }[] = [
 ];
 
 function MapPage() {
+  const { pathname } = useLocation();
   const [filter, setFilter] = useState<Filter>("all");
   const [api, setApi] = useState<CarouselApi | null>(null);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const syncSource = useRef<"map" | "carousel" | null>(null);
+
+  if (pathname !== "/map") {
+    return <Outlet />;
+  }
 
   const mentors = useMemo(
     () => (filter === "all" ? MENTORS : MENTORS.filter((m) => m.category === filter)),
