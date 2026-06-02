@@ -208,6 +208,30 @@ function CallPage() {
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Web Speech API
+  const speech = useSpeech();
+  useEffect(() => { speech.setMuted(muted || !speakerOn); }, [muted, speakerOn, speech]);
+
+  // 角色腳本：每換一句就朗讀
+  useEffect(() => {
+    if (active) speech.speak(active.script[lineIdx], active.gender);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, lineIdx]);
+
+  // LLM 回覆：每收到新 assistant 訊息就朗讀
+  useEffect(() => {
+    if (!active || chat.length === 0) return;
+    const last = chat[chat.length - 1];
+    if (last.role === "assistant") speech.speak(last.content, active.gender);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chat]);
+
+  // 廣播劇：每換一個節點就朗讀（中性聲音）
+  useEffect(() => {
+    if (drama) speech.speak(drama.nodes[dramaIdx]?.line ?? "", "neutral");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drama, dramaIdx]);
+
   useEffect(() => {
     if (active || drama) {
       timerRef.current = setInterval(() => setSeconds((s) => s + 1), 1000);
@@ -218,6 +242,7 @@ function CallPage() {
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat, asking]);
+
 
   const hangup = () => {
     setActive(null); setLineIdx(0);
