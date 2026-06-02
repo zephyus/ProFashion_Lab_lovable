@@ -8,7 +8,12 @@ import {
   Zap,
   FlaskConical,
   Sparkles,
+  LogIn,
+  LogOut,
 } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_app/")({
   head: () => ({
