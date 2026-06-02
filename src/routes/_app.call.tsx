@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
-import { Phone, PhoneOff, Mic, Volume2 } from "lucide-react";
+import { Phone, PhoneOff, Mic, Volume2, Sparkles, Radio, Briefcase, Atom, Trophy } from "lucide-react";
 
 export const Route = createFileRoute("/_app/call")({
   head: () => ({ meta: [{ title: "您撥的號碼是未來" }] }),
   component: CallPage,
 });
+
+type Mode = "real" | "timewarp" | "drama" | "intern" | "hybrid";
 
 type Persona = {
   id: string;
@@ -17,7 +19,7 @@ type Persona = {
   script: string[];
 };
 
-const personas: Persona[] = [
+const realPersonas: Persona[] = [
   {
     id: "av", name: "綾瀨小姐", job: "AV 女優", tag: "成人產業",
     color: "from-rose-400 to-pink-500",
@@ -80,26 +82,216 @@ const personas: Persona[] = [
   },
 ];
 
+const timewarpPersonas: Persona[] = [
+  {
+    id: "jobs", name: "Steve Jobs", job: "Apple 創辦人 · 1985", tag: "歷史名人",
+    color: "from-neutral-700 to-neutral-900",
+    intro: "與賈伯斯聊產品開發哲學",
+    script: [
+      "（線路雜訊）Hi, this is Steve. 你想聊產品？我只有十分鐘。",
+      "產品不是功能清單，是『一個你願意為它流淚的故事』。先想清楚，再寫一行 code。",
+      "焦點不是『多做什麼』，是『不做什麼』。我們砍掉 70% 的點子才有 Mac。",
+      "如果使用者要『更快的馬』，你給他汽車。不要問他要什麼，觀察他真正的痛。",
+      "Stay hungry, stay foolish. 掛了，我要去開會。",
+    ],
+  },
+  {
+    id: "davinci", name: "達文西", job: "文藝復興斜槓王 · 1503", tag: "歷史名人",
+    color: "from-amber-600 to-yellow-700",
+    intro: "聊斜槓人生與跨領域學習",
+    script: [
+      "Buongiorno，我是 Leonardo。你說你想當斜槓？",
+      "我畫畫、設計武器、解剖屍體、研究水流——它們其實是『同一件事』，叫做『觀察』。",
+      "不要怕『學了沒用』。我研究鳥的翅膀，三百年後才有飛機。",
+      "筆記本永遠帶在身上。每天記下 10 個你看不懂的東西，一年後你會驚訝。",
+      "好奇心是唯一不會退流行的技能。Addio。",
+    ],
+  },
+  {
+    id: "asteroid", name: "K-7 號採礦員", job: "小行星採礦工程師 · 2087", tag: "未來職業",
+    color: "from-zinc-600 to-slate-800",
+    intro: "在木星軌道採稀土礦",
+    script: [
+      "（訊號延遲 3 秒）這裡是 K-7，木星軌道。你說地球？",
+      "我們一趟任務 18 個月，重力是零，骨密度每個月掉 1%。",
+      "AI 操控鑽探，我們負責『判斷』——哪塊岩石值得拖回地球。",
+      "薪水是地球工程師 50 倍，但回去後三個月才能走路。",
+      "想入行？先考太空生理學跟稀土地質學，雙學位。Over。",
+    ],
+  },
+  {
+    id: "meta-shrink", name: "Dr. Vex", job: "元宇宙心理醫生 · 2045", tag: "未來職業",
+    color: "from-purple-500 to-fuchsia-600",
+    intro: "治療虛擬人格分裂與沉浸症候群",
+    script: [
+      "歡迎進入諮詢空間。我的化身只是介面，請放鬆。",
+      "新世代有 40% 的人有『分身焦慮』——不知道哪個自己才是真的。",
+      "我們用 VR 重建你最早的記憶，然後一層一層整理你的虛擬身份。",
+      "最難治的是『元宇宙婚姻破裂』——對方關閉了共享空間，等於人間蒸發。",
+      "如果你想入行，先讀臨床心理 + 沉浸式介面設計，缺一不可。",
+    ],
+  },
+];
+
+const hybridPersonas: Persona[] = [
+  {
+    id: "ai-detective", name: "林探員", job: "AI 倫理偵探", tag: "跨界混合",
+    color: "from-emerald-500 to-teal-700",
+    intro: "調查 AI 偏見與演算法歧視案件",
+    script: [
+      "我是林探員。最近的案子——銀行 AI 拒絕了一整區的房貸申請。",
+      "我們不抓人，我們『拆解模型』。看訓練資料藏了什麼歷史偏見。",
+      "這行需要的是『法律 + 統計 + 心理學』的三角能力，缺一不可。",
+      "最棘手的是黑箱模型——連工程師都解釋不了它為什麼做這個決定。",
+      "想入行？先讀 ML 公平性論文，再考一張資料保護認證。",
+    ],
+  },
+  {
+    id: "legacy-restorer", name: "Maya", job: "數位遺產修復師", tag: "跨界混合",
+    color: "from-rose-500 to-purple-600",
+    intro: "重建逝者的社群帳號與數位記憶",
+    script: [
+      "Hi，我是 Maya。我幫家屬『找回』過世親人的數位生命。",
+      "從加密硬碟、雲端相簿、聊天紀錄，整理成一本『數位回憶錄』。",
+      "最感人的案子是替一位母親重建女兒 15 歲的 IG，讓她能再看一次。",
+      "倫理界線很重要——哪些該還原、哪些該銷毀，我們有一套協議。",
+      "這行結合資安 + 心理諮商 + 檔案學，現在全台不到 30 人。",
+    ],
+  },
+];
+
+type DramaChoice = { label: string; next: number };
+type DramaNode = { speaker: string; line: string; choices?: DramaChoice[]; ending?: string };
+
+const dramaScenes: { id: string; title: string; tag: string; color: string; intro: string; nodes: DramaNode[] }[] = [
+  {
+    id: "er", title: "急診室 03:47", tag: "醫療現場", color: "from-red-500 to-rose-700",
+    intro: "心臟外科住院醫師值班的最後一小時",
+    nodes: [
+      { speaker: "護理師", line: "醫師！32 床血壓掉到 70，他剛從車禍送進來。" },
+      { speaker: "主治（電話）", line: "我十分鐘後到。你先做決定。" },
+      { speaker: "你", line: "（選擇）",
+        choices: [{ label: "立刻開胸探查", next: 3 }, { label: "先做 CT 確認出血點", next: 4 }] },
+      { speaker: "結果", line: "你劃下第一刀。心包填塞解除，血壓回穩。主治趕到時握了你的手。", ending: "🏆 結局：你救了他。三年後他寄來婚禮喜帖。" },
+      { speaker: "結果", line: "CT 顯示主動脈剝離，但你錯失黃金 4 分鐘。患者在手術台上離開。", ending: "💔 結局：規範正確，結果遺憾。你學到——有時 SOP 救不了人。" },
+    ],
+  },
+  {
+    id: "ma", title: "東京 · 併購談判", tag: "跨國商戰", color: "from-indigo-500 to-blue-700",
+    intro: "你是 28 歲投行 VP，桌上 12 億美元",
+    nodes: [
+      { speaker: "對方 CEO", line: "我們要求估值再提 15%，否則今晚簽不下去。" },
+      { speaker: "你方 MD（耳機）", line: "底線是 8%。看你怎麼接。" },
+      { speaker: "你", line: "（選擇）",
+        choices: [{ label: "接受 15%，搶下交易", next: 3 }, { label: "強硬走人，逼對方讓步", next: 4 }] },
+      { speaker: "結果", line: "案子成交，但兩年後標的減值 40%。你升 MD，也背了內部處分。", ending: "🏆 結局：贏了短期，輸了長期。交易圈會記住你的名字——好壞參半。" },
+      { speaker: "結果", line: "你起身要走，對方追到電梯口接受 7%。簽約那晚你喝到斷片。", ending: "🏆 結局：你成為今年最年輕的 MD。但對方再也不接你電話。" },
+    ],
+  },
+];
+
+type Mission = { id: string; title: string; manager: string; reply: string; reward: number; success: string; fail: string };
+const missions: Mission[] = [
+  {
+    id: "m1", title: "Day 1：影印機卡紙了，全辦公室在看你",
+    manager: "（不耐煩）新來的，去處理一下。十分鐘內。",
+    reply: "選一個回應 →",
+    reward: 50,
+    success: "✅ 你冷靜拆開、清紙、重啟。經理點頭。+50 經驗值",
+    fail: "❌ 你慌張按錯按鈕，影印機冒煙。經理嘆氣。-10 信任值",
+  },
+  {
+    id: "m2", title: "Day 7：客戶突然來電飆罵，經理在開會",
+    manager: "（短訊）你接，我等下處理。記住——別承諾任何事。",
+    reply: "選一個回應 →",
+    reward: 100,
+    success: "✅ 你傾聽、記錄、承諾回電。客戶情緒平復。+100 經驗值",
+    fail: "❌ 你為了息事寧人答應全額退款。經理回來臉色鐵青。-30 信任值",
+  },
+  {
+    id: "m3", title: "Day 30：提案會議，老闆問你的看法",
+    manager: "（眼神）你說。三句話以內。",
+    reply: "選一個回應 →",
+    reward: 200,
+    success: "✅ 你提出市場切角，老闆當場拍桌：『就用這個』。+200 經驗值 🏆 升職為正職",
+    fail: "❌ 你緊張地說『沒意見』。會後經理把你拉到角落。-50 信任值",
+  },
+];
+
 function CallPage() {
+  const [mode, setMode] = useState<Mode>("real");
   const [active, setActive] = useState<Persona | null>(null);
   const [lineIdx, setLineIdx] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [muted, setMuted] = useState(false);
   const [speakerOn, setSpeakerOn] = useState(true);
+
+  // Drama state
+  const [drama, setDrama] = useState<(typeof dramaScenes)[number] | null>(null);
+  const [dramaIdx, setDramaIdx] = useState(0);
+
+  // Intern state
+  const [internStep, setInternStep] = useState(0);
+  const [xp, setXp] = useState(0);
+  const [internResult, setInternResult] = useState<string | null>(null);
+
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (active) {
+    if (active || drama) {
       timerRef.current = setInterval(() => setSeconds((s) => s + 1), 1000);
       return () => { if (timerRef.current) clearInterval(timerRef.current); };
     }
-  }, [active]);
+  }, [active, drama]);
 
-  const hangup = () => { setActive(null); setLineIdx(0); setSeconds(0); setMuted(false); setSpeakerOn(true); };
+  const hangup = () => {
+    setActive(null); setDrama(null); setLineIdx(0); setDramaIdx(0);
+    setSeconds(0); setMuted(false); setSpeakerOn(true);
+  };
   const next = () => active && lineIdx < active.script.length - 1 && setLineIdx((i) => i + 1);
-
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
+  // ===== Drama active view =====
+  if (drama) {
+    const node = drama.nodes[dramaIdx];
+    return (
+      <div className={`fixed inset-0 z-[60] mx-auto flex max-w-md flex-col bg-gradient-to-br ${drama.color} px-6 py-10 text-white`}>
+        <div className="text-center">
+          <p className="text-xs opacity-80">廣播劇 · {fmt(seconds)}</p>
+          <h2 className="mt-2 text-2xl font-bold">{drama.title}</h2>
+        </div>
+        <div className="mt-8 flex-1 space-y-4 overflow-y-auto">
+          <div className="rounded-2xl bg-white/15 p-4 backdrop-blur-sm">
+            <p className="text-xs opacity-80">{node.speaker}</p>
+            <p className="mt-2 text-base leading-relaxed">{node.line}</p>
+          </div>
+          {node.choices && (
+            <div className="space-y-2">
+              {node.choices.map((c, i) => (
+                <button key={i} onClick={() => setDramaIdx(c.next)}
+                  className="w-full rounded-2xl bg-white/20 p-4 text-left text-sm font-semibold backdrop-blur-sm active:scale-95">
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          )}
+          {node.ending && (
+            <div className="rounded-2xl border border-white/30 bg-black/20 p-4 text-sm">
+              <p className="font-bold">{node.ending}</p>
+            </div>
+          )}
+          {!node.choices && !node.ending && dramaIdx < drama.nodes.length - 1 && (
+            <button onClick={() => setDramaIdx(dramaIdx + 1)} className="w-full rounded-2xl bg-white/20 p-3 text-sm font-semibold">繼續 →</button>
+          )}
+        </div>
+        <button onClick={hangup} className="mx-auto mt-6 flex h-14 w-14 items-center justify-center rounded-full bg-red-500 shadow-2xl active:scale-95">
+          <PhoneOff className="h-6 w-6" />
+        </button>
+      </div>
+    );
+  }
+
+  // ===== Persona call active view =====
   if (active) {
     return (
       <div className={`fixed inset-0 z-[60] mx-auto flex max-w-md flex-col items-center justify-between bg-gradient-to-br ${active.color} px-8 py-12 text-white`}>
@@ -123,10 +315,8 @@ function CallPage() {
         </div>
 
         <div className="w-full">
-          <button
-            onClick={next}
-            className="min-h-[100px] w-full rounded-3xl bg-white/15 p-5 text-left text-[15px] leading-relaxed backdrop-blur-sm transition-all active:bg-white/25"
-          >
+          <button onClick={next}
+            className="min-h-[100px] w-full rounded-3xl bg-white/15 p-5 text-left text-[15px] leading-relaxed backdrop-blur-sm transition-all active:bg-white/25">
             {active.script[lineIdx]}
           </button>
           <p className="mt-2 text-center text-xs opacity-70">
@@ -134,23 +324,15 @@ function CallPage() {
           </p>
 
           <div className="mt-6 flex items-center justify-around">
-            <button
-              onClick={() => setMuted((m) => !m)}
-              aria-pressed={muted}
-              aria-label={muted ? "取消靜音" : "靜音"}
-              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${muted ? "bg-white text-foreground" : "bg-white/15"}`}
-            >
+            <button onClick={() => setMuted((m) => !m)} aria-pressed={muted} aria-label={muted ? "取消靜音" : "靜音"}
+              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${muted ? "bg-white text-foreground" : "bg-white/15"}`}>
               <Mic className="h-6 w-6" />
             </button>
             <button onClick={hangup} aria-label="掛斷" className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 shadow-2xl active:scale-95">
               <PhoneOff className="h-7 w-7" />
             </button>
-            <button
-              onClick={() => setSpeakerOn((s) => !s)}
-              aria-pressed={speakerOn}
-              aria-label={speakerOn ? "切換聽筒" : "切換喇叭"}
-              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${speakerOn ? "bg-white/15" : "bg-white text-foreground"}`}
-            >
+            <button onClick={() => setSpeakerOn((s) => !s)} aria-pressed={speakerOn} aria-label={speakerOn ? "切換聽筒" : "切換喇叭"}
+              className={`flex h-14 w-14 items-center justify-center rounded-full backdrop-blur-sm transition-colors active:scale-95 ${speakerOn ? "bg-white/15" : "bg-white text-foreground"}`}>
               <Volume2 className="h-6 w-6" />
             </button>
           </div>
@@ -159,38 +341,157 @@ function CallPage() {
     );
   }
 
+  // ===== List view =====
+  const tabs: { id: Mode; label: string; icon: typeof Phone }[] = [
+    { id: "real", label: "真實職人", icon: Phone },
+    { id: "timewarp", label: "跨時空", icon: Sparkles },
+    { id: "drama", label: "一日實境", icon: Radio },
+    { id: "intern", label: "虛擬實習", icon: Trophy },
+    { id: "hybrid", label: "跨界混合", icon: Atom },
+  ];
+
+  const personaList: Persona[] =
+    mode === "real" ? realPersonas :
+    mode === "timewarp" ? timewarpPersonas :
+    mode === "hybrid" ? hybridPersonas : [];
+
   return (
-    <div className="px-5 pt-12">
+    <div className="px-5 pt-12 pb-24">
       <header className="mb-5">
         <h1 className="text-3xl font-bold tracking-tight">您撥的號碼<br />是<span className="text-primary-deep">未來</span></h1>
-        <p className="mt-2 text-sm text-muted-foreground">撥通電話，聽見少數職業的真實聲音。</p>
+        <p className="mt-2 text-sm text-muted-foreground">撥通電話，聽見職業的真實聲音——或穿越時空。</p>
       </header>
 
-      <div className="space-y-3">
-        {personas.map((p) => (
-          <div key={p.id} className="overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-card)]">
-            <div className={`bg-gradient-to-r ${p.color} px-5 py-4 text-white`}>
-              <div>
+      {/* Mode tabs */}
+      <div className="-mx-5 mb-5 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {tabs.map((t) => {
+          const Icon = t.icon;
+          const isActive = mode === t.id;
+          return (
+            <button key={t.id} onClick={() => setMode(t.id)}
+              className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition ${isActive ? "bg-primary text-primary-foreground" : "bg-muted text-foreground/70"}`}>
+              <Icon className="h-3.5 w-3.5" /> {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Persona list (real / timewarp / hybrid) */}
+      {(mode === "real" || mode === "timewarp" || mode === "hybrid") && (
+        <div className="space-y-3">
+          {personaList.map((p) => (
+            <div key={p.id} className="overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-card)]">
+              <div className={`bg-gradient-to-r ${p.color} px-5 py-4 text-white`}>
                 <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{p.tag}</span>
                 <h3 className="mt-2 text-lg font-bold">{p.name}</h3>
                 <p className="text-xs opacity-90">{p.job}</p>
               </div>
+              <div className="flex items-center justify-between gap-3 px-5 py-4">
+                <p className="text-xs text-muted-foreground">{p.intro}</p>
+                <button onClick={() => { setActive(p); setLineIdx(0); setSeconds(0); }}
+                  className="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-card)] active:scale-95">
+                  <Phone className="h-3.5 w-3.5" /> 撥打
+                </button>
+              </div>
             </div>
-            <div className="flex items-center justify-between gap-3 px-5 py-4">
-              <p className="text-xs text-muted-foreground">{p.intro}</p>
-              <button
-                onClick={() => setActive(p)}
-                className="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-card)] active:scale-95"
-              >
-                <Phone className="h-3.5 w-3.5" /> 撥打
-              </button>
+          ))}
+        </div>
+      )}
+
+      {/* Drama scenes */}
+      {mode === "drama" && (
+        <div className="space-y-3">
+          <p className="rounded-2xl bg-muted/60 p-3 text-xs text-muted-foreground">
+            🎧 5 分鐘的高張力廣播劇。在關鍵點做選擇，導向不同結局。
+          </p>
+          {dramaScenes.map((d) => (
+            <div key={d.id} className="overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-card)]">
+              <div className={`bg-gradient-to-r ${d.color} px-5 py-4 text-white`}>
+                <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{d.tag}</span>
+                <h3 className="mt-2 text-lg font-bold">{d.title}</h3>
+                <p className="text-xs opacity-90">{d.intro}</p>
+              </div>
+              <div className="flex items-center justify-end px-5 py-4">
+                <button onClick={() => { setDrama(d); setDramaIdx(0); setSeconds(0); }}
+                  className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground active:scale-95">
+                  <Radio className="h-3.5 w-3.5" /> 進入劇情
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Intern challenge */}
+      {mode === "intern" && (
+        <div className="space-y-4">
+          <div className="rounded-3xl bg-gradient-to-br from-amber-400 to-orange-500 p-5 text-white shadow-[var(--shadow-card)]">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs opacity-90">虛擬實習生</p>
+                <h3 className="text-xl font-bold">魔王經理 · 林總監</h3>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] opacity-80">經驗值</p>
+                <p className="text-2xl font-bold">{xp} XP</p>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
+
+          {internStep < missions.length ? (
+            <div className="rounded-3xl bg-card p-5 shadow-[var(--shadow-card)]">
+              <div className="mb-3 flex items-center gap-2">
+                <Briefcase className="h-4 w-4 text-primary" />
+                <p className="text-xs font-semibold text-primary">任務 {internStep + 1} / {missions.length}</p>
+              </div>
+              <h4 className="text-base font-bold">{missions[internStep].title}</h4>
+              <div className="mt-3 rounded-2xl bg-muted/60 p-3">
+                <p className="text-[11px] text-muted-foreground">📞 經理語音</p>
+                <p className="mt-1 text-sm">{missions[internStep].manager}</p>
+              </div>
+
+              {internResult ? (
+                <div className="mt-4">
+                  <p className="rounded-2xl bg-primary/10 p-3 text-sm font-medium">{internResult}</p>
+                  <button onClick={() => { setInternResult(null); setInternStep(internStep + 1); }}
+                    className="mt-3 w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground active:scale-95">
+                    下一個任務 →
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-4 space-y-2">
+                  <button onClick={() => { setXp(xp + missions[internStep].reward); setInternResult(missions[internStep].success); }}
+                    className="w-full rounded-2xl bg-emerald-500 px-4 py-3 text-left text-sm font-semibold text-white active:scale-95">
+                    🅰️ 冷靜應對，按 SOP 處理
+                  </button>
+                  <button onClick={() => setInternResult(missions[internStep].fail)}
+                    className="w-full rounded-2xl bg-rose-400 px-4 py-3 text-left text-sm font-semibold text-white active:scale-95">
+                    🅱️ 憑直覺反應
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="rounded-3xl bg-gradient-to-br from-primary to-primary/70 p-6 text-center text-primary-foreground shadow-[var(--shadow-card)]">
+              <Trophy className="mx-auto h-12 w-12" />
+              <h3 className="mt-3 text-xl font-bold">實習結束</h3>
+              <p className="mt-1 text-sm opacity-90">總經驗值 {xp} XP</p>
+              <p className="mt-3 text-xs opacity-80">
+                {xp >= 300 ? "🏆 林總監：『下週開始，你就是正職。』" :
+                 xp >= 150 ? "👍 林總監：『還行，回去再練。』" :
+                 "😐 林總監：『……感謝你的付出。』"}
+              </p>
+              <button onClick={() => { setInternStep(0); setXp(0); setInternResult(null); }}
+                className="mt-4 rounded-full bg-white px-5 py-2 text-sm font-semibold text-primary active:scale-95">
+                再挑戰一次
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <p className="mt-6 text-center text-[11px] text-muted-foreground">
-        所有對話皆為模擬訪談，內容經當事人同意改編。
+        所有對話皆為模擬訪談或情境劇本，內容經當事人同意改編或為創作虛構。
       </p>
     </div>
   );
