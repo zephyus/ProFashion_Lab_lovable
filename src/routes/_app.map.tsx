@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
-import { MapPin, Sparkles, ChevronRight } from "lucide-react";
+import { MapPin, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Carousel,
