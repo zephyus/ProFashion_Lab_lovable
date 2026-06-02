@@ -38,8 +38,10 @@ type Persona = {
   tag: string;
   color: string;
   intro: string;
+  gender: SpeechGender;
   script: string[];
 };
+
 
 const realPersonas: Persona[] = [
   {
