@@ -376,6 +376,19 @@ function CallPage() {
     speech.cancel();
     stopLocalAudio();
     synthSeqRef.current++;
+    // 留存通話紀錄（至少聽完一句才記）；未登入或失敗都靜默
+    if (active && (lineIdx > 0 || chat.length > 0)) {
+      void saveCallFn({
+        data: {
+          persona_id: active.id,
+          persona_name: active.name,
+          persona_job: active.job,
+          script_lines_played: lineIdx + 1,
+          message_count: chat.length,
+          duration_seconds: seconds,
+        },
+      }).catch(() => { /* 訪客或斷線都不打擾 */ });
+    }
     setActive(null); setLineIdx(0);
     setSeconds(0); setMuted(false);
     setChat([]); setQuestion(""); setAsking(false);
