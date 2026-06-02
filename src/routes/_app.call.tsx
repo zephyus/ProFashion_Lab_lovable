@@ -320,7 +320,7 @@ function CallPage() {
         <div className="space-y-3">
           {personaList.map((p) => (
             <div key={p.id} className="overflow-hidden rounded-3xl bg-card shadow-[var(--shadow-card)]">
-              <div className={`bg-gradient-to-r ${p.color} px-5 py-4 text-white`}>
+              <div className="bg-[image:var(--gradient-morandi)] px-5 py-4 text-primary-foreground">
                 <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm">{p.tag}</span>
                 <h3 className="mt-2 text-lg font-bold">{p.name}</h3>
                 <p className="text-xs opacity-90">{p.job}</p>
