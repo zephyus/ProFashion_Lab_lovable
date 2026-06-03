@@ -211,12 +211,11 @@ function LoginPage() {
                   />
                 )}
                 <input
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email"
+                  placeholder="Email 或帳號"
                   autoComplete="email"
-                  required
                   className="rounded-xl border border-border bg-card px-4 py-3 text-callout text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
                 <input
@@ -225,8 +224,6 @@ function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="密碼（至少 6 字元）"
                   autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                  required
-                  minLength={6}
                   className="rounded-xl border border-border bg-card px-4 py-3 text-callout text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
                 <button
