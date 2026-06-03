@@ -83,10 +83,6 @@ function LoginPage() {
     }
     // Demo backdoor: root / root
     const isDemo = email.trim().toLowerCase() === "root" && password === "root";
-    if (!isDemo && password.length < 6) {
-      toast.error("密碼至少 6 個字元");
-      return;
-    }
     setSubmitting(true);
     try {
       if (isDemo) {
@@ -222,7 +218,7 @@ function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="密碼（至少 6 字元）"
+                  placeholder="密碼"
                   autoComplete={mode === "signup" ? "new-password" : "current-password"}
                   className="rounded-xl border border-border bg-card px-4 py-3 text-callout text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
