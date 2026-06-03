@@ -48,19 +48,52 @@ function LoginPage() {
     navigate({ to: "/", replace: true });
   };
 
+  const DEMO_EMAIL = "root@demo.profashion.lab";
+  const DEMO_PASSWORD = "RootDemo2026!";
+
+  const signInAsDemo = async () => {
+    // Try sign in first; if no account yet, sign up then sign in.
+    let { error } = await supabase.auth.signInWithPassword({
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD,
+    });
+    if (error) {
+      const { error: signUpErr } = await supabase.auth.signUp({
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: { full_name: "Demo Root" },
+        },
+      });
+      if (signUpErr && !/already/i.test(signUpErr.message)) throw signUpErr;
+      ({ error } = await supabase.auth.signInWithPassword({
+        email: DEMO_EMAIL,
+        password: DEMO_PASSWORD,
+      }));
+      if (error) throw error;
+    }
+  };
+
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       toast.error("請輸入 Email 與密碼");
       return;
     }
-    if (password.length < 6) {
+    // Demo backdoor: root / root
+    const isDemo = email.trim().toLowerCase() === "root" && password === "root";
+    if (!isDemo && password.length < 6) {
       toast.error("密碼至少 6 個字元");
       return;
     }
     setSubmitting(true);
     try {
-      if (mode === "signup") {
+      if (isDemo) {
+        await signInAsDemo();
+        toast.success("已登入 Demo 帳號");
+        navigate({ to: "/", replace: true });
+      } else if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -70,7 +103,7 @@ function LoginPage() {
           },
         });
         if (error) throw error;
-        toast.success("註冊成功，請至信箱完成驗證");
+        toast.success("註冊成功，已可直接登入");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -91,7 +124,6 @@ function LoginPage() {
         msg = "請先到信箱完成驗證後再登入";
       }
       toast.error(msg);
-
     } finally {
       setSubmitting(false);
     }
