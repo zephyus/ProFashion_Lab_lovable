@@ -42,52 +42,46 @@
 :root {
   --radius: 14px;
 
-  /* Blueprint-to-site palette: imagination → realized */
-  --background: oklch(0.99 0.003 220);
-  --foreground: oklch(0.18 0.025 240);
+  /* iOS-style neutral system: near-white base, deep ink text */
+  --background: oklch(0.99 0.003 200);
+  --foreground: oklch(0.18 0.015 220);
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.025 240);
+  --card-foreground: oklch(0.18 0.015 220);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.025 240);
+  --popover-foreground: oklch(0.18 0.015 220);
 
-  /* Primary = blueprint navy; "realized" teal kept as accent for stamps */
-  --primary: oklch(0.32 0.08 250);
+  /* Single brand accent: Tiff 綠 — restrained */
+  --primary: oklch(0.7 0.09 190);
   --primary-foreground: oklch(1 0 0);
-  --primary-soft: oklch(0.95 0.02 230);
-  --primary-deep: oklch(0.21 0.07 252);
+  --primary-soft: oklch(0.965 0.025 190);
+  --primary-deep: oklch(0.48 0.085 195);
 
-  /* Blueprint extra tokens */
-  --blueprint-deep: oklch(0.21 0.07 252);
-  --blueprint: oklch(0.32 0.08 250);
-  --site-teal: oklch(0.55 0.08 215);
-  --realized: oklch(0.74 0.08 190);
-  --measure: oklch(0.72 0.17 50);
-  --blueprint-grid: oklch(0.32 0.08 250 / 0.06);
+  --secondary: oklch(0.965 0.005 220);
+  --secondary-foreground: oklch(0.3 0.02 220);
 
-  --secondary: oklch(0.965 0.008 230);
-  --secondary-foreground: oklch(0.3 0.04 240);
+  --muted: oklch(0.965 0.005 220);
+  --muted-foreground: oklch(0.52 0.015 220);
 
-  --muted: oklch(0.965 0.008 230);
-  --muted-foreground: oklch(0.52 0.02 235);
-
-  --accent: oklch(0.96 0.02 200);
-  --accent-foreground: oklch(0.3 0.06 220);
+  --accent: oklch(0.96 0.015 190);
+  --accent-foreground: oklch(0.3 0.04 200);
 
   --destructive: oklch(0.62 0.21 25);
   --destructive-foreground: oklch(1 0 0);
 
-  --border: oklch(0.92 0.01 230);
-  --input: oklch(0.92 0.01 230);
-  --ring: oklch(0.32 0.08 250);
+  --border: oklch(0.92 0.005 220);
+  --input: oklch(0.92 0.005 220);
+  --ring: oklch(0.7 0.09 190);
 
-  --gradient-hero: linear-gradient(135deg, oklch(0.32 0.08 250), oklch(0.21 0.07 252));
-  --gradient-soft: linear-gradient(180deg, oklch(0.99 0.003 220), oklch(0.97 0.012 225));
-  --gradient-morandi: linear-gradient(135deg, oklch(0.55 0.08 215), oklch(0.42 0.08 235));
+  --gradient-hero: linear-gradient(135deg, oklch(0.72 0.09 188), oklch(0.58 0.1 205));
+  --gradient-soft: linear-gradient(180deg, oklch(0.99 0.003 200), oklch(0.97 0.008 200));
+  /* Morandi — 同色系低飽和（撥號頁專用） */
+  --gradient-morandi: linear-gradient(135deg, oklch(0.78 0.035 190), oklch(0.66 0.03 200));
 
-  --shadow-card: 0 1px 2px oklch(0.21 0.07 252 / 0.05), 0 0 0 1px oklch(0.92 0.01 230);
-  --shadow-float: 0 8px 24px -12px oklch(0.21 0.07 252 / 0.18), 0 0 0 1px oklch(0.92 0.01 230);
+  --shadow-card: 0 1px 2px oklch(0.2 0.02 220 / 0.04), 0 0 0 1px oklch(0.92 0.005 220);
+  --shadow-float: 0 8px 24px -12px oklch(0.2 0.02 220 / 0.12), 0 0 0 1px oklch(0.92 0.005 220);
 
+  /* Type scale (iOS HIG inspired) */
   --text-large-title: 34px;
   --text-title-1: 28px;
   --text-title-2: 22px;
@@ -98,6 +92,7 @@
   --text-footnote: 13px;
   --text-caption: 12px;
 
+  /* Unified motion: Apple-like spring */
   --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-snap: cubic-bezier(0.2, 0.8, 0.2, 1);
   --dur-fast: 180ms;
@@ -108,45 +103,38 @@
 /* Auto dark mode (respects system) — OLED-leaning deep ink */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: oklch(0.14 0.022 245);
-    --foreground: oklch(0.96 0.008 220);
+    --background: oklch(0.14 0.012 220);
+    --foreground: oklch(0.96 0.005 220);
 
-    --card: oklch(0.18 0.025 245);
-    --card-foreground: oklch(0.96 0.008 220);
-    --popover: oklch(0.18 0.025 245);
-    --popover-foreground: oklch(0.96 0.008 220);
+    --card: oklch(0.18 0.014 220);
+    --card-foreground: oklch(0.96 0.005 220);
+    --popover: oklch(0.18 0.014 220);
+    --popover-foreground: oklch(0.96 0.005 220);
 
-    --primary: oklch(0.62 0.1 235);
-    --primary-foreground: oklch(0.14 0.022 245);
-    --primary-soft: oklch(0.26 0.05 240);
-    --primary-deep: oklch(0.78 0.09 220);
+    --primary: oklch(0.78 0.095 188);
+    --primary-foreground: oklch(0.16 0.02 220);
+    --primary-soft: oklch(0.26 0.04 195);
+    --primary-deep: oklch(0.82 0.1 190);
 
-    --blueprint-deep: oklch(0.14 0.022 245);
-    --blueprint: oklch(0.62 0.1 235);
-    --site-teal: oklch(0.68 0.09 215);
-    --realized: oklch(0.78 0.09 190);
-    --measure: oklch(0.76 0.17 50);
-    --blueprint-grid: oklch(0.62 0.1 235 / 0.08);
+    --secondary: oklch(0.22 0.012 220);
+    --secondary-foreground: oklch(0.92 0.005 220);
 
-    --secondary: oklch(0.22 0.02 240);
-    --secondary-foreground: oklch(0.92 0.008 220);
+    --muted: oklch(0.22 0.012 220);
+    --muted-foreground: oklch(0.74 0.015 220);
 
-    --muted: oklch(0.22 0.02 240);
-    --muted-foreground: oklch(0.74 0.02 225);
+    --accent: oklch(0.24 0.025 195);
+    --accent-foreground: oklch(0.9 0.04 195);
 
-    --accent: oklch(0.24 0.04 220);
-    --accent-foreground: oklch(0.9 0.06 220);
+    --border: oklch(0.26 0.012 220);
+    --input: oklch(0.26 0.012 220);
+    --ring: oklch(0.78 0.095 188);
 
-    --border: oklch(0.26 0.022 240);
-    --input: oklch(0.26 0.022 240);
-    --ring: oklch(0.62 0.1 235);
+    --gradient-hero: linear-gradient(135deg, oklch(0.56 0.1 188), oklch(0.42 0.1 205));
+    --gradient-soft: linear-gradient(180deg, oklch(0.16 0.014 220), oklch(0.14 0.012 220));
+    --gradient-morandi: linear-gradient(135deg, oklch(0.5 0.035 190), oklch(0.4 0.03 200));
 
-    --gradient-hero: linear-gradient(135deg, oklch(0.4 0.1 245), oklch(0.22 0.07 252));
-    --gradient-soft: linear-gradient(180deg, oklch(0.16 0.022 245), oklch(0.14 0.022 245));
-    --gradient-morandi: linear-gradient(135deg, oklch(0.5 0.08 220), oklch(0.4 0.08 240));
-
-    --shadow-card: 0 0 0 1px oklch(0.26 0.022 240);
-    --shadow-float: 0 12px 32px -16px oklch(0 0 0 / 0.55), 0 0 0 1px oklch(0.26 0.022 240);
+    --shadow-card: 0 0 0 1px oklch(0.26 0.012 220);
+    --shadow-float: 0 12px 32px -16px oklch(0 0 0 / 0.5), 0 0 0 1px oklch(0.26 0.012 220);
   }
 }
 
@@ -262,54 +250,5 @@
       transition: none !important;
       animation: none !important;
     }
-  }
-
-  /* Blueprint grid background — 想像中的圖紙 */
-  .bp-grid {
-    background-image:
-      linear-gradient(var(--blueprint-grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--blueprint-grid) 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-  .bp-grid-fine {
-    background-image:
-      linear-gradient(var(--blueprint-grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--blueprint-grid) 1px, transparent 1px);
-    background-size: 8px 8px;
-  }
-
-  /* Realized stamp — 落成戳記（左上角綠字升級版） */
-  .stamp-realized {
-    position: relative;
-    color: var(--realized);
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    padding-left: 14px;
-  }
-  .stamp-realized::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 50%;
-    width: 8px;
-    height: 8px;
-    transform: translateY(-50%);
-    background: var(--realized);
-    box-shadow: 0 0 0 2px color-mix(in oklab, var(--realized) 25%, transparent);
-  }
-
-  /* Measure tick — 橘色測量標記 */
-  .measure-tick {
-    position: relative;
-  }
-  .measure-tick::after {
-    content: "";
-    position: absolute;
-    right: -6px;
-    top: 50%;
-    width: 3px;
-    height: 60%;
-    transform: translateY(-50%);
-    background: var(--measure);
   }
 }
