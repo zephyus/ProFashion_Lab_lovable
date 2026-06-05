@@ -268,6 +268,25 @@ function LoginPage() {
                 {signingIn ? "正在前往 Google…" : "使用 Google 繼續"}
               </button>
 
+              <div className="mt-5 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-3">
+                <p className="mb-2 text-center text-caption font-semibold text-primary-deep">
+                  Demo 快速登入
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {(["parent", "student", "teacher", "worker"] as const).map((role) => (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={() => handleQuickLogin(role)}
+                      disabled={quickLoading !== null}
+                      className="press rounded-xl border border-border bg-card px-3 py-2.5 text-callout font-medium text-foreground transition-colors hover:bg-muted/40 disabled:opacity-60"
+                    >
+                      {quickLoading === role ? "登入中…" : DEMO_ACCOUNTS[role].label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <p className="mt-4 text-center text-caption">
                 {mode === "signin" ? "還沒有帳號？" : "已經有帳號？"}
                 <button
