@@ -119,7 +119,7 @@ function HomePage() {
           想認識哪一個自己？
         </h1>
         <p className="mt-3 text-subhead text-muted-foreground">
-          把模糊的未來，<span className="stamp-realized">帶到現場</span>。
+          把模糊的未來，<span className="font-semibold" style={{ color: "var(--realized)" }}>帶到現場</span>。
         </p>
       </section>
 
