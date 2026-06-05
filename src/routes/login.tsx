@@ -48,30 +48,52 @@ function LoginPage() {
     navigate({ to: "/", replace: true });
   };
 
-  const DEMO_EMAIL = "root@demo.profashion.lab";
   const DEMO_PASSWORD = "RootDemo2026!";
+  const DEMO_ACCOUNTS = {
+    root: { email: "root@demo.profashion.lab", name: "Demo Root", label: "Root" },
+    parent: { email: "parent@demo.profashion.lab", name: "Demo 家長", label: "家長" },
+    student: { email: "student@demo.profashion.lab", name: "Demo 學生", label: "學生" },
+    teacher: { email: "teacher@demo.profashion.lab", name: "Demo 老師", label: "老師" },
+    worker: { email: "worker@demo.profashion.lab", name: "Demo 工作者", label: "工作者" },
+  } as const;
+  type DemoRole = keyof typeof DEMO_ACCOUNTS;
 
-  const signInAsDemo = async () => {
-    // Try sign in first; if no account yet, sign up then sign in.
+  const signInAsDemoAccount = async (acc: { email: string; name: string }) => {
     let { error } = await supabase.auth.signInWithPassword({
-      email: DEMO_EMAIL,
+      email: acc.email,
       password: DEMO_PASSWORD,
     });
     if (error) {
       const { error: signUpErr } = await supabase.auth.signUp({
-        email: DEMO_EMAIL,
+        email: acc.email,
         password: DEMO_PASSWORD,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { full_name: "Demo Root" },
+          data: { full_name: acc.name },
         },
       });
       if (signUpErr && !/already/i.test(signUpErr.message)) throw signUpErr;
       ({ error } = await supabase.auth.signInWithPassword({
-        email: DEMO_EMAIL,
+        email: acc.email,
         password: DEMO_PASSWORD,
       }));
       if (error) throw error;
+    }
+  };
+
+  const signInAsDemo = () => signInAsDemoAccount(DEMO_ACCOUNTS.root);
+
+  const [quickLoading, setQuickLoading] = useState<DemoRole | null>(null);
+  const handleQuickLogin = async (role: DemoRole) => {
+    setQuickLoading(role);
+    try {
+      await signInAsDemoAccount(DEMO_ACCOUNTS[role]);
+      toast.success(`已登入：${DEMO_ACCOUNTS[role].name}`);
+      navigate({ to: "/", replace: true });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "登入失敗");
+    } finally {
+      setQuickLoading(null);
     }
   };
 
