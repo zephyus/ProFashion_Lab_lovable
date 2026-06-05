@@ -1,123 +1,109 @@
 
-# MVP 變現功能開發計畫
+# Profashion Lab —「藍圖到現場」設計方向
 
-## 為什麼挑這兩個
+## 核心一句話
+**把未來，從想像帶到現場——真實，才是重點。**
 
-你的策略文件把 B2B 學校授權列為主力（NT$15K–150K/校/年），而學校會買單的真正理由只有兩個：**108 課綱學習歷程**和**教師管理工具**。其他功能（金流、AI 計量、Freemium）都可以等學校願意付錢之後再做。
-
-所以 MVP 範圍鎖定：
-
-1. **學習歷程 PDF 匯出**（學生端／賣點 #1）
-2. **教師後台 Dashboard**（教師端／賣點 #2）
-
-金流、Freemium 計量列為 Phase 2，不在這次範圍。
+設計語言：**藍圖（想像）→ 施工（過程）→ 現場（真實）**。所有畫面都隱含這條時間軸。
 
 ---
 
-## Phase 1A：學習歷程匯出（學生端）
+## 1. 視覺語言（全 App 一致）
 
-### 使用者故事
-學生在 ProFashion Lab 玩了幾週後，可以一鍵下載一份 PDF：
-- 個人測驗結果與職涯傾向
-- 完成的虛擬實習關卡與反思
-- 撥打過的職人通話記錄與重點
-- 累積 XP 與職等
-- 時間軸（首次登入 → 最後活動）
+**色票（取代現有 primary）**
+- `--blueprint-deep` #0c2340（深夜藍／藍圖底）
+- `--blueprint` #1a4a6e（藍圖線稿主色）
+- `--site-teal` #2d8a9e（施工中的訊號色）
+- `--realized` #5cbdb9（落成／完成的綠青，現有「綠色字」改用這支）
+- 中性：水泥灰 #e8ecf1 / 紙白 #fafbfc / 墨黑 #0d0d0d
+- 強調：橘色測量標記 #ff8c42（極少量，僅用在「現在進行中」「測量數據」）
 
-格式對齊教育部「學習歷程檔案 — 多元表現」欄位（標題／時間／內容描述／反思）。
+**字體**
+- 顯示字（標題、數據）：`Space Grotesk` 或 `Archivo`——工程感、技術製圖感
+- 內文：`IBM Plex Sans` 或 `Inter`——清晰、文件感
+- 標籤、座標：`JetBrains Mono`——藍圖註記、量測標註
 
-### 後端
-- 新表：
-  - `exploration_events` — 統一記錄使用者每一個探索動作（type, payload, created_at, user_id）。目前 XP/關卡都存在 localStorage，要先搬到雲端否則匯出沒資料。
-  - `quiz_results` — 測驗結果快照（answers, archetype, summary）。
-  - `call_sessions` — 通話記錄（persona_id, persona_name, script_lines_played, llm_messages）。
-- 一個 server function `exportLearningPortfolio()` 聚合上述資料、回傳結構化 JSON。
-- PDF 由前端用 `@react-pdf/renderer` 在瀏覽器產生（Cloudflare Worker 環境不適合跑 PDF binary）。
-
-### 前端
-- 個人頁新增「我的學習歷程」分頁，預覽 + 下載 PDF。
-- 既有 `useXp` 從 localStorage 改為 Supabase 來源（保留 localStorage 作為訪客回退）。
-- 既有測驗／通話完成事件要寫入新表。
+**質感**
+- 背景加入 **極淺的藍圖網格**（dot/grid pattern，opacity 0.04~0.08）
+- 卡片用 **單線描邊** 取代厚陰影（1px solid，藍圖風）
+- 重要區塊角落加 **十字測量標記**（crosshair）與小型座標標籤
+- 完全去除紫色漸層、糖果色、毛玻璃過度模糊
 
 ---
 
-## Phase 1B：教師後台 Dashboard
+## 2. Manifesto 與文案語氣
 
-### 使用者故事
-教師建立一個「班級」、邀請學生加入，可以：
-- 看到全班學生清單（姓名、最後活動、XP、完成關卡數）
-- 點進單一學生看其探索摘要（職涯傾向、玩過的職人、通話次數）
-- 匯出全班的 CSV / 個別學生的 PDF
-- 不能看到學生的 AI 對話原文（隱私）
+**新增 `/manifesto` 頁**（從 Drawer/設定可進入，登入頁底部也放連結）
+- 全頁深藍底 + 大字白色 manifesto
+- 三段式：想像 → 過程 → 現場，配對應的視覺章節
 
-### 角色系統
-- 新增 `app_role` enum：`student`、`teacher`、`admin`
-- 新表 `user_roles`（依照系統規範分離存放）
-- `has_role()` security-definer 函式
-- 註冊流程預設 student；teacher 需邀請碼或管理員指派
+**全 App 文案改寫原則**
+- 動詞優先：「開始」「抵達」「交付」「現場」「測量」「落地」
+- 去除：「探索一下」「快來試試」這種輕飄詞
+- 數字、座標、時間戳記要露出來（強化真實感）
 
-### 班級 / 邀請
-- 新表 `classrooms`（teacher_id, name, school_name, invite_code）
-- 新表 `classroom_members`（classroom_id, student_id, joined_at）
-- 學生輸入邀請碼加入
-
-### 教師後台路由
-- `/_authenticated/teacher`（用 has_role 守門，非教師導回首頁）
-- 班級列表 / 新增班級 / 班級詳情 / 學生詳情
-- 蒐集匯出：整班 CSV、單人 PDF
+**登入頁**
+- 主標改為：**「從想像，到現場。」**
+- 副標：「Profashion Lab — 把未來時尚帶到當下。」
+- Demo 快速登入區塊改成「現場演練入口」
 
 ---
 
-## 不做的事（明確排除）
+## 3. 互動／轉場（差異化關鍵）
 
-- **金流／體驗預約付費**：等真正有第一間學校付錢再做 Stripe/綠界
-- **AI 對話額度與 Freemium 鎖**：先讓功能完整、收集真實使用數據再決定上限
-- **AI 加值服務**（模擬面試、自傳助手）：Phase 3
-- **企業／縣市方案**：商業談判，不是產品問題
+這條最能傳達「從想像到現場」的哲學：
 
----
+**a. 載入轉場 — 藍圖顯影**
+- 頁面進入時：先顯示線稿輪廓（stroke-dasharray 動畫畫出邊框）→ 0.3s 後填入內容
+- 子頁切換用 `fade-in` + 細微「描線」動畫
 
-## 技術細節（給工程脈絡）
+**b. 左上角綠色標題 — 落成戳記**
+- 現在已經是粗體 + 綠色
+- 改為 `--realized` 青綠 + 前綴一個極小的 ✓ 或 ▣ 標記
+- hover 時微微亮起，像「已驗收」的印章感
 
-### 資料庫遷移
-所有新表都要 RLS：
-- `exploration_events` / `quiz_results` / `call_sessions`：學生只能讀寫自己；教師可讀同班學生的（透過 `classroom_members` join + `has_role('teacher')`）。
-- `user_roles`：用戶可讀自己的角色；只有 service_role 可寫。
-- `classrooms`：teacher 可 CRUD 自己的；學生可讀自己加入的（透過 `classroom_members`）。
-- `classroom_members`：學生用邀請碼加入（INSERT 政策驗證 invite_code）；teacher 可看自己班級的。
+**c. 卡片 hover — 從藍圖到實照**
+- 預設狀態：低飽和、帶藍圖網格疊加
+- hover：網格淡出、飽和度回到 100%（像「實景顯影」）
 
-每張表都要附 `GRANT` 給 authenticated 角色。
+**d. 按鈕**
+- Primary 按鈕：實心 `--blueprint-deep` + 右側一條橘色測量標記
+- Secondary：藍圖線稿風（透明底、1px 描邊、虛線 hover 變實線）
 
-### 既有程式碼影響
-- `src/hooks/useXp.ts` — 改成讀 Supabase；保留 localStorage 作為未登入者的暫存。
-- `src/routes/_app.call.tsx` — 通話開始／結束時寫 `call_sessions`。
-- `src/components/ExploreQuiz.tsx` — 測驗完成寫 `quiz_results` + `exploration_events`。
-- 新增 `src/lib/portfolio.functions.ts`、`src/lib/classroom.functions.ts`（server functions）。
-
-### PDF
-- 安裝 `@react-pdf/renderer`
-- 元件 `src/components/portfolio/PortfolioDocument.tsx`
-- 套用既有 design tokens（中文字型用 Noto Sans TC，需另載入）
-
-### 教師邀請碼
-- 8 碼大寫英數隨機碼
-- 教師後台顯示可複製連結 `/join?code=ABC12345`
+**e. 底部導覽**
+- 當前頁籤加一個小座標標籤（如「N 31°」「現場」），強化「你在哪」的真實感
 
 ---
 
-## 建議實作順序
+## 4. 各頁面調整重點
 
-1. 角色系統 + user_roles 表（基礎建設）
-2. exploration_events / quiz_results / call_sessions 表 + 把現有事件寫進去
-3. 學習歷程 PDF 匯出（學生立刻有感）
-4. classrooms / 邀請碼 / 教師後台 Dashboard
-5. 教師端 CSV / PDF 匯出
-
-每一步都可獨立 ship，不會卡住下一步。
+| 頁面 | 調整 |
+|---|---|
+| `/login` | 主標語改寫、加 manifesto 連結、Demo 區重新命名 |
+| `/` (home) | Hero 用「想像 → 現場」雙欄對照、加藍圖網格背景 |
+| `/explore` | 卡片改藍圖線稿樣式、hover 顯影 |
+| `/map` | 地圖配色貼齊藍圖色票、Pin 改成測量標記樣式 |
+| `/cafe`, `/call`, `/portfolio`, `/teacher` | 統一卡片風格、左上綠標升級為落成戳記 |
+| `/manifesto` (新) | 全屏深藍 + 大字三段式 |
 
 ---
 
-## 需要你確認的兩件事
+## 5. 實作順序
 
-1. **教師身份認證**：MVP 階段允許「任何人輸入特殊註冊碼成為教師」，還是先寫死由管理員手動指派？前者快、後者安全。建議 MVP 用「教師註冊碼」（一個共用密碼，登入後自助升級），上線後再換成審核制。
-2. **PDF 中文字型**：可接受用 Google Fonts 的 Noto Sans TC（檔案約 2MB，第一次下載稍慢）嗎？還是要用更精簡的本地字型？
+1. **CSS Token 重寫**：`src/styles.css` 換成藍圖色票 + 加網格 utility + 描線動畫 keyframes
+2. **共用元件升級**：Button、Card、左上標題、底部導覽
+3. **登入頁**：新文案 + 視覺
+4. **新增 `/manifesto` 路由**
+5. **逐頁套用**：home → explore → map → cafe/call/portfolio/teacher
+6. **轉場動畫**：路由切換的線稿顯影
+7. **QA**：每頁親自走一遍，確認 demo 四個角色都能順利點完所有按鈕
+
+---
+
+## 給你決定的細節
+
+1. **manifesto 三段文字** 你想自己寫，還是我先擬草稿給你改？
+2. **登入頁 Demo 區** 要不要改名「現場演練入口 / Field Demo」？
+3. **底部導覽座標標籤** 屬於小巧思也可能太花，要保留還是先拿掉？
+
+回覆這三題後我就可以進 build mode 開工。
