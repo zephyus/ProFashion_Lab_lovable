@@ -48,30 +48,52 @@ function LoginPage() {
     navigate({ to: "/", replace: true });
   };
 
-  const DEMO_EMAIL = "root@demo.profashion.lab";
   const DEMO_PASSWORD = "RootDemo2026!";
+  const DEMO_ACCOUNTS = {
+    root: { email: "root@demo.profashion.lab", name: "Demo Root", label: "Root" },
+    parent: { email: "parent@demo.profashion.lab", name: "Demo 家長", label: "家長" },
+    student: { email: "student@demo.profashion.lab", name: "Demo 學生", label: "學生" },
+    teacher: { email: "teacher@demo.profashion.lab", name: "Demo 老師", label: "老師" },
+    worker: { email: "worker@demo.profashion.lab", name: "Demo 工作者", label: "工作者" },
+  } as const;
+  type DemoRole = keyof typeof DEMO_ACCOUNTS;
 
-  const signInAsDemo = async () => {
-    // Try sign in first; if no account yet, sign up then sign in.
+  const signInAsDemoAccount = async (acc: { email: string; name: string }) => {
     let { error } = await supabase.auth.signInWithPassword({
-      email: DEMO_EMAIL,
+      email: acc.email,
       password: DEMO_PASSWORD,
     });
     if (error) {
       const { error: signUpErr } = await supabase.auth.signUp({
-        email: DEMO_EMAIL,
+        email: acc.email,
         password: DEMO_PASSWORD,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { full_name: "Demo Root" },
+          data: { full_name: acc.name },
         },
       });
       if (signUpErr && !/already/i.test(signUpErr.message)) throw signUpErr;
       ({ error } = await supabase.auth.signInWithPassword({
-        email: DEMO_EMAIL,
+        email: acc.email,
         password: DEMO_PASSWORD,
       }));
       if (error) throw error;
+    }
+  };
+
+  const signInAsDemo = () => signInAsDemoAccount(DEMO_ACCOUNTS.root);
+
+  const [quickLoading, setQuickLoading] = useState<DemoRole | null>(null);
+  const handleQuickLogin = async (role: DemoRole) => {
+    setQuickLoading(role);
+    try {
+      await signInAsDemoAccount(DEMO_ACCOUNTS[role]);
+      toast.success(`已登入：${DEMO_ACCOUNTS[role].name}`);
+      navigate({ to: "/", replace: true });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "登入失敗");
+    } finally {
+      setQuickLoading(null);
     }
   };
 
@@ -245,6 +267,25 @@ function LoginPage() {
                 <GoogleIcon className="h-[18px] w-[18px]" />
                 {signingIn ? "正在前往 Google…" : "使用 Google 繼續"}
               </button>
+
+              <div className="mt-5 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-3">
+                <p className="mb-2 text-center text-caption font-semibold text-primary-deep">
+                  Demo 快速登入
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {(["parent", "student", "teacher", "worker"] as const).map((role) => (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={() => handleQuickLogin(role)}
+                      disabled={quickLoading !== null}
+                      className="press rounded-xl border border-border bg-card px-3 py-2.5 text-callout font-medium text-foreground transition-colors hover:bg-muted/40 disabled:opacity-60"
+                    >
+                      {quickLoading === role ? "登入中…" : DEMO_ACCOUNTS[role].label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               <p className="mt-4 text-center text-caption">
                 {mode === "signin" ? "還沒有帳號？" : "已經有帳號？"}
