@@ -263,4 +263,53 @@
       animation: none !important;
     }
   }
+
+  /* Blueprint grid background — 想像中的圖紙 */
+  .bp-grid {
+    background-image:
+      linear-gradient(var(--blueprint-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--blueprint-grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .bp-grid-fine {
+    background-image:
+      linear-gradient(var(--blueprint-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--blueprint-grid) 1px, transparent 1px);
+    background-size: 8px 8px;
+  }
+
+  /* Realized stamp — 落成戳記（左上角綠字升級版） */
+  .stamp-realized {
+    position: relative;
+    color: var(--realized);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    padding-left: 14px;
+  }
+  .stamp-realized::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    transform: translateY(-50%);
+    background: var(--realized);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--realized) 25%, transparent);
+  }
+
+  /* Measure tick — 橘色測量標記 */
+  .measure-tick {
+    position: relative;
+  }
+  .measure-tick::after {
+    content: "";
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    width: 3px;
+    height: 60%;
+    transform: translateY(-50%);
+    background: var(--measure);
+  }
 }
