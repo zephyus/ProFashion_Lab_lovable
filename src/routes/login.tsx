@@ -148,7 +148,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background px-6 animate-page">
+    <div className="app-shell mx-auto flex min-h-screen max-w-md flex-col bg-background px-6 animate-page">
       {/* Top bar */}
       <header className="flex h-12 items-center pt-3">
         <Link
