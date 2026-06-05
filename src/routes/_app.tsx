@@ -61,12 +61,12 @@ function AppLayout() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col bg-background pb-[72px]">
+    <div className="app-shell mx-auto flex min-h-screen max-w-md flex-col bg-background pb-[72px]">
       <main className="flex-1">
         <Outlet />
       </main>
 
-      <nav className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-border bg-card/85 backdrop-blur-xl print:hidden">
+      <nav className="app-shell-nav fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-border bg-card/85 backdrop-blur-xl print:hidden">
         <ul className="grid grid-cols-5 px-1">
           {leftTabs.map(renderTab)}
           <li key="lab-home">

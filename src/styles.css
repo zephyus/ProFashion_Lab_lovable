@@ -152,6 +152,29 @@
     letter-spacing: -0.01em;
   }
 
+  /* Desktop: frame the mobile shell with an ambient backdrop */
+  @media (min-width: 768px) {
+    body {
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, color-mix(in oklab, var(--color-primary) 14%, transparent), transparent 60%),
+        radial-gradient(ellipse 70% 50% at 85% 90%, color-mix(in oklab, var(--color-primary-deep, var(--color-primary)) 12%, transparent), transparent 60%),
+        var(--color-muted, var(--color-background));
+      min-height: 100vh;
+    }
+    .app-shell {
+      box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.22), 0 8px 24px -8px rgb(0 0 0 / 0.08);
+      border-radius: 28px;
+      margin-top: 24px;
+      margin-bottom: 24px;
+      min-height: calc(100vh - 48px) !important;
+      overflow: hidden;
+    }
+    .app-shell-nav {
+      border-radius: 0 0 28px 28px;
+      bottom: 24px !important;
+    }
+  }
+
   /* Apple-style type utilities */
   .text-large-title { font-size: var(--text-large-title); line-height: 1.12; letter-spacing: -0.022em; font-weight: 700; }
   .text-title-1 { font-size: var(--text-title-1); line-height: 1.18; letter-spacing: -0.02em; font-weight: 600; }
