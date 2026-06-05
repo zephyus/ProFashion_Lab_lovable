@@ -106,12 +106,21 @@ function HomePage() {
       </header>
 
       {/* Hero */}
-      <section className="pt-10 pb-7 animate-rise">
-        <h1 className="text-large-title text-foreground">
+      <section className="relative pt-10 pb-7 animate-rise">
+        <Link
+          to="/manifesto"
+          className="font-mono text-[10px] tracking-[0.25em] text-primary-deep/70 transition-opacity hover:opacity-100"
+        >
+          N°001 — 從想像，到現場 →
+        </Link>
+        <h1 className="mt-3 text-large-title text-foreground">
           今天，
           <br />
           想認識哪一個自己？
         </h1>
+        <p className="mt-3 text-subhead text-muted-foreground">
+          把模糊的未來，<span className="font-semibold" style={{ color: "var(--realized)" }}>帶到現場</span>。
+        </p>
       </section>
 
       {/* XP card — slim */}

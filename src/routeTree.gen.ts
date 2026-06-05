@@ -15,6 +15,7 @@ import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppTeacherSignupRouteImport } from './routes/_app.teacher-signup'
 import { Route as AppPortfolioRouteImport } from './routes/_app.portfolio'
 import { Route as AppMapRouteImport } from './routes/_app.map'
+import { Route as AppManifestoRouteImport } from './routes/_app.manifesto'
 import { Route as AppJoinRouteImport } from './routes/_app.join'
 import { Route as AppExploreRouteImport } from './routes/_app.explore'
 import { Route as AppCallRouteImport } from './routes/_app.call'
@@ -50,6 +51,11 @@ const AppPortfolioRoute = AppPortfolioRouteImport.update({
 const AppMapRoute = AppMapRouteImport.update({
   id: '/map',
   path: '/map',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppManifestoRoute = AppManifestoRouteImport.update({
+  id: '/manifesto',
+  path: '/manifesto',
   getParentRoute: () => AppRoute,
 } as any)
 const AppJoinRoute = AppJoinRouteImport.update({
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
   '/join': typeof AppJoinRoute
+  '/manifesto': typeof AppManifestoRoute
   '/map': typeof AppMapRouteWithChildren
   '/portfolio': typeof AppPortfolioRoute
   '/teacher-signup': typeof AppTeacherSignupRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
   '/join': typeof AppJoinRoute
+  '/manifesto': typeof AppManifestoRoute
   '/map': typeof AppMapRouteWithChildren
   '/portfolio': typeof AppPortfolioRoute
   '/teacher-signup': typeof AppTeacherSignupRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/_app/call': typeof AppCallRoute
   '/_app/explore': typeof AppExploreRoute
   '/_app/join': typeof AppJoinRoute
+  '/_app/manifesto': typeof AppManifestoRoute
   '/_app/map': typeof AppMapRouteWithChildren
   '/_app/portfolio': typeof AppPortfolioRoute
   '/_app/teacher-signup': typeof AppTeacherSignupRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/call'
     | '/explore'
     | '/join'
+    | '/manifesto'
     | '/map'
     | '/portfolio'
     | '/teacher-signup'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/call'
     | '/explore'
     | '/join'
+    | '/manifesto'
     | '/map'
     | '/portfolio'
     | '/teacher-signup'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/_app/call'
     | '/_app/explore'
     | '/_app/join'
+    | '/_app/manifesto'
     | '/_app/map'
     | '/_app/portfolio'
     | '/_app/teacher-signup'
@@ -225,6 +237,13 @@ declare module '@tanstack/react-router' {
       path: '/map'
       fullPath: '/map'
       preLoaderRoute: typeof AppMapRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/manifesto': {
+      id: '/_app/manifesto'
+      path: '/manifesto'
+      fullPath: '/manifesto'
+      preLoaderRoute: typeof AppManifestoRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/join': {
@@ -295,6 +314,7 @@ interface AppRouteChildren {
   AppCallRoute: typeof AppCallRoute
   AppExploreRoute: typeof AppExploreRoute
   AppJoinRoute: typeof AppJoinRoute
+  AppManifestoRoute: typeof AppManifestoRoute
   AppMapRoute: typeof AppMapRouteWithChildren
   AppPortfolioRoute: typeof AppPortfolioRoute
   AppTeacherSignupRoute: typeof AppTeacherSignupRoute
@@ -308,6 +328,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCallRoute: AppCallRoute,
   AppExploreRoute: AppExploreRoute,
   AppJoinRoute: AppJoinRoute,
+  AppManifestoRoute: AppManifestoRoute,
   AppMapRoute: AppMapRouteWithChildren,
   AppPortfolioRoute: AppPortfolioRoute,
   AppTeacherSignupRoute: AppTeacherSignupRoute,
@@ -325,13 +346,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
