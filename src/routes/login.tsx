@@ -210,10 +210,10 @@ function LoginPage() {
         ) : (
           <>
             <h1 className="mt-7 text-center text-title-1 text-foreground">
-              {mode === "signin" ? "登入" : "註冊"}
+              從想像，到現場。
             </h1>
-            <p className="mx-auto mt-2 max-w-[280px] text-center text-subhead text-muted-foreground">
-              紀錄會跟著你，不會因為換裝置消失。
+            <p className="mx-auto mt-2 max-w-[300px] text-center text-subhead text-muted-foreground">
+              Profashion Lab — 把未來時尚帶到當下。紀錄會跟著你，不會因為換裝置消失。
             </p>
 
             <div className="mx-auto mt-8 w-full max-w-[320px]">
@@ -268,9 +268,9 @@ function LoginPage() {
                 {signingIn ? "正在前往 Google…" : "使用 Google 繼續"}
               </button>
 
-              <div className="mt-5 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-3">
-                <p className="mb-2 text-center text-caption font-semibold text-primary-deep">
-                  Demo 快速登入
+              <div className="mt-5 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-3 bp-grid-fine">
+                <p className="mb-2 text-center text-caption font-semibold text-primary-deep tracking-wider">
+                  現場演練入口 · FIELD DEMO
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {(["parent", "student", "teacher", "worker"] as const).map((role) => (
@@ -307,7 +307,13 @@ function LoginPage() {
 
 
       <footer className="pb-8">
-        <p className="text-center text-caption">
+        <Link
+          to="/manifesto"
+          className="block text-center text-caption font-semibold tracking-wider text-primary-deep transition-opacity hover:opacity-70"
+        >
+          閱讀 MANIFESTO — 從想像，到現場 →
+        </Link>
+        <p className="mt-2 text-center text-caption">
           登入即表示同意服務條款與隱私權政策
         </p>
       </footer>
