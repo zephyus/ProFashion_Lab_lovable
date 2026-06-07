@@ -184,9 +184,10 @@ export const submitConsentRequest = createServerFn({ method: "POST" })
         student_id: context.userId,
         parent_id: link.parent_id,
         kind: data.kind,
-        payload: data.payload,
+        payload: data.payload as never,
         status: "pending",
       })
+
       .select()
       .single();
     if (error) throw new Error(error.message);
