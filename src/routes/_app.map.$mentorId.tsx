@@ -454,9 +454,14 @@ function MentorDetailPage() {
                   <Button type="button" variant="outline" className="flex-1" onClick={() => setStep("slot")}>
                     上一步
                   </Button>
-                  <Button type="submit" className="flex-1 bg-[image:var(--gradient-hero)]">
-                    確認報名
+                  <Button type="submit" disabled={submitting} className="flex-1 bg-[image:var(--gradient-hero)]">
+                    {submitting
+                      ? "送出中…"
+                      : bookingType === "individual" && parentStatus === "linked"
+                        ? "送出請求給家長"
+                        : "確認報名"}
                   </Button>
+
                 </div>
               </form>
             )}
