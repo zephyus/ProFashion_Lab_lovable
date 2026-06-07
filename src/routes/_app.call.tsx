@@ -200,6 +200,17 @@ function CallPage() {
   const [mode, setMode] = useState<Mode>("real");
   const [active, setActive] = useState<Persona | null>(null);
   const [activeIdx, setActiveIdx] = useState(0);
+  const sub = useSubscription();
+  const [paywallOpen, setPaywallOpen] = useState(false);
+
+  const tryStartCall = useCallback((p: Persona, i: number) => {
+    if (!sub.canMakeAiCall) {
+      setPaywallOpen(true);
+      return;
+    }
+    sub.consumeAiCall();
+    setActive(p); setActiveIdx(i); setLineIdx(0); setSeconds(0);
+  }, [sub]);
   const [lineIdx, setLineIdx] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [muted, setMuted] = useState(false);
