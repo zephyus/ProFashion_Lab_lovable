@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 //   未訂閱：AI 語音每月 5 次、職圖體驗單次付費 NT$300
 //   訂閱方案：NT$199 / 月
 
-export const SUB_PRICE = 199;
+export const SUB_PRICE = 100;
 export const BOOKING_PRICE = 300;
 export const FREE_AI_CALL_LIMIT = 5;
 export const SUB_BOOKING_LIMIT = 5;
