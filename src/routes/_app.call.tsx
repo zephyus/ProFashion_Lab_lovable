@@ -14,13 +14,21 @@ import {
 } from "@/lib/local-tts/kokoroTts";
 import { splitTextForTts } from "@/lib/local-tts/wav";
 import { toast } from "sonner";
+import { useActiveRole } from "@/hooks/useActiveRole";
+import { ParentBlocked } from "@/components/ParentBlocked";
 
 
 
 export const Route = createFileRoute("/_app/call")({
   head: () => ({ meta: [{ title: "對話 — 職感 Zhígǎn" }] }),
-  component: CallPage,
+  component: CallPageGate,
 });
+
+function CallPageGate() {
+  const { isParentRole } = useActiveRole();
+  if (isParentRole) return <ParentBlocked featureName="您撥的號碼是未來" />;
+  return <CallPage />;
+}
 
 
 // 莫蘭迪色票 — 全頁子項目統一使用
