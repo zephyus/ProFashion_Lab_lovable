@@ -176,25 +176,24 @@ function HomePage() {
             <ArrowRight className="h-4 w-4 text-muted-foreground" />
           </Link>
 
-          <Link
-            to={isTeacher ? "/teacher" : "/teacher-signup"}
-            className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
-                <GraduationCap className="h-[18px] w-[18px]" strokeWidth={1.9} />
+          {isTeacher && (
+            <Link
+              to="/teacher"
+              className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
+                  <GraduationCap className="h-[18px] w-[18px]" strokeWidth={1.9} />
+                </div>
+                <div>
+                  <p className="text-subhead font-semibold text-foreground">教師後台</p>
+                  <p className="text-caption text-muted-foreground">管理班級、查看學員進度</p>
+                </div>
               </div>
-              <div>
-                <p className="text-subhead font-semibold text-foreground">
-                  {isTeacher ? "教師後台" : "我是老師"}
-                </p>
-                <p className="text-caption text-muted-foreground">
-                  {isTeacher ? "管理班級、查看學員進度" : "輸入註冊碼升級為教師"}
-                </p>
-              </div>
-            </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground" />
-          </Link>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          )}
+
 
           <Link
             to="/join"
