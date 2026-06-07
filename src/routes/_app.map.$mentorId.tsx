@@ -81,6 +81,22 @@ function MentorDetailPage() {
     setErrors({});
   };
 
+  const sub = useSubscription();
+  const [paywallOpen, setPaywallOpen] = useState(false);
+  const [paid, setPaid] = useState(false); // 單次付費完成 flag
+
+  const handleStartBooking = () => {
+    if (sub.canBookFree) {
+      setStep("type");
+      return;
+    }
+    if (paid) {
+      setStep("type");
+      return;
+    }
+    setPaywallOpen(true);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const errs: typeof errors = {};
@@ -96,6 +112,8 @@ function MentorDetailPage() {
     }
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
+    // 訂閱會員消耗一次配額；單次付費者已在 paid flag 內處理
+    if (sub.canBookFree) sub.consumeBooking();
     setStep("done");
   };
 
