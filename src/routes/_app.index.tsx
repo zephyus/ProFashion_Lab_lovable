@@ -199,6 +199,40 @@ function HomePage() {
           )}
 
 
+          {isParent && (
+            <Link
+              to="/parent"
+              className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
+                  <ShieldCheck className="h-[18px] w-[18px]" strokeWidth={1.9} />
+                </div>
+                <div>
+                  <p className="text-subhead font-semibold text-foreground">家長後台</p>
+                  <p className="text-caption text-muted-foreground">查看孩子、核可活動請求</p>
+                </div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+          )}
+
+          <Link
+            to="/parent-link"
+            className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
+                <HeartHandshake className="h-[18px] w-[18px]" strokeWidth={1.9} />
+              </div>
+              <div>
+                <p className="text-subhead font-semibold text-foreground">我的家長</p>
+                <p className="text-caption text-muted-foreground">產生邀請碼讓家長綁定</p>
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+          </Link>
+
           <Link
             to="/join"
             className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30"
@@ -216,6 +250,7 @@ function HomePage() {
           </Link>
         </div>
       )}
+
 
       {/* Guest CTA */}
       {!user && !loading && (
