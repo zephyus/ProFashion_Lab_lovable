@@ -5,7 +5,9 @@ import {
   Map as MapIcon,
   Phone,
   FlaskConical,
+  Bell,
 } from "lucide-react";
+import { useUnreadCount } from "@/hooks/useNotifications";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -23,6 +25,7 @@ const rightTabs = [
 
 function AppLayout() {
   const { pathname } = useLocation();
+  const unread = useUnreadCount();
   const homeActive = pathname === "/" || pathname === "/_app" || pathname === "/_app/";
 
   const renderTab = ({
@@ -62,6 +65,20 @@ function AppLayout() {
 
   return (
     <div className="app-shell mx-auto flex min-h-screen max-w-md flex-col bg-background pb-[72px]">
+      {/* Floating inbox bell */}
+      <Link
+        to="/inbox"
+        aria-label="通知收件夾"
+        className="fixed right-3 top-3 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-card/90 text-foreground shadow-[var(--shadow-card)] backdrop-blur-md transition-transform hover:scale-105 md:right-[calc(50%-220px)]"
+      >
+        <Bell className="h-[18px] w-[18px]" strokeWidth={1.85} />
+        {unread > 0 && (
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground">
+            {unread > 9 ? "9+" : unread}
+          </span>
+        )}
+      </Link>
+
       <main className="flex-1">
         <Outlet />
       </main>
