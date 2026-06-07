@@ -369,3 +369,79 @@ function ChamberCard({
   );
 }
 
+// —— 雷達圖（純 SVG，4 軸） ——
+function RadarChart({ values, labels }: { values: number[]; labels: string[] }) {
+  const size = 180;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = 58;
+  const n = values.length;
+  const angle = (i: number) => (Math.PI * 2 * i) / n - Math.PI / 2;
+  const pt = (i: number, v: number) => {
+    const a = angle(i);
+    const rr = (Math.max(0, Math.min(100, v)) / 100) * r;
+    return [cx + Math.cos(a) * rr, cy + Math.sin(a) * rr] as const;
+  };
+  const ringPoints = (p: number) =>
+    Array.from({ length: n }, (_, i) => {
+      const [x, y] = pt(i, p);
+      return `${x},${y}`;
+    }).join(" ");
+  const dataPoints = values.map((v, i) => pt(i, v).join(",")).join(" ");
+
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[180px]">
+      {[25, 50, 75, 100].map((p) => (
+        <polygon
+          key={p}
+          fill="none"
+          stroke="var(--color-primary-deep)"
+          strokeOpacity="0.18"
+          points={ringPoints(p)}
+        />
+      ))}
+      {Array.from({ length: n }, (_, i) => {
+        const [x, y] = pt(i, 100);
+        return (
+          <line
+            key={i}
+            x1={cx}
+            y1={cy}
+            x2={x}
+            y2={y}
+            stroke="var(--color-primary-deep)"
+            strokeOpacity="0.15"
+          />
+        );
+      })}
+      <polygon
+        points={dataPoints}
+        fill="var(--color-primary)"
+        fillOpacity="0.45"
+        stroke="var(--color-primary-deep)"
+        strokeWidth="1.5"
+      />
+      {values.map((_, i) => {
+        const [x, y] = pt(i, 100);
+        const lx = cx + (x - cx) * 1.22;
+        const ly = cy + (y - cy) * 1.22;
+        return (
+          <text
+            key={i}
+            x={lx}
+            y={ly}
+            fontSize="9"
+            fontWeight="600"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill="var(--color-foreground)"
+          >
+            {labels[i]}
+          </text>
+        );
+      })}
+    </svg>
+  );
+}
+
+
