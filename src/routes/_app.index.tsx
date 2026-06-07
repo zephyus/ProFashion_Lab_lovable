@@ -345,21 +345,16 @@ function HomePage() {
 
 // —— 子視窗外殼 ——
 function ChamberCard({
-  title, delay, children,
+  delay, children,
 }: {
-  title: string;
   delay: number;
   children: React.ReactNode;
 }) {
   return (
     <section
-      className="relative mt-5 overflow-hidden rounded-2xl border border-primary/20 bg-card p-4 shadow-[var(--shadow-card)] animate-rise"
+      className="relative mt-5 overflow-hidden rounded-2xl bg-primary-deep p-4 shadow-[var(--shadow-card)] animate-rise"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <header className="relative mb-3 flex items-center border-b border-dashed border-primary/15 pb-3">
-        <p className="text-[15px] font-bold leading-tight text-foreground">{title}</p>
-      </header>
-
       <div className="relative">{children}</div>
     </section>
   );
@@ -367,10 +362,10 @@ function ChamberCard({
 
 // —— 雷達圖（純 SVG，4 軸） ——
 function RadarChart({ values, labels }: { values: number[]; labels: string[] }) {
-  const size = 180;
+  const size = 200;
   const cx = size / 2;
   const cy = size / 2;
-  const r = 58;
+  const r = 52;
   const n = values.length;
   const angle = (i: number) => (Math.PI * 2 * i) / n - Math.PI / 2;
   const pt = (i: number, v: number) => {
@@ -386,13 +381,13 @@ function RadarChart({ values, labels }: { values: number[]; labels: string[] }) 
   const dataPoints = values.map((v, i) => pt(i, v).join(",")).join(" ");
 
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[180px]">
+    <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[200px]">
       {[25, 50, 75, 100].map((p) => (
         <polygon
           key={p}
           fill="none"
-          stroke="var(--color-primary-deep)"
-          strokeOpacity="0.18"
+          stroke="white"
+          strokeOpacity="0.25"
           points={ringPoints(p)}
         />
       ))}
@@ -405,32 +400,32 @@ function RadarChart({ values, labels }: { values: number[]; labels: string[] }) 
             y1={cy}
             x2={x}
             y2={y}
-            stroke="var(--color-primary-deep)"
-            strokeOpacity="0.15"
+            stroke="white"
+            strokeOpacity="0.22"
           />
         );
       })}
       <polygon
         points={dataPoints}
-        fill="var(--color-primary)"
-        fillOpacity="0.45"
-        stroke="var(--color-primary-deep)"
+        fill="white"
+        fillOpacity="0.55"
+        stroke="white"
         strokeWidth="1.5"
       />
       {values.map((_, i) => {
         const [x, y] = pt(i, 100);
-        const lx = cx + (x - cx) * 1.22;
-        const ly = cy + (y - cy) * 1.22;
+        const lx = cx + (x - cx) * 1.32;
+        const ly = cy + (y - cy) * 1.32;
         return (
           <text
             key={i}
             x={lx}
             y={ly}
-            fontSize="9"
+            fontSize="8.5"
             fontWeight="600"
             textAnchor="middle"
             dominantBaseline="middle"
-            fill="var(--color-foreground)"
+            fill="white"
           >
             {labels[i]}
           </text>
@@ -439,5 +434,6 @@ function RadarChart({ values, labels }: { values: number[]; labels: string[] }) 
     </svg>
   );
 }
+
 
 
