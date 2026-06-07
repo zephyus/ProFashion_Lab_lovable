@@ -118,6 +118,11 @@ function MentorDetailPage() {
     if (Object.keys(errs).length > 0) return;
     // 訂閱會員消耗一次配額；單次付費者已在 paid flag 內處理
     if (sub.canBookFree) sub.consumeBooking();
+    logActivity({
+      station: "map",
+      type: "booking",
+      detail: `預約 ${mentor.name}${slot ? `・${slot.date} ${slot.time}` : ""}${bookingType === "class" ? `（${school} ${className}）` : ""}`,
+    });
     setStep("done");
   };
 
