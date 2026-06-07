@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut, FileText, GraduationCap, Users, Crown, FlaskConical, Beaker, Atom, TestTube, Compass, BookOpen, Target } from "lucide-react";
+import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut, FileText, GraduationCap, Users, Crown, FlaskConical, Beaker, TestTube } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -65,36 +65,32 @@ function HomePage() {
   const overall = Math.round((explorePct + cafePct + mapPct + callPct) / 4);
 
   const stations = [
-    { key: "explore", icon: Sparkles, title: "發現小秘 me", desc: "認識你自己", to: "/explore", pct: explorePct, formula: "C₁₆H₂₂" },
-    { key: "cafe", icon: Coffee, title: "職業咖啡館", desc: "聽前輩怎麼說", to: "/cafe", pct: cafePct, formula: "C₈H₁₀N₄O₂" },
-    { key: "map", icon: MapPin, title: "職圖", desc: "看見你的路徑", to: "/map", pct: mapPct, formula: "Fe₂O₃" },
-    { key: "call", icon: Phone, title: "您撥的號碼是未來", desc: "預演關鍵時刻", to: "/call", pct: callPct, formula: "Ag₂S" },
+    { key: "explore", icon: Sparkles, title: "發現小秘 me", to: "/explore", pct: explorePct },
+    { key: "cafe", icon: Coffee, title: "職業咖啡館", to: "/cafe", pct: cafePct },
+    { key: "map", icon: MapPin, title: "職圖", to: "/map", pct: mapPct },
+    { key: "call", icon: Phone, title: "您撥的號碼是未來", to: "/call", pct: callPct },
   ] as const;
 
-  // —— 未來室階段建議 ——
-  const futureStages = [
-    {
-      icon: Compass,
-      stage: "現在 · 國中探索期",
-      label: "Phase 01",
-      tip: "把每天「我覺得有趣」記下來。完成 3 次小秘me 測驗 + 2 次職業咖啡館，可以看出你的興趣輪廓。",
-      chip: overall < 30 ? "剛開始" : overall < 70 ? "進行中" : "輪廓清晰",
-    },
-    {
-      icon: BookOpen,
-      stage: "下一步 · 選高中／高職",
-      label: "Phase 02",
-      tip: "技術型 vs 學術型？綜合高中先觀望？用「職圖」對應你的興趣科系，再用「您撥的號碼是未來」預演面試與選組對話。",
-      chip: "可開始準備",
-    },
-    {
-      icon: Target,
-      stage: "未來 · 大學科系與職涯",
-      label: "Phase 03",
-      tip: "高一下決定選組、高二想學群、高三填志願。把現在的小秘me 結果存進學習歷程，三年後你會感謝自己。",
-      chip: "持續累積",
-    },
-  ] as const;
+  // —— 未來室：根據進度動態給出「現在 / 下一步」 ——
+  const lowest = [...stations].sort((a, b) => a.pct - b.pct)[0];
+  const highest = [...stations].sort((a, b) => b.pct - a.pct)[0];
+  const nowTip =
+    overall === 0
+      ? "還沒開始調配——挑一個有興趣的站點，先放第一滴試劑。"
+      : overall < 40
+        ? `已經啟動「${highest.title}」，再多累積幾次會看出方向。`
+        : overall < 80
+          ? `「${highest.title}」走得不錯，輪廓正在浮現。`
+          : "四個站點都調得很均勻，可以開始整理你的成果。";
+  const nextTip =
+    overall === 0
+      ? "建議從「發現小秘 me」開始：3 分鐘的小測驗。"
+      : lowest.pct < 40
+        ? `下一步：補強「${lowest.title}」，讓配方更平衡。`
+        : sub.bookingsUsed === 0
+          ? "下一步：到「職圖」預約一場真人職人體驗。"
+          : "下一步：匯出學習歷程，把調配結果留下來。";
+
 
   return (
     <div className="px-5 animate-page">
@@ -161,99 +157,61 @@ function HomePage() {
       <ChamberCard
         index="01"
         title="職感進行室"
-        subtitle="Reaction Chamber · 進行中的調配"
+        subtitle="Reaction Chamber"
         icon={Beaker}
         delay={120}
       >
-        <div className="grid grid-cols-2 gap-2.5">
+        <ul className="space-y-2">
           {stations.map((s) => {
             const Icon = s.icon;
             return (
-              <Link
-                key={s.key}
-                to={s.to}
-                className="press group relative flex flex-col gap-2.5 overflow-hidden rounded-xl border border-primary/20 bg-card/60 p-3 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card"
-              >
-                {/* 試管液面動畫底色 */}
-                <div
-                  className="absolute inset-x-0 bottom-0 origin-bottom bg-[image:var(--gradient-hero)] opacity-[0.12] transition-all duration-700"
-                  style={{ height: `${s.pct}%` }}
-                  aria-hidden
-                />
-                <div className="relative flex items-start justify-between">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-soft text-primary-deep">
+              <li key={s.key}>
+                <Link
+                  to={s.to}
+                  className="press group relative flex items-center gap-3 overflow-hidden rounded-xl border border-primary/15 bg-card/70 px-3 py-2.5 backdrop-blur-sm transition-colors hover:border-primary/40"
+                >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary-deep">
                     <Icon className="h-[16px] w-[16px]" strokeWidth={1.9} />
                   </div>
-                  <span className="font-mono text-[9px] tracking-wider text-muted-foreground">{s.formula}</span>
-                </div>
-                <div className="relative min-w-0">
-                  <p className="text-[13px] font-semibold leading-tight text-foreground">{s.title}</p>
-                  <p className="mt-0.5 text-[10px] leading-snug text-muted-foreground">{s.desc}</p>
-                </div>
-                {/* 進度條 */}
-                <div className="relative mt-auto">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Progress</span>
-                    <span className="font-mono text-[10px] font-bold tabular-nums text-primary-deep">{s.pct}%</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[13px] font-semibold text-foreground truncate">{s.title}</p>
+                      <span className="font-mono text-[10px] font-bold tabular-nums text-primary-deep">{s.pct}%</span>
+                    </div>
+                    <div className="mt-1 h-1 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-[image:var(--gradient-hero)] transition-all duration-500"
+                        style={{ width: `${s.pct}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-[image:var(--gradient-hero)] transition-all duration-500"
-                      style={{ width: `${s.pct}%` }}
-                    />
-                  </div>
-                </div>
-              </Link>
+                </Link>
+              </li>
             );
           })}
-        </div>
-
-        {/* 整體濃度 */}
-        <div className="mt-3 flex items-center justify-between rounded-xl border border-dashed border-primary/30 bg-primary-soft/40 px-3 py-2">
-          <div className="flex items-center gap-2">
-            <Atom className="h-3.5 w-3.5 text-primary-deep" strokeWidth={1.9} />
-            <span className="text-[11px] font-semibold text-foreground">調配濃度</span>
-          </div>
-          <span className="font-mono text-[11px] font-bold tabular-nums text-primary-deep">{overall}%</span>
-        </div>
+        </ul>
       </ChamberCard>
 
       {/* ============ 子視窗 2：職感未來室 ============ */}
       <ChamberCard
         index="02"
         title="職感未來室"
-        subtitle="Future Chamber · 從國中通往大學的配方"
+        subtitle="Future Chamber"
         icon={TestTube}
         delay={180}
       >
-        <div className="space-y-2.5">
-          {futureStages.map((f, i) => {
-            const Icon = f.icon;
-            return (
-              <div key={i} className="relative rounded-xl border border-primary/15 bg-card/60 p-3 backdrop-blur-sm">
-                <div className="flex items-start gap-3">
-                  <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary-deep">
-                    <Icon className="h-[17px] w-[17px]" strokeWidth={1.9} />
-                    {i < futureStages.length - 1 && (
-                      <span className="absolute left-1/2 top-full h-3 w-px -translate-x-1/2 bg-primary/30" aria-hidden />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[13px] font-semibold text-foreground">{f.stage}</p>
-                      <span className="font-mono text-[9px] tracking-wider text-muted-foreground">{f.label}</span>
-                    </div>
-                    <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{f.tip}</p>
-                    <span className="mt-2 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary-deep">
-                      {f.chip}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        <div className="space-y-2">
+          <div className="rounded-xl border border-primary/15 bg-card/70 p-3 backdrop-blur-sm">
+            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Now · 現在</p>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nowTip}</p>
+          </div>
+          <div className="rounded-xl border border-primary/15 bg-card/70 p-3 backdrop-blur-sm">
+            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Next · 下一步</p>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nextTip}</p>
+          </div>
         </div>
       </ChamberCard>
+
 
       {/* 訂閱方案 */}
       <div className="mt-4 animate-rise" style={{ animationDelay: "220ms" }}>
