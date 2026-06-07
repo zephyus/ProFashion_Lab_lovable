@@ -394,6 +394,11 @@ function CallPage() {
     synthSeqRef.current++;
     // 留存通話紀錄（至少聽完一句才記）；未登入或失敗都靜默
     if (active && (lineIdx > 0 || chat.length > 0)) {
+      logActivity({
+        station: "call",
+        type: "call_completed",
+        detail: `與 ${active.name}・${active.job} 通話 ${seconds} 秒（${chat.length} 訊息）`,
+      });
       void saveCallFn({
         data: {
           persona_id: active.id,
