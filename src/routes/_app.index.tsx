@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useXp } from "@/hooks/useXp";
 import { useRoles } from "@/hooks/useRoles";
-import { useSubscription, SUB_PRICE, FREE_AI_CALL_LIMIT, SUB_BOOKING_LIMIT } from "@/hooks/useSubscription";
+import { useSubscription, FREE_AI_CALL_LIMIT, SUB_BOOKING_LIMIT } from "@/hooks/useSubscription";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/_app/")({
