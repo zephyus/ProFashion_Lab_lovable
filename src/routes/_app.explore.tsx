@@ -4,6 +4,8 @@ import { Gamepad2, Trophy, ChevronRight, Briefcase, RefreshCw } from "lucide-rea
 import ExploreQuiz from "../components/ExploreQuiz";
 import { internMissions } from "../lib/intern-missions";
 import { useXp } from "@/hooks/useXp";
+import { useActiveRole } from "@/hooks/useActiveRole";
+import { ParentBlocked } from "@/components/ParentBlocked";
 
 export const Route = createFileRoute("/_app/explore")({
   head: () => ({ meta: [{ title: "發現 — 職感 Zhígǎn" }] }),
@@ -13,7 +15,9 @@ export const Route = createFileRoute("/_app/explore")({
 type Game = "menu" | "quiz" | "intern";
 
 function ExplorePage() {
+  const { isParentRole } = useActiveRole();
   const [game, setGame] = useState<Game>("menu");
+  if (isParentRole) return <ParentBlocked featureName="發現小秘 me" />;
 
   // —— 測驗 ——
   if (game === "quiz") {
