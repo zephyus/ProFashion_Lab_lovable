@@ -191,33 +191,33 @@ function HomePage() {
               <Link
                 key={s.key}
                 to={s.to}
-                className="press flex items-center justify-between gap-2 rounded-lg bg-white/55 px-2 py-1.5 backdrop-blur-sm transition hover:bg-white"
+                className="press flex items-center justify-between gap-2 rounded-lg bg-white/10 px-2 py-1.5 backdrop-blur-sm transition hover:bg-white/20"
               >
-                <span className="font-semibold text-foreground">{s.title}</span>
-                <span className="tabular-nums font-bold text-primary-deep">{s.pct}%</span>
+                <span className="font-semibold text-primary-foreground">{s.title}</span>
+                <span className="tabular-nums font-bold text-primary-foreground">{s.pct}%</span>
               </Link>
             ))}
           </div>
         </div>
 
         {/* 綜合分析：適合的學群 */}
-        <div className="mt-3 rounded-xl bg-white/55 p-3 backdrop-blur-sm">
-          <p className="text-[11px] font-bold text-primary-deep">綜合分析 · 適合學群</p>
+        <div className="mt-3 rounded-xl bg-white/10 p-3 backdrop-blur-sm">
+          <p className="text-[11px] font-bold text-primary-foreground/80">綜合分析 · 適合學群</p>
           {overall === 0 ? (
-            <p className="mt-1 text-[12px] text-muted-foreground">
+            <p className="mt-1 text-[12px] text-primary-foreground/70">
               開始體驗任一站點後，這裡會分析你適合 18 學群中的哪幾個方向。
             </p>
           ) : (
             <ul className="mt-2 space-y-1.5">
               {topGroups.map(([name, score], i) => (
                 <li key={name} className="flex items-center gap-2">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-deep text-[10px] font-bold text-primary-foreground">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-foreground text-[10px] font-bold text-primary-deep">
                     {i + 1}
                   </span>
-                  <span className="flex-1 text-[12px] font-semibold text-foreground">{name}</span>
-                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-primary/15">
+                  <span className="flex-1 text-[12px] font-semibold text-primary-foreground">{name}</span>
+                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-white/15">
                     <div
-                      className="h-full rounded-full bg-[image:var(--gradient-hero)] transition-all duration-500"
+                      className="h-full rounded-full bg-primary-foreground transition-all duration-500"
                       style={{ width: `${Math.min(100, Math.round(score))}%` }}
                     />
                   </div>
