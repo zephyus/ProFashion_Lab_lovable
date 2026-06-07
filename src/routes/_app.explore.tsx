@@ -118,6 +118,7 @@ function InternGame({ onBack }: { onBack: () => void }) {
     const gain = which === "A" ? mission.rewardA : mission.rewardB;
     const text = which === "A" ? mission.successA : mission.successB;
     addXp(gain);
+    logActivity({ station: "explore", type: "intern_choice", detail: `${mission.title}：${text}`, xp: gain });
     setResult({ text, gain });
   };
 
