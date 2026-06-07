@@ -119,197 +119,221 @@ function HomePage() {
 
 
   return (
-    <div className="px-5 animate-page">
+    <div
+      className="-mx-0 min-h-screen bg-black px-5 pb-8 text-white animate-page"
+      style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif" }}
+    >
       {/* Top bar */}
-      <header className="flex h-12 items-center justify-between pt-3">
+      <header className="flex items-center justify-between pt-4">
         <div className="flex flex-col">
-          <span className="text-footnote font-semibold tracking-wide text-foreground/80">
-            ProFashion <span className="text-muted-foreground">Lab</span>
+          <span className="text-[11px] font-medium uppercase tracking-widest text-neutral-500">
+            ProFashion Lab
           </span>
-          <span className="text-[10px] tracking-widest text-muted-foreground">職感實驗室</span>
+          <span className="text-[11px] font-medium text-neutral-500">職感實驗室</span>
         </div>
         {loading ? (
-          <div className="h-7 w-7 animate-pulse rounded-full bg-muted" />
+          <div className="h-9 w-9 animate-pulse rounded-full bg-neutral-800" />
         ) : user ? (
           <div className="flex items-center gap-2">
             {avatarUrl ? (
-              <img src={avatarUrl} alt={displayName} className="h-7 w-7 rounded-full object-cover" />
+              <img src={avatarUrl} alt={displayName} className="h-9 w-9 rounded-full border border-white/10 object-cover" />
             ) : (
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-neutral-900 text-[12px] font-semibold text-white">
                 {displayName.charAt(0).toUpperCase() || "U"}
               </div>
             )}
-            <button onClick={handleLogout} aria-label="登出"
-              className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+            <button
+              onClick={handleLogout}
+              aria-label="登出"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-neutral-900 text-neutral-400 transition-colors hover:text-white"
+            >
               <LogOut className="h-4 w-4" strokeWidth={1.85} />
             </button>
           </div>
         ) : (
-          <Link to="/login" className="text-subhead font-semibold text-primary-deep transition-opacity hover:opacity-70">登入</Link>
+          <Link
+            to="/login"
+            className="rounded-full border border-white/15 bg-neutral-900 px-3.5 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-neutral-800"
+          >
+            登入
+          </Link>
         )}
       </header>
 
       {/* Hero */}
-      <section className="pt-10 pb-7 animate-rise">
-        <h1 className="text-large-title text-foreground">
+      <section className="pt-8 pb-6 animate-rise">
+        <h1 className="text-[32px] font-bold leading-tight tracking-tight text-white">
           今天，
           <br />
           想認識哪一個自己？
         </h1>
       </section>
 
-      {/* XP card */}
+      {/* Level Card */}
       <Link
         to="/explore"
-        className="press flex items-center justify-between gap-4 rounded-2xl bg-[image:var(--gradient-hero)] px-5 py-4 text-primary-foreground shadow-[var(--shadow-card)] animate-rise"
+        className="press mb-6 flex items-center justify-between gap-4 rounded-[22px] bg-[#008080] px-5 py-4 text-white shadow-lg shadow-teal-900/30 animate-rise"
         style={{ animationDelay: "60ms" }}
       >
-        <div className="flex items-center gap-2.5">
-          <Trophy className="h-4 w-4" strokeWidth={2} />
+        <div className="flex items-center gap-3">
+          <div className="rounded-xl bg-white/15 p-2.5">
+            <Trophy className="h-5 w-5" strokeWidth={2} />
+          </div>
           <div>
-            <p className="text-subhead font-semibold leading-tight">{tierName}</p>
-            <p className="text-[11px] opacity-80">
+            <p className="text-[17px] font-bold leading-tight">{tierName}</p>
+            <p className="text-[11px] text-white/70">
               {completed > 0 ? `已完成 ${completed} 關` : "尚未開始"}
             </p>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-title-2 font-bold leading-none tabular-nums">{xp}</p>
-          <p className="text-[10px] uppercase tracking-widest opacity-80 mt-0.5">XP</p>
+          <p className="text-[26px] font-black leading-none tabular-nums">{xp}</p>
+          <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-white/60">XP</p>
         </div>
       </Link>
 
-      {/* ============ 子視窗 1：進行室（儀表板 + 雷達 + 學群分析） ============ */}
-      <ChamberCard delay={120}>
-        <div className="grid grid-cols-2 gap-2 text-[11px]">
+      {/* Stations + Analysis */}
+      <section
+        className="mb-6 rounded-[28px] border border-white/10 bg-neutral-900/50 p-4 backdrop-blur-md animate-rise"
+        style={{ animationDelay: "120ms" }}
+      >
+        <div className="mb-5 grid grid-cols-2 gap-3">
           {stations.map((s) => (
             <Link
               key={s.key}
               to={s.to}
-              className="press flex flex-col items-center gap-1 rounded-lg bg-primary-soft px-2 py-2.5 transition hover:bg-primary-soft/70"
+              className="press flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-[#1c1c1e] px-3 py-4 text-center transition-colors hover:bg-[#242426]"
             >
-              <span className="font-semibold text-foreground">{s.title}</span>
-              <span className="tabular-nums font-bold text-primary-deep">{s.pct}%</span>
+              <span className="mb-1 text-[13px] font-medium text-white">{s.title}</span>
+              <span className="text-[11px] font-bold text-teal-500 tabular-nums">{s.pct}%</span>
             </Link>
           ))}
         </div>
 
-        {/* 綜合分析：適合的學群 */}
-        <div className="mt-3 rounded-xl bg-primary-soft p-3">
-          <p className="text-[11px] font-bold text-primary-deep">綜合分析 · 適合學群</p>
+        <div className="px-1">
+          <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-teal-500">
+            綜合分析 · 適合學群
+          </h3>
           {overall === 0 ? (
-            <p className="mt-1 text-[12px] text-muted-foreground">
+            <p className="text-[13px] leading-relaxed text-neutral-400">
               開始體驗任一站點後，這裡會分析你適合 18 學群中的哪幾個方向。
             </p>
           ) : (
-            <ul className="mt-2 space-y-1.5">
+            <ul className="space-y-1.5">
               {topGroups.map(([name], i) => (
                 <li key={name} className="flex items-center gap-2">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-deep text-[10px] font-bold text-primary-foreground">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-500 text-[10px] font-bold text-black">
                     {i + 1}
                   </span>
-                  <span className="flex-1 text-[12px] font-semibold text-foreground">{name}</span>
+                  <span className="flex-1 text-[13px] font-semibold text-white">{name}</span>
                 </li>
               ))}
             </ul>
           )}
         </div>
-      </ChamberCard>
+      </section>
 
-      {/* ============ 子視窗 2：未來室 ============ */}
-      <ChamberCard delay={180}>
-        <div className="space-y-2">
-          <div className="rounded-xl bg-primary-soft p-3">
-            <p className="text-[11px] font-semibold text-primary-deep">現在</p>
-            <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nowTip}</p>
-          </div>
-          <div className="rounded-xl bg-primary-soft p-3">
-            <p className="text-[11px] font-semibold text-primary-deep">下一步</p>
-            <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nextTip}</p>
-          </div>
+      {/* Now / Next */}
+      <section
+        className="mb-6 rounded-[28px] border border-white/10 bg-neutral-900/50 p-6 backdrop-blur-md animate-rise"
+        style={{ animationDelay: "180ms" }}
+      >
+        <div className="mb-5">
+          <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-teal-500">現在</h3>
+          <p className="text-[13px] leading-relaxed text-neutral-200">{nowTip}</p>
         </div>
-      </ChamberCard>
+        <div>
+          <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+            下一步
+          </h3>
+          <p className="text-[13px] leading-relaxed text-neutral-300">{nextTip}</p>
+        </div>
+      </section>
 
-
-
-
-
-      {/* 訂閱狀態（已登入） */}
+      {/* 訂閱狀態（已登入且已訂閱） */}
       {user && sub.isSubscribed && (
-        <div className="mt-4 animate-rise" style={{ animationDelay: "220ms" }}>
-          <div className="rounded-2xl bg-[image:var(--gradient-hero)] p-4 text-primary-foreground shadow-[var(--shadow-card)]">
+        <div className="mb-4 animate-rise" style={{ animationDelay: "220ms" }}>
+          <div className="rounded-[22px] border border-teal-500/30 bg-teal-500/10 p-4 text-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Crown className="h-4 w-4" />
-                <p className="text-subhead font-semibold">職感 PRO 訂閱中</p>
+                <Crown className="h-4 w-4 text-teal-400" />
+                <p className="text-[14px] font-semibold">職感 PRO 訂閱中</p>
               </div>
               <button
                 onClick={() => { sub.unsubscribe(); toast.success("已取消訂閱（demo）"); }}
-                className="rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur">
+                className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold text-white backdrop-blur"
+              >
                 取消
               </button>
             </div>
-            <p className="mt-1 text-[11px] opacity-85">
+            <p className="mt-1.5 text-[11px] text-neutral-300">
               AI 語音無限 ・ 職圖本月剩 {sub.bookingsRemaining} / {sub.bookingsLimit} 次免費
             </p>
           </div>
         </div>
       )}
 
-      {/* 已登入：訂閱方案 + 學習歷程 + 教師入口 */}
+      {/* 已登入：學習歷程 + 教師入口 + 加入班級 */}
       {user && (
-        <div className="mt-4 space-y-2.5 animate-rise" style={{ animationDelay: "240ms" }}>
-          {/* 訂閱方案已移至 /login 頁面 */}
-
-
-          <Link to="/portfolio" className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30">
+        <div className="space-y-2.5 animate-rise" style={{ animationDelay: "240ms" }}>
+          <Link
+            to="/portfolio"
+            className="press flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3.5 transition-colors hover:bg-neutral-800/70"
+          >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/15 text-teal-400">
                 <FileText className="h-[18px] w-[18px]" strokeWidth={1.9} />
               </div>
               <div>
-                <p className="text-subhead font-semibold text-foreground">我的學習歷程</p>
-                <p className="text-caption text-muted-foreground">匯出 108 課綱 PDF</p>
+                <p className="text-[14px] font-semibold text-white">我的學習歷程</p>
+                <p className="text-[11px] text-neutral-500">匯出 108 課綱 PDF</p>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            <ArrowRight className="h-4 w-4 text-neutral-500" />
           </Link>
 
-          <Link to={isTeacher ? "/teacher" : "/teacher-signup"}
-            className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30">
+          <Link
+            to={isTeacher ? "/teacher" : "/teacher-signup"}
+            className="press flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3.5 transition-colors hover:bg-neutral-800/70"
+          >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/15 text-teal-400">
                 <GraduationCap className="h-[18px] w-[18px]" strokeWidth={1.9} />
               </div>
               <div>
-                <p className="text-subhead font-semibold text-foreground">{isTeacher ? "教師後台" : "我是老師"}</p>
-                <p className="text-caption text-muted-foreground">{isTeacher ? "管理班級、查看學員進度" : "輸入註冊碼升級為教師"}</p>
+                <p className="text-[14px] font-semibold text-white">{isTeacher ? "教師後台" : "我是老師"}</p>
+                <p className="text-[11px] text-neutral-500">{isTeacher ? "管理班級、查看學員進度" : "輸入註冊碼升級為教師"}</p>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            <ArrowRight className="h-4 w-4 text-neutral-500" />
           </Link>
 
-          <Link to="/join" className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30">
+          <Link
+            to="/join"
+            className="press flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3.5 transition-colors hover:bg-neutral-800/70"
+          >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/15 text-teal-400">
                 <Users className="h-[18px] w-[18px]" strokeWidth={1.9} />
               </div>
               <div>
-                <p className="text-subhead font-semibold text-foreground">加入班級</p>
-                <p className="text-caption text-muted-foreground">輸入老師給的邀請碼</p>
+                <p className="text-[14px] font-semibold text-white">加入班級</p>
+                <p className="text-[11px] text-neutral-500">輸入老師給的邀請碼</p>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            <ArrowRight className="h-4 w-4 text-neutral-500" />
           </Link>
         </div>
       )}
 
       {!user && !loading && (
         <div className="mt-6 animate-rise" style={{ animationDelay: "260ms" }}>
-          <Link to="/login"
-            className="press flex items-center justify-between rounded-2xl bg-primary px-5 py-4 text-primary-foreground">
-            <p className="text-subhead font-semibold">登入以保留你的軌跡</p>
-            <ArrowRight className="h-5 w-5" strokeWidth={2} />
+          <Link
+            to="/login"
+            className="press flex items-center justify-between rounded-2xl bg-teal-500 px-5 py-4 text-black shadow-lg shadow-teal-500/30"
+          >
+            <p className="text-[14px] font-bold">登入以保留你的軌跡</p>
+            <ArrowRight className="h-5 w-5" strokeWidth={2.4} />
           </Link>
         </div>
       )}
@@ -318,6 +342,7 @@ function HomePage() {
     </div>
   );
 }
+
 
 // —— 子視窗外殼 ——
 function ChamberCard({
