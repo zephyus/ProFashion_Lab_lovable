@@ -86,19 +86,28 @@ function LoginPage() {
 
   const signInAsDemo = () => signInAsDemoAccount(DEMO_ACCOUNTS.root);
 
+  const ensureSetup = useServerFn(ensureDemoParentSetup);
   const [quickLoading, setQuickLoading] = useState<DemoRole | null>(null);
   const handleQuickLogin = async (role: DemoRole) => {
     setQuickLoading(role);
     try {
       await signInAsDemoAccount(DEMO_ACCOUNTS[role]);
+      if (role === "student" || role === "parent") {
+        try {
+          await ensureSetup({ data: { role } });
+        } catch {
+          // demo setup 失敗不擋登入
+        }
+      }
       toast.success(`已登入：${DEMO_ACCOUNTS[role].name}`);
-      navigate({ to: "/", replace: true });
+      navigate({ to: role === "parent" ? "/parent" : "/", replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "登入失敗");
     } finally {
       setQuickLoading(null);
     }
   };
+
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
