@@ -374,12 +374,20 @@ function MentorDetailPage() {
                     </p>
                   </div>
                 )}
-                {bookingType === "individual" && user && parentStatus === "none" && (
-                  <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-400/40 bg-amber-50 p-3 dark:bg-amber-950/30">
-                    <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-700 dark:text-amber-300" />
-                    <p className="text-[11px] leading-relaxed text-amber-900 dark:text-amber-200">
-                      建議先到「我的家長」綁定家長，職人預約需要家長知情同意比較安全。
-                    </p>
+                {bookingType === "individual" && user && parentStatus !== "linked" && (
+                  <div className="mt-3 rounded-xl border border-amber-400/40 bg-amber-50 p-3 dark:bg-amber-950/30">
+                    <div className="flex items-start gap-2">
+                      <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-700 dark:text-amber-300" />
+                      <p className="text-[11px] leading-relaxed text-amber-900 dark:text-amber-200">
+                        職人預約必須由家長在後台同意才能成立。請先到「我的家長」綁定家長帳號後再回來報名。
+                      </p>
+                    </div>
+                    <Link
+                      to="/parent-link"
+                      className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-amber-600 px-3 py-1.5 text-[11px] font-semibold text-white"
+                    >
+                      前往綁定家長 →
+                    </Link>
                   </div>
                 )}
 
