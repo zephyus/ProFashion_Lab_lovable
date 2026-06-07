@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/carousel";
 import { CATEGORY_META, MENTORS, MentorCategory } from "@/lib/mentors";
 import { cn } from "@/lib/utils";
+import { useTrackVisit } from "@/hooks/useActivity";
 
 export const Route = createFileRoute("/_app/map")({
   head: () => ({ meta: [{ title: "地圖 — 職感 Zhígǎn" }] }),
