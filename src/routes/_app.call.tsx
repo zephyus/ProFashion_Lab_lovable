@@ -14,6 +14,9 @@ import {
 } from "@/lib/local-tts/kokoroTts";
 import { splitTextForTts } from "@/lib/local-tts/wav";
 import { toast } from "sonner";
+import { useSubscription } from "@/hooks/useSubscription";
+import { SubscribeDialog } from "@/components/SubscribeDialog";
+import { Crown } from "lucide-react";
 
 
 
