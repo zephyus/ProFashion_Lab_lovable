@@ -235,43 +235,24 @@ function HomePage() {
 
 
       {/* 訂閱狀態（已登入） */}
-      {user && (
+      {user && sub.isSubscribed && (
         <div className="mt-4 animate-rise" style={{ animationDelay: "220ms" }}>
-          {sub.isSubscribed ? (
-            <div className="rounded-2xl bg-[image:var(--gradient-hero)] p-4 text-primary-foreground shadow-[var(--shadow-card)]">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Crown className="h-4 w-4" />
-                  <p className="text-subhead font-semibold">職感 PRO 訂閱中</p>
-                </div>
-                <button
-                  onClick={() => { sub.unsubscribe(); toast.success("已取消訂閱（demo）"); }}
-                  className="rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur">
-                  取消
-                </button>
+          <div className="rounded-2xl bg-[image:var(--gradient-hero)] p-4 text-primary-foreground shadow-[var(--shadow-card)]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Crown className="h-4 w-4" />
+                <p className="text-subhead font-semibold">職感 PRO 訂閱中</p>
               </div>
-              <p className="mt-1 text-[11px] opacity-85">
-                AI 語音無限 ・ 職圖本月剩 {sub.bookingsRemaining} / {sub.bookingsLimit} 次免費
-              </p>
+              <button
+                onClick={() => { sub.unsubscribe(); toast.success("已取消訂閱（demo）"); }}
+                className="rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur">
+                取消
+              </button>
             </div>
-          ) : (
-            <button
-              onClick={() => { sub.subscribe(); toast.success(`已升級訂閱（demo）— NT$${SUB_PRICE}/月`); }}
-              className="press flex w-full items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary-soft px-4 py-3.5 text-left">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[image:var(--gradient-hero)] text-primary-foreground">
-                  <Crown className="h-[18px] w-[18px]" strokeWidth={1.9} />
-                </div>
-                <div>
-                  <p className="text-subhead font-semibold text-foreground">升級 職感 PRO</p>
-                  <p className="text-caption text-muted-foreground">
-                    AI 語音無限・職圖每月 5 次　NT${SUB_PRICE}/月
-                  </p>
-                </div>
-              </div>
-              <ArrowRight className="h-4 w-4 text-primary-deep" />
-            </button>
-          )}
+            <p className="mt-1 text-[11px] opacity-85">
+              AI 語音無限 ・ 職圖本月剩 {sub.bookingsRemaining} / {sub.bookingsLimit} 次免費
+            </p>
+          </div>
         </div>
       )}
 
