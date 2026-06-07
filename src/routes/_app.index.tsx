@@ -354,7 +354,7 @@ function ChamberCard({
 }) {
   return (
     <section
-      className="relative mt-5 overflow-hidden rounded-3xl border border-primary/20 bg-card p-4 shadow-[var(--shadow-card)] animate-rise"
+      className="relative mt-5 overflow-hidden rounded-3xl border border-primary/30 bg-primary-soft p-4 shadow-[var(--shadow-card)] animate-rise"
       style={{ animationDelay: `${delay}ms` }}
     >
       <header className="relative mb-3 flex items-center gap-2.5 border-b border-dashed border-primary/20 pb-3">
