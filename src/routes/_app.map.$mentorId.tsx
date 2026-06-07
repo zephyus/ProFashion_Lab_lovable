@@ -54,6 +54,7 @@ function MentorDetailPage() {
   const { mentorId } = Route.useParams();
   const mentor = getMentor(mentorId)!;
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = useState<Step>("idle");
   const [bookingType, setBookingType] = useState<BookingType | null>(null);
   const [slot, setSlot] = useState<MentorSlot | null>(null);
@@ -62,6 +63,8 @@ function MentorDetailPage() {
   const [school, setSchool] = useState("");
   const [className, setClassName] = useState("");
   const [studentCount, setStudentCount] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [sentToParent, setSentToParent] = useState(false);
   const [errors, setErrors] = useState<{
     name?: string;
     contact?: string;
@@ -69,6 +72,25 @@ function MentorDetailPage() {
     className?: string;
     studentCount?: string;
   }>({});
+
+  // 家長綁定狀態：個人預約若已綁家長，會走「家長同意」流程
+  const [parentStatus, setParentStatus] = useState<"loading" | "none" | "pending" | "linked">("loading");
+  const fetchParents = useServerFn(listMyParents);
+  const submitConsent = useServerFn(submitConsentRequest);
+
+  useEffect(() => {
+    if (!user) {
+      setParentStatus("none");
+      return;
+    }
+    fetchParents()
+      .then((r) => {
+        const active = r.links.find((l) => l.status === "active");
+        const pending = r.links.find((l) => l.status === "pending");
+        setParentStatus(active ? "linked" : pending ? "pending" : "none");
+      })
+      .catch(() => setParentStatus("none"));
+  }, [user, fetchParents]);
 
   const tone = CATEGORY_META[mentor.category].tone;
 
@@ -81,10 +103,11 @@ function MentorDetailPage() {
     setSchool("");
     setClassName("");
     setStudentCount("");
+    setSentToParent(false);
     setErrors({});
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs: typeof errors = {};
     if (!name.trim()) errs.name = bookingType === "class" ? "請輸入老師姓名" : "請輸入姓名";
@@ -99,8 +122,38 @@ function MentorDetailPage() {
     }
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
+
+    // 個人預約 + 已綁定家長 → 送出家長同意請求
+    if (bookingType === "individual" && parentStatus === "linked" && slot) {
+      setSubmitting(true);
+      try {
+        await submitConsent({
+          data: {
+            kind: "teacher_booking",
+            payload: {
+              mentor_id: mentor.id,
+              mentor_name: mentor.name,
+              mentor_job: mentor.job,
+              slot: `${slot.date} ${slot.time}`,
+              applicant_name: name,
+              contact,
+            },
+          },
+        });
+        setSentToParent(true);
+        setStep("done");
+        toast.success("已送出請求，等待家長核可");
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "送出失敗");
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
     setStep("done");
   };
+
 
   return (
     <div className="relative pb-44">
