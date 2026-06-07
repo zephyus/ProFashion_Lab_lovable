@@ -191,36 +191,30 @@ function HomePage() {
               <Link
                 key={s.key}
                 to={s.to}
-                className="press flex items-center justify-between gap-2 rounded-lg bg-white/10 px-2 py-1.5 backdrop-blur-sm transition hover:bg-white/20"
+                className="press flex items-center justify-between gap-2 rounded-lg bg-primary-soft px-2 py-1.5 transition hover:bg-primary-soft/70"
               >
-                <span className="font-semibold text-primary-foreground">{s.title}</span>
-                <span className="tabular-nums font-bold text-primary-foreground">{s.pct}%</span>
+                <span className="font-semibold text-foreground">{s.title}</span>
+                <span className="tabular-nums font-bold text-primary-deep">{s.pct}%</span>
               </Link>
             ))}
           </div>
         </div>
 
         {/* 綜合分析：適合的學群 */}
-        <div className="mt-3 rounded-xl bg-white/10 p-3 backdrop-blur-sm">
-          <p className="text-[11px] font-bold text-primary-foreground/80">綜合分析 · 適合學群</p>
+        <div className="mt-3 rounded-xl bg-primary-soft p-3">
+          <p className="text-[11px] font-bold text-primary-deep">綜合分析 · 適合學群</p>
           {overall === 0 ? (
-            <p className="mt-1 text-[12px] text-primary-foreground/70">
+            <p className="mt-1 text-[12px] text-muted-foreground">
               開始體驗任一站點後，這裡會分析你適合 18 學群中的哪幾個方向。
             </p>
           ) : (
             <ul className="mt-2 space-y-1.5">
-              {topGroups.map(([name, score], i) => (
+              {topGroups.map(([name], i) => (
                 <li key={name} className="flex items-center gap-2">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-foreground text-[10px] font-bold text-primary-deep">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-deep text-[10px] font-bold text-primary-foreground">
                     {i + 1}
                   </span>
-                  <span className="flex-1 text-[12px] font-semibold text-primary-foreground">{name}</span>
-                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-white/15">
-                    <div
-                      className="h-full rounded-full bg-primary-foreground transition-all duration-500"
-                      style={{ width: `${Math.min(100, Math.round(score))}%` }}
-                    />
-                  </div>
+                  <span className="flex-1 text-[12px] font-semibold text-foreground">{name}</span>
                 </li>
               ))}
             </ul>
@@ -231,16 +225,17 @@ function HomePage() {
       {/* ============ 子視窗 2：未來室 ============ */}
       <ChamberCard delay={180}>
         <div className="space-y-2">
-          <div className="rounded-xl bg-white/10 p-3 backdrop-blur-sm">
-            <p className="text-[11px] font-semibold text-primary-foreground/80">現在</p>
-            <p className="mt-1 text-[12.5px] leading-relaxed text-primary-foreground">{nowTip}</p>
+          <div className="rounded-xl bg-primary-soft p-3">
+            <p className="text-[11px] font-semibold text-primary-deep">現在</p>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nowTip}</p>
           </div>
-          <div className="rounded-xl bg-white/10 p-3 backdrop-blur-sm">
-            <p className="text-[11px] font-semibold text-primary-foreground/80">下一步</p>
-            <p className="mt-1 text-[12.5px] leading-relaxed text-primary-foreground">{nextTip}</p>
+          <div className="rounded-xl bg-primary-soft p-3">
+            <p className="text-[11px] font-semibold text-primary-deep">下一步</p>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nextTip}</p>
           </div>
         </div>
       </ChamberCard>
+
 
 
 
@@ -352,7 +347,7 @@ function ChamberCard({
 }) {
   return (
     <section
-      className="relative mt-5 overflow-hidden rounded-2xl bg-primary-deep p-4 shadow-[var(--shadow-card)] animate-rise"
+      className="relative mt-5 overflow-hidden rounded-2xl border border-primary/15 bg-card p-4 shadow-[var(--shadow-card)] animate-rise"
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className="relative">{children}</div>
@@ -386,8 +381,8 @@ function RadarChart({ values, labels }: { values: number[]; labels: string[] }) 
         <polygon
           key={p}
           fill="none"
-          stroke="white"
-          strokeOpacity="0.25"
+          stroke="var(--color-primary-deep)"
+          strokeOpacity="0.18"
           points={ringPoints(p)}
         />
       ))}
@@ -400,18 +395,33 @@ function RadarChart({ values, labels }: { values: number[]; labels: string[] }) 
             y1={cy}
             x2={x}
             y2={y}
-            stroke="white"
-            strokeOpacity="0.22"
+            stroke="var(--color-primary-deep)"
+            strokeOpacity="0.15"
           />
         );
       })}
       <polygon
         points={dataPoints}
-        fill="white"
-        fillOpacity="0.55"
-        stroke="white"
+        fill="var(--color-primary)"
+        fillOpacity="0.45"
+        stroke="var(--color-primary-deep)"
         strokeWidth="1.5"
       />
+      {[25, 50, 75, 100].map((p) => {
+        const [x, y] = pt(0, p);
+        return (
+          <text
+            key={p}
+            x={x + 3}
+            y={y - 1}
+            fontSize="6.5"
+            fill="var(--color-muted-foreground)"
+            textAnchor="start"
+          >
+            {p}
+          </text>
+        );
+      })}
       {values.map((_, i) => {
         const [x, y] = pt(i, 100);
         const lx = cx + (x - cx) * 1.32;
@@ -425,12 +435,21 @@ function RadarChart({ values, labels }: { values: number[]; labels: string[] }) 
             fontWeight="600"
             textAnchor="middle"
             dominantBaseline="middle"
-            fill="white"
+            fill="var(--color-foreground)"
           >
             {labels[i]}
           </text>
         );
       })}
+      <text
+        x={size - 4}
+        y={size - 4}
+        fontSize="7"
+        fill="var(--color-muted-foreground)"
+        textAnchor="end"
+      >
+        單位：完成進度 (%)
+      </text>
     </svg>
   );
 }
