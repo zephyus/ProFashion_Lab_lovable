@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowLeft,
   MapPin,
@@ -11,13 +12,18 @@ import {
   Calendar,
   User,
   Users,
+  ShieldAlert,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CATEGORY_META, MentorSlot, getMentor } from "@/lib/mentors";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { listMyParents, submitConsentRequest } from "@/lib/parent.functions";
+
 
 type BookingType = "individual" | "class";
 
@@ -48,6 +54,7 @@ function MentorDetailPage() {
   const { mentorId } = Route.useParams();
   const mentor = getMentor(mentorId)!;
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = useState<Step>("idle");
   const [bookingType, setBookingType] = useState<BookingType | null>(null);
   const [slot, setSlot] = useState<MentorSlot | null>(null);
@@ -56,6 +63,8 @@ function MentorDetailPage() {
   const [school, setSchool] = useState("");
   const [className, setClassName] = useState("");
   const [studentCount, setStudentCount] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [sentToParent, setSentToParent] = useState(false);
   const [errors, setErrors] = useState<{
     name?: string;
     contact?: string;
@@ -63,6 +72,25 @@ function MentorDetailPage() {
     className?: string;
     studentCount?: string;
   }>({});
+
+  // 家長綁定狀態：個人預約若已綁家長，會走「家長同意」流程
+  const [parentStatus, setParentStatus] = useState<"loading" | "none" | "pending" | "linked">("loading");
+  const fetchParents = useServerFn(listMyParents);
+  const submitConsent = useServerFn(submitConsentRequest);
+
+  useEffect(() => {
+    if (!user) {
+      setParentStatus("none");
+      return;
+    }
+    fetchParents()
+      .then((r) => {
+        const active = r.links.find((l) => l.status === "active");
+        const pending = r.links.find((l) => l.status === "pending");
+        setParentStatus(active ? "linked" : pending ? "pending" : "none");
+      })
+      .catch(() => setParentStatus("none"));
+  }, [user, fetchParents]);
 
   const tone = CATEGORY_META[mentor.category].tone;
 
@@ -75,10 +103,11 @@ function MentorDetailPage() {
     setSchool("");
     setClassName("");
     setStudentCount("");
+    setSentToParent(false);
     setErrors({});
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs: typeof errors = {};
     if (!name.trim()) errs.name = bookingType === "class" ? "請輸入老師姓名" : "請輸入姓名";
@@ -93,8 +122,38 @@ function MentorDetailPage() {
     }
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
+
+    // 個人預約 + 已綁定家長 → 送出家長同意請求
+    if (bookingType === "individual" && parentStatus === "linked" && slot) {
+      setSubmitting(true);
+      try {
+        await submitConsent({
+          data: {
+            kind: "teacher_booking",
+            payload: {
+              mentor_id: mentor.id,
+              mentor_name: mentor.name,
+              mentor_job: mentor.job,
+              slot: `${slot.date} ${slot.time}`,
+              applicant_name: name,
+              contact,
+            },
+          },
+        });
+        setSentToParent(true);
+        setStep("done");
+        toast.success("已送出請求，等待家長核可");
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "送出失敗");
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
     setStep("done");
   };
+
 
   return (
     <div className="relative pb-44">
@@ -297,6 +356,24 @@ function MentorDetailPage() {
                 <p className="mt-1 text-xs text-muted-foreground">
                   {slot.date} · {slot.time}
                 </p>
+
+                {bookingType === "individual" && user && parentStatus === "linked" && (
+                  <div className="mt-3 flex items-start gap-2 rounded-xl border border-primary/30 bg-primary/5 p-3">
+                    <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-primary-deep" />
+                    <p className="text-[11px] leading-relaxed text-primary-deep">
+                      此預約會先送出請求給已綁定的家長，待家長同意後才完成報名。
+                    </p>
+                  </div>
+                )}
+                {bookingType === "individual" && user && parentStatus === "none" && (
+                  <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-400/40 bg-amber-50 p-3 dark:bg-amber-950/30">
+                    <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-700 dark:text-amber-300" />
+                    <p className="text-[11px] leading-relaxed text-amber-900 dark:text-amber-200">
+                      建議先到「我的家長」綁定家長，職人預約需要家長知情同意比較安全。
+                    </p>
+                  </div>
+                )}
+
                 <div className="mt-4 space-y-3">
                   <div>
                     <Label htmlFor="name">
@@ -377,20 +454,34 @@ function MentorDetailPage() {
                   <Button type="button" variant="outline" className="flex-1" onClick={() => setStep("slot")}>
                     上一步
                   </Button>
-                  <Button type="submit" className="flex-1 bg-[image:var(--gradient-hero)]">
-                    確認報名
+                  <Button type="submit" disabled={submitting} className="flex-1 bg-[image:var(--gradient-hero)]">
+                    {submitting
+                      ? "送出中…"
+                      : bookingType === "individual" && parentStatus === "linked"
+                        ? "送出請求給家長"
+                        : "確認報名"}
                   </Button>
+
                 </div>
               </form>
             )}
 
             {step === "done" && slot && (
               <div className="py-2 text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft">
-                  <CheckCircle2 className="h-8 w-8 text-primary-deep" />
+                <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full ${sentToParent ? "bg-amber-100 dark:bg-amber-950/40" : "bg-primary-soft"}`}>
+                  {sentToParent ? (
+                    <ShieldAlert className="h-8 w-8 text-amber-700 dark:text-amber-300" />
+                  ) : (
+                    <CheckCircle2 className="h-8 w-8 text-primary-deep" />
+                  )}
                 </div>
-                <h2 className="mt-4 text-lg font-bold">報名成功！</h2>
-                <p className="mt-1 text-xs text-muted-foreground">我們會盡快與你聯繫確認細節</p>
+                <h2 className="mt-4 text-lg font-bold">
+                  {sentToParent ? "已送出，等待家長核可" : "報名成功！"}
+                </h2>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {sentToParent ? "家長同意後會自動完成預約，可到收件夾追蹤狀態。" : "我們會盡快與你聯繫確認細節"}
+                </p>
+
                 <div className="mt-5 rounded-xl bg-primary-soft p-4 text-left text-sm">
                   <Row
                     label="預約類型"

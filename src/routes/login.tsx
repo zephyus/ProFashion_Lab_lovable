@@ -1,11 +1,14 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Trophy, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { useXp } from "@/hooks/useXp";
 import { supabase } from "@/integrations/supabase/client";
+import { ensureDemoParentSetup } from "@/lib/parent.functions";
+
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -83,19 +86,28 @@ function LoginPage() {
 
   const signInAsDemo = () => signInAsDemoAccount(DEMO_ACCOUNTS.root);
 
+  const ensureSetup = useServerFn(ensureDemoParentSetup);
   const [quickLoading, setQuickLoading] = useState<DemoRole | null>(null);
   const handleQuickLogin = async (role: DemoRole) => {
     setQuickLoading(role);
     try {
       await signInAsDemoAccount(DEMO_ACCOUNTS[role]);
+      if (role === "student" || role === "parent") {
+        try {
+          await ensureSetup({ data: { role } });
+        } catch {
+          // demo setup 失敗不擋登入
+        }
+      }
       toast.success(`已登入：${DEMO_ACCOUNTS[role].name}`);
-      navigate({ to: "/", replace: true });
+      navigate({ to: role === "parent" ? "/parent" : "/", replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "登入失敗");
     } finally {
       setQuickLoading(null);
     }
   };
+
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
