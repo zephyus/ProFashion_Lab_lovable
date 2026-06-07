@@ -212,12 +212,6 @@ function HomePage() {
         </div>
       </ChamberCard>
 
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </ChamberCard>
 
       {/* 訂閱方案 */}
       <div className="mt-4 animate-rise" style={{ animationDelay: "220ms" }}>
