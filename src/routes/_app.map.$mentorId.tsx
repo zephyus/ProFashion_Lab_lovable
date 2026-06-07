@@ -123,8 +123,17 @@ function MentorDetailPage() {
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    // 個人預約 + 已綁定家長 → 送出家長同意請求
-    if (bookingType === "individual" && parentStatus === "linked" && slot) {
+    // 個人預約一律需要家長同意才能成立
+    if (bookingType === "individual") {
+      if (!user) {
+        toast.error("請先登入後再報名");
+        return;
+      }
+      if (parentStatus !== "linked") {
+        toast.error("請先到「我的家長」綁定家長後再報名");
+        return;
+      }
+      if (!slot) return;
       setSubmitting(true);
       try {
         await submitConsent({
