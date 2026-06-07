@@ -691,7 +691,7 @@ function CallPage() {
               </div>
               <div className="flex items-center justify-between gap-3 px-5 py-4">
                 <p className="text-xs text-muted-foreground">{p.intro}</p>
-                <button onClick={() => { setActive(p); setActiveIdx(i); setLineIdx(0); setSeconds(0); }}
+                <button onClick={() => tryStartCall(p, i)}
                   className="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-card)] active:scale-95">
                   <Phone className="h-3.5 w-3.5" /> 撥打
                 </button>
