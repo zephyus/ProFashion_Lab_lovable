@@ -14,6 +14,7 @@ export const Route = createFileRoute("/_app/explore")({
 type Game = "menu" | "quiz" | "intern";
 
 function ExplorePage() {
+  useTrackVisit("explore");
   const [game, setGame] = useState<Game>("menu");
 
   // —— 測驗 ——
