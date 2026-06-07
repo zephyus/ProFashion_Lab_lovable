@@ -18,6 +18,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CATEGORY_META, MentorSlot, getMentor } from "@/lib/mentors";
 import { cn } from "@/lib/utils";
+import { useSubscription, BOOKING_PRICE } from "@/hooks/useSubscription";
+import { SubscribeDialog } from "@/components/SubscribeDialog";
+import { Crown } from "lucide-react";
 
 type BookingType = "individual" | "class";
 
