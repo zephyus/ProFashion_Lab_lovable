@@ -321,12 +321,29 @@ function HomePage() {
       )}
 
       {!user && !loading && (
-        <Link to="/login"
-          className="press mt-6 flex items-center justify-between rounded-2xl bg-primary px-5 py-4 text-primary-foreground animate-rise"
-          style={{ animationDelay: "260ms" }}>
-          <p className="text-subhead font-semibold">登入以保留你的軌跡</p>
-          <ArrowRight className="h-5 w-5" strokeWidth={2} />
-        </Link>
+        <div className="mt-6 space-y-3 animate-rise" style={{ animationDelay: "260ms" }}>
+          <button
+            onClick={() => { sub.subscribe(); toast.success(`已升級訂閱（demo）— NT$${SUB_PRICE}/月`); }}
+            className="press flex w-full items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary-soft px-4 py-3.5 text-left">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[image:var(--gradient-hero)] text-primary-foreground">
+                <Crown className="h-[18px] w-[18px]" strokeWidth={1.9} />
+              </div>
+              <div>
+                <p className="text-subhead font-semibold text-foreground">升級 職感 PRO</p>
+                <p className="text-caption text-muted-foreground">
+                  AI 語音無限・職圖每月 5 次　NT${SUB_PRICE}/月
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-primary-deep" />
+          </button>
+          <Link to="/login"
+            className="press flex items-center justify-between rounded-2xl bg-primary px-5 py-4 text-primary-foreground">
+            <p className="text-subhead font-semibold">登入以保留你的軌跡</p>
+            <ArrowRight className="h-5 w-5" strokeWidth={2} />
+          </Link>
+        </div>
       )}
 
       <div className="h-12" />
