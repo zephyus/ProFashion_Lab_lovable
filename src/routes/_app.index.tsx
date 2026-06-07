@@ -76,20 +76,20 @@ function HomePage() {
   const highest = [...stations].sort((a, b) => b.pct - a.pct)[0];
   const nowTip =
     overall === 0
-      ? "還沒開始調配——挑一個有興趣的站點，先放第一滴試劑。"
+      ? "尚未開始，挑一個站點試試。"
       : overall < 40
-        ? `已經啟動「${highest.title}」，再多累積幾次會看出方向。`
+        ? `已啟動「${highest.title}」。`
         : overall < 80
-          ? `「${highest.title}」走得不錯，輪廓正在浮現。`
-          : "四個站點都調得很均勻，可以開始整理你的成果。";
+          ? `「${highest.title}」進展良好。`
+          : "四站均衡，可整理成果。";
   const nextTip =
     overall === 0
-      ? "建議從「發現小秘 me」開始：3 分鐘的小測驗。"
+      ? "從「發現小秘 me」開始。"
       : lowest.pct < 40
-        ? `下一步：補強「${lowest.title}」，讓配方更平衡。`
+        ? `補強「${lowest.title}」。`
         : sub.bookingsUsed === 0
-          ? "下一步：到「職圖」預約一場真人職人體驗。"
-          : "下一步：匯出學習歷程，把調配結果留下來。";
+          ? "到「職圖」預約職人。"
+          : "匯出學習歷程。";
 
   // —— 綜合分析：12 年國教 18 學群配對 ——
   const groupScores: Record<string, number> = {
