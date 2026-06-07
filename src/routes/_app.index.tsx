@@ -344,22 +344,5 @@ function HomePage() {
 }
 
 
-// —— 子視窗外殼 ——
-function ChamberCard({
-  delay, children,
-}: {
-  delay: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <section
-      className="relative mt-5 overflow-hidden rounded-2xl border border-primary/15 bg-card p-4 shadow-[var(--shadow-card)] animate-rise"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <div className="relative">{children}</div>
-    </section>
-  );
-}
-
 
 
