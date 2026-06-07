@@ -157,93 +157,61 @@ function HomePage() {
       <ChamberCard
         index="01"
         title="職感進行室"
-        subtitle="Reaction Chamber · 進行中的調配"
+        subtitle="Reaction Chamber"
         icon={Beaker}
         delay={120}
       >
-        <div className="grid grid-cols-2 gap-2.5">
+        <ul className="space-y-2">
           {stations.map((s) => {
             const Icon = s.icon;
             return (
-              <Link
-                key={s.key}
-                to={s.to}
-                className="press group relative flex flex-col gap-2.5 overflow-hidden rounded-xl border border-primary/20 bg-card/60 p-3 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card"
-              >
-                {/* 試管液面動畫底色 */}
-                <div
-                  className="absolute inset-x-0 bottom-0 origin-bottom bg-[image:var(--gradient-hero)] opacity-[0.12] transition-all duration-700"
-                  style={{ height: `${s.pct}%` }}
-                  aria-hidden
-                />
-                <div className="relative flex items-start justify-between">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-soft text-primary-deep">
+              <li key={s.key}>
+                <Link
+                  to={s.to}
+                  className="press group relative flex items-center gap-3 overflow-hidden rounded-xl border border-primary/15 bg-card/70 px-3 py-2.5 backdrop-blur-sm transition-colors hover:border-primary/40"
+                >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary-deep">
                     <Icon className="h-[16px] w-[16px]" strokeWidth={1.9} />
                   </div>
-                  <span className="font-mono text-[9px] tracking-wider text-muted-foreground">{s.formula}</span>
-                </div>
-                <div className="relative min-w-0">
-                  <p className="text-[13px] font-semibold leading-tight text-foreground">{s.title}</p>
-                  <p className="mt-0.5 text-[10px] leading-snug text-muted-foreground">{s.desc}</p>
-                </div>
-                {/* 進度條 */}
-                <div className="relative mt-auto">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Progress</span>
-                    <span className="font-mono text-[10px] font-bold tabular-nums text-primary-deep">{s.pct}%</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[13px] font-semibold text-foreground truncate">{s.title}</p>
+                      <span className="font-mono text-[10px] font-bold tabular-nums text-primary-deep">{s.pct}%</span>
+                    </div>
+                    <div className="mt-1 h-1 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-[image:var(--gradient-hero)] transition-all duration-500"
+                        style={{ width: `${s.pct}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-[image:var(--gradient-hero)] transition-all duration-500"
-                      style={{ width: `${s.pct}%` }}
-                    />
-                  </div>
-                </div>
-              </Link>
+                </Link>
+              </li>
             );
           })}
-        </div>
-
-        {/* 整體濃度 */}
-        <div className="mt-3 flex items-center justify-between rounded-xl border border-dashed border-primary/30 bg-primary-soft/40 px-3 py-2">
-          <div className="flex items-center gap-2">
-            <Atom className="h-3.5 w-3.5 text-primary-deep" strokeWidth={1.9} />
-            <span className="text-[11px] font-semibold text-foreground">調配濃度</span>
-          </div>
-          <span className="font-mono text-[11px] font-bold tabular-nums text-primary-deep">{overall}%</span>
-        </div>
+        </ul>
       </ChamberCard>
 
       {/* ============ 子視窗 2：職感未來室 ============ */}
       <ChamberCard
         index="02"
         title="職感未來室"
-        subtitle="Future Chamber · 從國中通往大學的配方"
+        subtitle="Future Chamber"
         icon={TestTube}
         delay={180}
       >
-        <div className="space-y-2.5">
-          {futureStages.map((f, i) => {
-            const Icon = f.icon;
-            return (
-              <div key={i} className="relative rounded-xl border border-primary/15 bg-card/60 p-3 backdrop-blur-sm">
-                <div className="flex items-start gap-3">
-                  <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary-deep">
-                    <Icon className="h-[17px] w-[17px]" strokeWidth={1.9} />
-                    {i < futureStages.length - 1 && (
-                      <span className="absolute left-1/2 top-full h-3 w-px -translate-x-1/2 bg-primary/30" aria-hidden />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[13px] font-semibold text-foreground">{f.stage}</p>
-                      <span className="font-mono text-[9px] tracking-wider text-muted-foreground">{f.label}</span>
-                    </div>
-                    <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{f.tip}</p>
-                    <span className="mt-2 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary-deep">
-                      {f.chip}
-                    </span>
-                  </div>
+        <div className="space-y-2">
+          <div className="rounded-xl border border-primary/15 bg-card/70 p-3 backdrop-blur-sm">
+            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Now · 現在</p>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nowTip}</p>
+          </div>
+          <div className="rounded-xl border border-primary/15 bg-card/70 p-3 backdrop-blur-sm">
+            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Next · 下一步</p>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nextTip}</p>
+          </div>
+        </div>
+      </ChamberCard>
+
                 </div>
               </div>
             );
