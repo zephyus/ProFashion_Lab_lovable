@@ -29,6 +29,7 @@ const FILTERS: { key: Filter; label: string }[] = [
 ];
 
 function MapPage() {
+  useTrackVisit("map");
   const { pathname } = useLocation();
   const [filter, setFilter] = useState<Filter>("all");
   const [api, setApi] = useState<CarouselApi | null>(null);
