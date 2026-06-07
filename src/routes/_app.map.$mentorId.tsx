@@ -468,11 +468,20 @@ function MentorDetailPage() {
 
             {step === "done" && slot && (
               <div className="py-2 text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft">
-                  <CheckCircle2 className="h-8 w-8 text-primary-deep" />
+                <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full ${sentToParent ? "bg-amber-100 dark:bg-amber-950/40" : "bg-primary-soft"}`}>
+                  {sentToParent ? (
+                    <ShieldAlert className="h-8 w-8 text-amber-700 dark:text-amber-300" />
+                  ) : (
+                    <CheckCircle2 className="h-8 w-8 text-primary-deep" />
+                  )}
                 </div>
-                <h2 className="mt-4 text-lg font-bold">報名成功！</h2>
-                <p className="mt-1 text-xs text-muted-foreground">我們會盡快與你聯繫確認細節</p>
+                <h2 className="mt-4 text-lg font-bold">
+                  {sentToParent ? "已送出，等待家長核可" : "報名成功！"}
+                </h2>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {sentToParent ? "家長同意後會自動完成預約，可到收件夾追蹤狀態。" : "我們會盡快與你聯繫確認細節"}
+                </p>
+
                 <div className="mt-5 rounded-xl bg-primary-soft p-4 text-left text-sm">
                   <Row
                     label="預約類型"
