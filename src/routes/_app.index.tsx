@@ -65,36 +65,32 @@ function HomePage() {
   const overall = Math.round((explorePct + cafePct + mapPct + callPct) / 4);
 
   const stations = [
-    { key: "explore", icon: Sparkles, title: "發現小秘 me", desc: "認識你自己", to: "/explore", pct: explorePct, formula: "C₁₆H₂₂" },
-    { key: "cafe", icon: Coffee, title: "職業咖啡館", desc: "聽前輩怎麼說", to: "/cafe", pct: cafePct, formula: "C₈H₁₀N₄O₂" },
-    { key: "map", icon: MapPin, title: "職圖", desc: "看見你的路徑", to: "/map", pct: mapPct, formula: "Fe₂O₃" },
-    { key: "call", icon: Phone, title: "您撥的號碼是未來", desc: "預演關鍵時刻", to: "/call", pct: callPct, formula: "Ag₂S" },
+    { key: "explore", icon: Sparkles, title: "發現小秘 me", to: "/explore", pct: explorePct },
+    { key: "cafe", icon: Coffee, title: "職業咖啡館", to: "/cafe", pct: cafePct },
+    { key: "map", icon: MapPin, title: "職圖", to: "/map", pct: mapPct },
+    { key: "call", icon: Phone, title: "您撥的號碼是未來", to: "/call", pct: callPct },
   ] as const;
 
-  // —— 未來室階段建議 ——
-  const futureStages = [
-    {
-      icon: Compass,
-      stage: "現在 · 國中探索期",
-      label: "Phase 01",
-      tip: "把每天「我覺得有趣」記下來。完成 3 次小秘me 測驗 + 2 次職業咖啡館，可以看出你的興趣輪廓。",
-      chip: overall < 30 ? "剛開始" : overall < 70 ? "進行中" : "輪廓清晰",
-    },
-    {
-      icon: BookOpen,
-      stage: "下一步 · 選高中／高職",
-      label: "Phase 02",
-      tip: "技術型 vs 學術型？綜合高中先觀望？用「職圖」對應你的興趣科系，再用「您撥的號碼是未來」預演面試與選組對話。",
-      chip: "可開始準備",
-    },
-    {
-      icon: Target,
-      stage: "未來 · 大學科系與職涯",
-      label: "Phase 03",
-      tip: "高一下決定選組、高二想學群、高三填志願。把現在的小秘me 結果存進學習歷程，三年後你會感謝自己。",
-      chip: "持續累積",
-    },
-  ] as const;
+  // —— 未來室：根據進度動態給出「現在 / 下一步」 ——
+  const lowest = [...stations].sort((a, b) => a.pct - b.pct)[0];
+  const highest = [...stations].sort((a, b) => b.pct - a.pct)[0];
+  const nowTip =
+    overall === 0
+      ? "還沒開始調配——挑一個有興趣的站點，先放第一滴試劑。"
+      : overall < 40
+        ? `已經啟動「${highest.title}」，再多累積幾次會看出方向。`
+        : overall < 80
+          ? `「${highest.title}」走得不錯，輪廓正在浮現。`
+          : "四個站點都調得很均勻，可以開始整理你的成果。";
+  const nextTip =
+    overall === 0
+      ? "建議從「發現小秘 me」開始：3 分鐘的小測驗。"
+      : lowest.pct < 40
+        ? `下一步：補強「${lowest.title}」，讓配方更平衡。`
+        : sub.bookingsUsed === 0
+          ? "下一步：到「職圖」預約一場真人職人體驗。"
+          : "下一步：匯出學習歷程，把調配結果留下來。";
+
 
   return (
     <div className="px-5 animate-page">
