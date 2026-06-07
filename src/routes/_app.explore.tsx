@@ -4,6 +4,7 @@ import { Gamepad2, Trophy, ChevronRight, Briefcase, RefreshCw } from "lucide-rea
 import ExploreQuiz from "../components/ExploreQuiz";
 import { internMissions } from "../lib/intern-missions";
 import { useXp } from "@/hooks/useXp";
+import { useTrackVisit, logActivity } from "@/hooks/useActivity";
 
 export const Route = createFileRoute("/_app/explore")({
   head: () => ({ meta: [{ title: "發現 — 職感 Zhígǎn" }] }),
