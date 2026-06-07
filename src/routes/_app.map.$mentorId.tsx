@@ -21,6 +21,8 @@ import { cn } from "@/lib/utils";
 import { useSubscription, BOOKING_PRICE } from "@/hooks/useSubscription";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { Crown } from "lucide-react";
+import { logActivity } from "@/hooks/useActivity";
+import { useEffect } from "react";
 
 type BookingType = "individual" | "class";
 
