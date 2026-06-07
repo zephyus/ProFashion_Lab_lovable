@@ -112,45 +112,6 @@ export type Database = {
         }
         Relationships: []
       }
-      consent_requests: {
-        Row: {
-          created_at: string
-          decided_at: string | null
-          id: string
-          kind: string
-          parent_id: string | null
-          parent_note: string | null
-          payload: Json
-          status: string
-          student_id: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          decided_at?: string | null
-          id?: string
-          kind: string
-          parent_id?: string | null
-          parent_note?: string | null
-          payload?: Json
-          status?: string
-          student_id: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          decided_at?: string | null
-          id?: string
-          kind?: string
-          parent_id?: string | null
-          parent_note?: string | null
-          payload?: Json
-          status?: string
-          student_id?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       exploration_events: {
         Row: {
           created_at: string
@@ -175,69 +136,6 @@ export type Database = {
           payload?: Json
           user_id?: string
           xp_delta?: number
-        }
-        Relationships: []
-      }
-      notifications: {
-        Row: {
-          body: string | null
-          created_at: string
-          id: string
-          link: string | null
-          read_at: string | null
-          title: string
-          type: string
-          user_id: string
-        }
-        Insert: {
-          body?: string | null
-          created_at?: string
-          id?: string
-          link?: string | null
-          read_at?: string | null
-          title: string
-          type: string
-          user_id: string
-        }
-        Update: {
-          body?: string | null
-          created_at?: string
-          id?: string
-          link?: string | null
-          read_at?: string | null
-          title?: string
-          type?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      parent_links: {
-        Row: {
-          created_at: string
-          id: string
-          invite_code: string
-          parent_id: string | null
-          status: string
-          student_id: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          invite_code: string
-          parent_id?: string | null
-          status?: string
-          student_id: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          invite_code?: string
-          parent_id?: string | null
-          status?: string
-          student_id?: string
-          updated_at?: string
         }
         Relationships: []
       }

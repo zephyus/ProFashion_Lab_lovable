@@ -1,83 +1,123 @@
-# 修復登出 + 角色分流介面
 
-## 為什麼登出不見了
-新加的通知鈴鐺 `absolute right-3 top-3` 蓋住了首頁右上角的頭像 + LogOut icon。要把登出移到一個不會被遮蔽的地方，並順便重整三種角色的入口。
+# MVP 變現功能開發計畫
 
-## 角色定義
-- **學生（student）**：所有登入者預設角色。
-- **家長（parent）**：在 `parent_links` 至少有一筆 `parent_id = me` 且 `status = active`。
-- **老師（teacher）**：`user_roles` 含 `teacher`。
+## 為什麼挑這兩個
 
-一個帳號可能同時是家長＋老師（例如老師本人有小孩）。在頭像選單裡提供「切換身分」。預設活躍身分優先序：teacher → parent → student（取使用者實際擁有的最高優先），存在 `localStorage.activeRole`。
+你的策略文件把 B2B 學校授權列為主力（NT$15K–150K/校/年），而學校會買單的真正理由只有兩個：**108 課綱學習歷程**和**教師管理工具**。其他功能（金流、AI 計量、Freemium）都可以等學校願意付錢之後再做。
 
-## 共用 Shell（`src/routes/_app.tsx`）
-右上角從「孤獨的鈴鐺」改為一條固定在 shell 內側的小工具列：
+所以 MVP 範圍鎖定：
 
-```
-[ 🔔 通知 ] [ 👤 頭像 ▾ ]
-```
+1. **學習歷程 PDF 匯出**（學生端／賣點 #1）
+2. **教師後台 Dashboard**（教師端／賣點 #2）
 
-- 鈴鐺：保留現有 `useUnreadCount` 紅點，連到 `/inbox`。
-- 頭像下拉（新元件 `AppUserMenu`）：
-  - 顯示名稱 + email
-  - 目前身分標籤（學生／家長／老師）
-  - 若使用者擁有多重身分：列出可切換的選項，點選後寫入 `localStorage.activeRole` 並 `router.invalidate()`
-  - 「登出」按鈕：依 `tanstack-auth-guards` 的標準流程
-    `queryClient.cancelQueries → clear → supabase.auth.signOut → navigate({to:"/login", replace:true})`
-- 移除 `_app.index.tsx` header 裡那顆獨立的 LogOut icon（登出統一在頭像選單）。
+金流、Freemium 計量列為 Phase 2，不在這次範圍。
 
-底部 Tab 依活躍身分換內容：
+---
 
-| 身分 | 五格 Tab（左→右） |
-| --- | --- |
-| 學生 | 發現 / 咖啡 / Lab(首頁) / 職圖 / 通話 |
-| 家長 | 咖啡 / 職圖 / Lab(家長首頁) / 收件夾 / 我的孩子 |
-| 老師 | 咖啡 / 職圖 / Lab(教師首頁) / 收件夾 / 我的班級 |
+## Phase 1A：學習歷程匯出（學生端）
 
-## 首頁分流（`/` = `_app.index.tsx`）
-依活躍身分渲染三個元件之一：
+### 使用者故事
+學生在 ProFashion Lab 玩了幾週後，可以一鍵下載一份 PDF：
+- 個人測驗結果與職涯傾向
+- 完成的虛擬實習關卡與反思
+- 撥打過的職人通話記錄與重點
+- 累積 XP 與職等
+- 時間軸（首次登入 → 最後活動）
 
-### StudentHome（現狀微調）
-- 維持現有 4 大關卡 + XP + 學習歷程 + 「我的家長」（產生邀請碼）+ 加入班級。
-- 移除原本內嵌的 LogOut。
+格式對齊教育部「學習歷程檔案 — 多元表現」欄位（標題／時間／內容描述／反思）。
 
-### ParentHome（新）
-- 標題：「孩子今天怎麼樣？」
-- 卡片：
-  1. 孩子列表（每個孩子顯示名字、近 7 天活動筆數、`待核可數`，點進 `/parent`）
-  2. 待核可請求摘要（連 `/parent`）
-  3. 最近通知（連 `/inbox`）
-  4. **可瀏覽的學生內容**：職業咖啡館、職圖（樣式較小、副標寫「了解孩子在看什麼」），點進 `/cafe`、`/map`
+### 後端
+- 新表：
+  - `exploration_events` — 統一記錄使用者每一個探索動作（type, payload, created_at, user_id）。目前 XP/關卡都存在 localStorage，要先搬到雲端否則匯出沒資料。
+  - `quiz_results` — 測驗結果快照（answers, archetype, summary）。
+  - `call_sessions` — 通話記錄（persona_id, persona_name, script_lines_played, llm_messages）。
+- 一個 server function `exportLearningPortfolio()` 聚合上述資料、回傳結構化 JSON。
+- PDF 由前端用 `@react-pdf/renderer` 在瀏覽器產生（Cloudflare Worker 環境不適合跑 PDF binary）。
 
-### TeacherHome（新）
-- 標題：「今天班上要做什麼？」
-- 卡片：
-  1. 我的班級列表（連 `/teacher`）
-  2. 邀請碼快速複製（取第一個班級）
-  3. 最近通知（連 `/inbox`）
-  4. **可瀏覽的學生內容**：發現小秘 me、職業咖啡館、職圖（用「以學生視角預覽」副標），點進對應路徑
+### 前端
+- 個人頁新增「我的學習歷程」分頁，預覽 + 下載 PDF。
+- 既有 `useXp` 從 localStorage 改為 Supabase 來源（保留 localStorage 作為訪客回退）。
+- 既有測驗／通話完成事件要寫入新表。
 
-## 功能限制（家長不能用 測驗 + 通話）
-在 `_app.explore.tsx` 與 `_app.call.tsx` 加角色守門：
-- 若活躍身分 = parent：渲染一張說明卡（`ShieldAlert` icon + 「此功能僅供學生使用，建議用孩子帳號操作」+ 一顆「切回學生身分（若擁有）」或「回到家長首頁」），不渲染原內容。
-- 老師可瀏覽（老師需要了解學生工具）。
-- `/cafe`、`/map`、`/inbox`：所有身分都能進。
+---
 
-## 新檔案
-- `src/hooks/useActiveRole.ts`：回傳 `{ roles, active, setActive, isStudent, isParent, isTeacher }`。內部組合 `useAuth` + `useRoles` + `useIsParent`，並讀寫 `localStorage.activeRole`。當儲存的 active 已不在 `roles` 內，自動降級。
-- `src/components/AppUserMenu.tsx`：用既有 shadcn `DropdownMenu`。
-- `src/components/home/StudentHome.tsx`、`ParentHome.tsx`、`TeacherHome.tsx`：拆分後的三個首頁；`_app.index.tsx` 只負責挑哪一個渲染。
+## Phase 1B：教師後台 Dashboard
 
-## 需要改的既有檔
-- `src/routes/_app.tsx`：右上工具列、Tab bar 改成依角色組裝、`AppUserMenu` 套入。
-- `src/routes/_app.index.tsx`：移除 LogOut、依 `useActiveRole` 切換子元件。
-- `src/routes/_app.explore.tsx`、`src/routes/_app.call.tsx`：家長角色守門。
+### 使用者故事
+教師建立一個「班級」、邀請學生加入，可以：
+- 看到全班學生清單（姓名、最後活動、XP、完成關卡數）
+- 點進單一學生看其探索摘要（職涯傾向、玩過的職人、通話次數）
+- 匯出全班的 CSV / 個別學生的 PDF
+- 不能看到學生的 AI 對話原文（隱私）
 
-## 不改動
-- 資料庫 schema、`parent.functions.ts`、`/parent`、`/teacher`、`/inbox`、`/map/$mentorId` 既有商業邏輯。
+### 角色系統
+- 新增 `app_role` enum：`student`、`teacher`、`admin`
+- 新表 `user_roles`（依照系統規範分離存放）
+- `has_role()` security-definer 函式
+- 註冊流程預設 student；teacher 需邀請碼或管理員指派
 
-## 驗收
-1. 登入學生 demo → 右上看到 🔔 + 頭像；點頭像看到「登出」。
-2. 切到家長身分 → 首頁變家長版；底部 Tab 沒有「發現」「通話」；點開 `/explore` 直接顯示限制卡。
-3. 老師身分 → 首頁變教師版；可進 `/explore` 但有「以學生視角預覽」提示橫條。
-4. 登出 → 立刻導去 `/login`，按上一頁不會回到受保護頁面。
+### 班級 / 邀請
+- 新表 `classrooms`（teacher_id, name, school_name, invite_code）
+- 新表 `classroom_members`（classroom_id, student_id, joined_at）
+- 學生輸入邀請碼加入
+
+### 教師後台路由
+- `/_authenticated/teacher`（用 has_role 守門，非教師導回首頁）
+- 班級列表 / 新增班級 / 班級詳情 / 學生詳情
+- 蒐集匯出：整班 CSV、單人 PDF
+
+---
+
+## 不做的事（明確排除）
+
+- **金流／體驗預約付費**：等真正有第一間學校付錢再做 Stripe/綠界
+- **AI 對話額度與 Freemium 鎖**：先讓功能完整、收集真實使用數據再決定上限
+- **AI 加值服務**（模擬面試、自傳助手）：Phase 3
+- **企業／縣市方案**：商業談判，不是產品問題
+
+---
+
+## 技術細節（給工程脈絡）
+
+### 資料庫遷移
+所有新表都要 RLS：
+- `exploration_events` / `quiz_results` / `call_sessions`：學生只能讀寫自己；教師可讀同班學生的（透過 `classroom_members` join + `has_role('teacher')`）。
+- `user_roles`：用戶可讀自己的角色；只有 service_role 可寫。
+- `classrooms`：teacher 可 CRUD 自己的；學生可讀自己加入的（透過 `classroom_members`）。
+- `classroom_members`：學生用邀請碼加入（INSERT 政策驗證 invite_code）；teacher 可看自己班級的。
+
+每張表都要附 `GRANT` 給 authenticated 角色。
+
+### 既有程式碼影響
+- `src/hooks/useXp.ts` — 改成讀 Supabase；保留 localStorage 作為未登入者的暫存。
+- `src/routes/_app.call.tsx` — 通話開始／結束時寫 `call_sessions`。
+- `src/components/ExploreQuiz.tsx` — 測驗完成寫 `quiz_results` + `exploration_events`。
+- 新增 `src/lib/portfolio.functions.ts`、`src/lib/classroom.functions.ts`（server functions）。
+
+### PDF
+- 安裝 `@react-pdf/renderer`
+- 元件 `src/components/portfolio/PortfolioDocument.tsx`
+- 套用既有 design tokens（中文字型用 Noto Sans TC，需另載入）
+
+### 教師邀請碼
+- 8 碼大寫英數隨機碼
+- 教師後台顯示可複製連結 `/join?code=ABC12345`
+
+---
+
+## 建議實作順序
+
+1. 角色系統 + user_roles 表（基礎建設）
+2. exploration_events / quiz_results / call_sessions 表 + 把現有事件寫進去
+3. 學習歷程 PDF 匯出（學生立刻有感）
+4. classrooms / 邀請碼 / 教師後台 Dashboard
+5. 教師端 CSV / PDF 匯出
+
+每一步都可獨立 ship，不會卡住下一步。
+
+---
+
+## 需要你確認的兩件事
+
+1. **教師身份認證**：MVP 階段允許「任何人輸入特殊註冊碼成為教師」，還是先寫死由管理員手動指派？前者快、後者安全。建議 MVP 用「教師註冊碼」（一個共用密碼，登入後自助升級），上線後再換成審核制。
+2. **PDF 中文字型**：可接受用 Google Fonts 的 Noto Sans TC（檔案約 2MB，第一次下載稍慢）嗎？還是要用更精簡的本地字型？
