@@ -198,6 +198,7 @@ const hybridPersonas: Persona[] = [
 ];
 
 function CallPage() {
+  useTrackVisit("call");
   const [mode, setMode] = useState<Mode>("real");
   const [active, setActive] = useState<Persona | null>(null);
   const [activeIdx, setActiveIdx] = useState(0);
