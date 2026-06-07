@@ -52,7 +52,9 @@ const stations = [
 function HomePage() {
   const { user, loading } = useAuth();
   const { isTeacher } = useRoles();
+  const { isParent } = useIsParent();
   const { xp, completed, tierName } = useXp();
+
   const displayName =
     (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ??
     (user?.user_metadata as { name?: string } | undefined)?.name ??
