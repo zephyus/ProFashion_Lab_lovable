@@ -76,20 +76,20 @@ function HomePage() {
   const highest = [...stations].sort((a, b) => b.pct - a.pct)[0];
   const nowTip =
     overall === 0
-      ? "還沒開始調配——挑一個有興趣的站點，先放第一滴試劑。"
+      ? "尚未開始，挑一個站點試試。"
       : overall < 40
-        ? `已經啟動「${highest.title}」，再多累積幾次會看出方向。`
+        ? `已啟動「${highest.title}」。`
         : overall < 80
-          ? `「${highest.title}」走得不錯，輪廓正在浮現。`
-          : "四個站點都調得很均勻，可以開始整理你的成果。";
+          ? `「${highest.title}」進展良好。`
+          : "四站均衡，可整理成果。";
   const nextTip =
     overall === 0
-      ? "建議從「發現小秘 me」開始：3 分鐘的小測驗。"
+      ? "從「發現小秘 me」開始。"
       : lowest.pct < 40
-        ? `下一步：補強「${lowest.title}」，讓配方更平衡。`
+        ? `補強「${lowest.title}」。`
         : sub.bookingsUsed === 0
-          ? "下一步：到「職圖」預約一場真人職人體驗。"
-          : "下一步：匯出學習歷程，把調配結果留下來。";
+          ? "到「職圖」預約職人。"
+          : "匯出學習歷程。";
 
   // —— 綜合分析：12 年國教 18 學群配對 ——
   const groupScores: Record<string, number> = {
@@ -120,7 +120,7 @@ function HomePage() {
 
   return (
     <div
-      className="-mx-0 min-h-screen bg-black px-5 pb-8 text-white animate-page"
+      className="min-h-screen bg-[#f2f2f7] px-5 pb-8 text-neutral-900 animate-page"
       style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif" }}
     >
       {/* Top bar */}
@@ -132,20 +132,20 @@ function HomePage() {
           <span className="text-[11px] font-medium text-neutral-500">職感實驗室</span>
         </div>
         {loading ? (
-          <div className="h-9 w-9 animate-pulse rounded-full bg-neutral-800" />
+          <div className="h-9 w-9 animate-pulse rounded-full bg-neutral-200" />
         ) : user ? (
           <div className="flex items-center gap-2">
             {avatarUrl ? (
-              <img src={avatarUrl} alt={displayName} className="h-9 w-9 rounded-full border border-white/10 object-cover" />
+              <img src={avatarUrl} alt={displayName} className="h-9 w-9 rounded-full border border-black/5 object-cover" />
             ) : (
-              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-neutral-900 text-[12px] font-semibold text-white">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-black/5 bg-white text-[12px] font-semibold text-neutral-900">
                 {displayName.charAt(0).toUpperCase() || "U"}
               </div>
             )}
             <button
               onClick={handleLogout}
               aria-label="登出"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-neutral-900 text-neutral-400 transition-colors hover:text-white"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-black/5 bg-white text-neutral-500 transition-colors hover:text-neutral-900"
             >
               <LogOut className="h-4 w-4" strokeWidth={1.85} />
             </button>
@@ -153,7 +153,7 @@ function HomePage() {
         ) : (
           <Link
             to="/login"
-            className="rounded-full border border-white/15 bg-neutral-900 px-3.5 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-neutral-800"
+            className="rounded-full border border-black/5 bg-white px-3.5 py-1.5 text-[12px] font-semibold text-neutral-900 transition-colors hover:bg-neutral-100"
           >
             登入
           </Link>
@@ -162,7 +162,7 @@ function HomePage() {
 
       {/* Hero */}
       <section className="pt-8 pb-6 animate-rise">
-        <h1 className="text-[32px] font-bold leading-tight tracking-tight text-white">
+        <h1 className="text-[32px] font-bold leading-tight tracking-tight text-neutral-900">
           今天，
           <br />
           想認識哪一個自己？
@@ -172,29 +172,29 @@ function HomePage() {
       {/* Level Card */}
       <Link
         to="/explore"
-        className="press mb-6 flex items-center justify-between gap-4 rounded-[22px] bg-[#008080] px-5 py-4 text-white shadow-lg shadow-teal-900/30 animate-rise"
+        className="press mb-6 flex items-center justify-between gap-4 rounded-[22px] bg-[#008080] px-5 py-4 text-white shadow-lg shadow-teal-900/15 animate-rise"
         style={{ animationDelay: "60ms" }}
       >
         <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-white/15 p-2.5">
+          <div className="rounded-xl bg-white/20 p-2.5">
             <Trophy className="h-5 w-5" strokeWidth={2} />
           </div>
           <div>
             <p className="text-[17px] font-bold leading-tight">{tierName}</p>
-            <p className="text-[11px] text-white/70">
-              {completed > 0 ? `已完成 ${completed} 關` : "尚未開始"}
+            <p className="text-[11px] text-white/75">
+              {completed > 0 ? `${completed} 關` : "未開始"}
             </p>
           </div>
         </div>
         <div className="text-right">
           <p className="text-[26px] font-black leading-none tabular-nums">{xp}</p>
-          <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-white/60">XP</p>
+          <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-white/70">XP</p>
         </div>
       </Link>
 
       {/* Stations + Analysis */}
       <section
-        className="mb-6 rounded-[28px] border border-white/10 bg-neutral-900/50 p-4 backdrop-blur-md animate-rise"
+        className="mb-6 rounded-[28px] border border-black/5 bg-white p-4 shadow-sm animate-rise"
         style={{ animationDelay: "120ms" }}
       >
         <div className="mb-5 grid grid-cols-2 gap-3">
@@ -202,30 +202,30 @@ function HomePage() {
             <Link
               key={s.key}
               to={s.to}
-              className="press flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-[#1c1c1e] px-3 py-4 text-center transition-colors hover:bg-[#242426]"
+              className="press flex flex-col items-center justify-center rounded-2xl bg-[#f2f2f7] px-3 py-4 text-center transition-colors hover:bg-neutral-200"
             >
-              <span className="mb-1 text-[13px] font-medium text-white">{s.title}</span>
-              <span className="text-[11px] font-bold text-teal-500 tabular-nums">{s.pct}%</span>
+              <span className="mb-1 text-[13px] font-medium text-neutral-900">{s.title}</span>
+              <span className="text-[11px] font-bold text-teal-600 tabular-nums">{s.pct}%</span>
             </Link>
           ))}
         </div>
 
         <div className="px-1">
-          <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-teal-500">
-            綜合分析 · 適合學群
+          <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-teal-600">
+            適合學群
           </h3>
           {overall === 0 ? (
-            <p className="text-[13px] leading-relaxed text-neutral-400">
-              開始體驗任一站點後，這裡會分析你適合 18 學群中的哪幾個方向。
+            <p className="text-[13px] leading-relaxed text-neutral-500">
+              體驗任一站點後顯示。
             </p>
           ) : (
             <ul className="space-y-1.5">
               {topGroups.map(([name], i) => (
                 <li key={name} className="flex items-center gap-2">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-500 text-[10px] font-bold text-black">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-600 text-[10px] font-bold text-white">
                     {i + 1}
                   </span>
-                  <span className="flex-1 text-[13px] font-semibold text-white">{name}</span>
+                  <span className="flex-1 text-[13px] font-semibold text-neutral-900">{name}</span>
                 </li>
               ))}
             </ul>
@@ -235,39 +235,39 @@ function HomePage() {
 
       {/* Now / Next */}
       <section
-        className="mb-6 rounded-[28px] border border-white/10 bg-neutral-900/50 p-6 backdrop-blur-md animate-rise"
+        className="mb-6 rounded-[28px] border border-black/5 bg-white p-6 shadow-sm animate-rise"
         style={{ animationDelay: "180ms" }}
       >
         <div className="mb-5">
-          <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-teal-500">現在</h3>
-          <p className="text-[13px] leading-relaxed text-neutral-200">{nowTip}</p>
+          <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-teal-600">現在</h3>
+          <p className="text-[14px] leading-relaxed text-neutral-800">{nowTip}</p>
         </div>
         <div>
           <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
             下一步
           </h3>
-          <p className="text-[13px] leading-relaxed text-neutral-300">{nextTip}</p>
+          <p className="text-[14px] leading-relaxed text-neutral-700">{nextTip}</p>
         </div>
       </section>
 
       {/* 訂閱狀態（已登入且已訂閱） */}
       {user && sub.isSubscribed && (
         <div className="mb-4 animate-rise" style={{ animationDelay: "220ms" }}>
-          <div className="rounded-[22px] border border-teal-500/30 bg-teal-500/10 p-4 text-white">
+          <div className="rounded-[22px] border border-teal-600/20 bg-teal-50 p-4 text-neutral-900">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Crown className="h-4 w-4 text-teal-400" />
-                <p className="text-[14px] font-semibold">職感 PRO 訂閱中</p>
+                <Crown className="h-4 w-4 text-teal-600" />
+                <p className="text-[14px] font-semibold">PRO 訂閱中</p>
               </div>
               <button
                 onClick={() => { sub.unsubscribe(); toast.success("已取消訂閱（demo）"); }}
-                className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold text-white backdrop-blur"
+                className="rounded-full border border-black/5 bg-white px-3 py-1 text-[11px] font-bold text-neutral-700"
               >
                 取消
               </button>
             </div>
-            <p className="mt-1.5 text-[11px] text-neutral-300">
-              AI 語音無限 ・ 職圖本月剩 {sub.bookingsRemaining} / {sub.bookingsLimit} 次免費
+            <p className="mt-1.5 text-[11px] text-neutral-600">
+              AI 無限 ・ 職圖剩 {sub.bookingsRemaining}/{sub.bookingsLimit}
             </p>
           </div>
         </div>
@@ -278,50 +278,50 @@ function HomePage() {
         <div className="space-y-2.5 animate-rise" style={{ animationDelay: "240ms" }}>
           <Link
             to="/portfolio"
-            className="press flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3.5 transition-colors hover:bg-neutral-800/70"
+            className="press flex items-center justify-between gap-3 rounded-2xl border border-black/5 bg-white px-4 py-3.5 transition-colors hover:bg-neutral-50"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/15 text-teal-400">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
                 <FileText className="h-[18px] w-[18px]" strokeWidth={1.9} />
               </div>
               <div>
-                <p className="text-[14px] font-semibold text-white">我的學習歷程</p>
-                <p className="text-[11px] text-neutral-500">匯出 108 課綱 PDF</p>
+                <p className="text-[14px] font-semibold text-neutral-900">學習歷程</p>
+                <p className="text-[11px] text-neutral-500">匯出 PDF</p>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-neutral-500" />
+            <ArrowRight className="h-4 w-4 text-neutral-400" />
           </Link>
 
           <Link
             to={isTeacher ? "/teacher" : "/teacher-signup"}
-            className="press flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3.5 transition-colors hover:bg-neutral-800/70"
+            className="press flex items-center justify-between gap-3 rounded-2xl border border-black/5 bg-white px-4 py-3.5 transition-colors hover:bg-neutral-50"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/15 text-teal-400">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
                 <GraduationCap className="h-[18px] w-[18px]" strokeWidth={1.9} />
               </div>
               <div>
-                <p className="text-[14px] font-semibold text-white">{isTeacher ? "教師後台" : "我是老師"}</p>
-                <p className="text-[11px] text-neutral-500">{isTeacher ? "管理班級、查看學員進度" : "輸入註冊碼升級為教師"}</p>
+                <p className="text-[14px] font-semibold text-neutral-900">{isTeacher ? "教師後台" : "我是老師"}</p>
+                <p className="text-[11px] text-neutral-500">{isTeacher ? "管理班級" : "輸入註冊碼"}</p>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-neutral-500" />
+            <ArrowRight className="h-4 w-4 text-neutral-400" />
           </Link>
 
           <Link
             to="/join"
-            className="press flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-3.5 transition-colors hover:bg-neutral-800/70"
+            className="press flex items-center justify-between gap-3 rounded-2xl border border-black/5 bg-white px-4 py-3.5 transition-colors hover:bg-neutral-50"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/15 text-teal-400">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
                 <Users className="h-[18px] w-[18px]" strokeWidth={1.9} />
               </div>
               <div>
-                <p className="text-[14px] font-semibold text-white">加入班級</p>
-                <p className="text-[11px] text-neutral-500">輸入老師給的邀請碼</p>
+                <p className="text-[14px] font-semibold text-neutral-900">加入班級</p>
+                <p className="text-[11px] text-neutral-500">輸入邀請碼</p>
               </div>
             </div>
-            <ArrowRight className="h-4 w-4 text-neutral-500" />
+            <ArrowRight className="h-4 w-4 text-neutral-400" />
           </Link>
         </div>
       )}
@@ -330,9 +330,9 @@ function HomePage() {
         <div className="mt-6 animate-rise" style={{ animationDelay: "260ms" }}>
           <Link
             to="/login"
-            className="press flex items-center justify-between rounded-2xl bg-teal-500 px-5 py-4 text-black shadow-lg shadow-teal-500/30"
+            className="press flex items-center justify-between rounded-2xl bg-teal-600 px-5 py-4 text-white shadow-lg shadow-teal-600/20"
           >
-            <p className="text-[14px] font-bold">登入以保留你的軌跡</p>
+            <p className="text-[14px] font-bold">登入保留紀錄</p>
             <ArrowRight className="h-5 w-5" strokeWidth={2.4} />
           </Link>
         </div>
