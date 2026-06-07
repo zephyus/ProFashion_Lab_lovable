@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppTeacherSignupRouteImport } from './routes/_app.teacher-signup'
 import { Route as AppPortfolioRouteImport } from './routes/_app.portfolio'
+import { Route as AppParentLinkRouteImport } from './routes/_app.parent-link'
 import { Route as AppMapRouteImport } from './routes/_app.map'
 import { Route as AppJoinRouteImport } from './routes/_app.join'
 import { Route as AppInboxRouteImport } from './routes/_app.inbox'
@@ -46,6 +47,11 @@ const AppTeacherSignupRoute = AppTeacherSignupRouteImport.update({
 const AppPortfolioRoute = AppPortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppParentLinkRoute = AppParentLinkRouteImport.update({
+  id: '/parent-link',
+  path: '/parent-link',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMapRoute = AppMapRouteImport.update({
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/inbox': typeof AppInboxRoute
   '/join': typeof AppJoinRoute
   '/map': typeof AppMapRouteWithChildren
+  '/parent-link': typeof AppParentLinkRoute
   '/portfolio': typeof AppPortfolioRoute
   '/teacher-signup': typeof AppTeacherSignupRoute
   '/map/$mentorId': typeof AppMapMentorIdRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/inbox': typeof AppInboxRoute
   '/join': typeof AppJoinRoute
   '/map': typeof AppMapRouteWithChildren
+  '/parent-link': typeof AppParentLinkRoute
   '/portfolio': typeof AppPortfolioRoute
   '/teacher-signup': typeof AppTeacherSignupRoute
   '/': typeof AppIndexRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/_app/inbox': typeof AppInboxRoute
   '/_app/join': typeof AppJoinRoute
   '/_app/map': typeof AppMapRouteWithChildren
+  '/_app/parent-link': typeof AppParentLinkRoute
   '/_app/portfolio': typeof AppPortfolioRoute
   '/_app/teacher-signup': typeof AppTeacherSignupRoute
   '/_app/': typeof AppIndexRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/join'
     | '/map'
+    | '/parent-link'
     | '/portfolio'
     | '/teacher-signup'
     | '/map/$mentorId'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/join'
     | '/map'
+    | '/parent-link'
     | '/portfolio'
     | '/teacher-signup'
     | '/'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/_app/inbox'
     | '/_app/join'
     | '/_app/map'
+    | '/_app/parent-link'
     | '/_app/portfolio'
     | '/_app/teacher-signup'
     | '/_app/'
@@ -230,6 +242,13 @@ declare module '@tanstack/react-router' {
       path: '/portfolio'
       fullPath: '/portfolio'
       preLoaderRoute: typeof AppPortfolioRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/parent-link': {
+      id: '/_app/parent-link'
+      path: '/parent-link'
+      fullPath: '/parent-link'
+      preLoaderRoute: typeof AppParentLinkRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/map': {
@@ -316,6 +335,7 @@ interface AppRouteChildren {
   AppInboxRoute: typeof AppInboxRoute
   AppJoinRoute: typeof AppJoinRoute
   AppMapRoute: typeof AppMapRouteWithChildren
+  AppParentLinkRoute: typeof AppParentLinkRoute
   AppPortfolioRoute: typeof AppPortfolioRoute
   AppTeacherSignupRoute: typeof AppTeacherSignupRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -330,6 +350,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppInboxRoute: AppInboxRoute,
   AppJoinRoute: AppJoinRoute,
   AppMapRoute: AppMapRouteWithChildren,
+  AppParentLinkRoute: AppParentLinkRoute,
   AppPortfolioRoute: AppPortfolioRoute,
   AppTeacherSignupRoute: AppTeacherSignupRoute,
   AppIndexRoute: AppIndexRoute,
