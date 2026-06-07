@@ -381,8 +381,8 @@ function RadarChart({ values, labels }: { values: number[]; labels: string[] }) 
         <polygon
           key={p}
           fill="none"
-          stroke="white"
-          strokeOpacity="0.25"
+          stroke="var(--color-primary-deep)"
+          strokeOpacity="0.18"
           points={ringPoints(p)}
         />
       ))}
@@ -395,18 +395,33 @@ function RadarChart({ values, labels }: { values: number[]; labels: string[] }) 
             y1={cy}
             x2={x}
             y2={y}
-            stroke="white"
-            strokeOpacity="0.22"
+            stroke="var(--color-primary-deep)"
+            strokeOpacity="0.15"
           />
         );
       })}
       <polygon
         points={dataPoints}
-        fill="white"
-        fillOpacity="0.55"
-        stroke="white"
+        fill="var(--color-primary)"
+        fillOpacity="0.45"
+        stroke="var(--color-primary-deep)"
         strokeWidth="1.5"
       />
+      {[25, 50, 75, 100].map((p) => {
+        const [x, y] = pt(0, p);
+        return (
+          <text
+            key={p}
+            x={x + 3}
+            y={y - 1}
+            fontSize="6.5"
+            fill="var(--color-muted-foreground)"
+            textAnchor="start"
+          >
+            {p}
+          </text>
+        );
+      })}
       {values.map((_, i) => {
         const [x, y] = pt(i, 100);
         const lx = cx + (x - cx) * 1.32;
@@ -420,12 +435,21 @@ function RadarChart({ values, labels }: { values: number[]; labels: string[] }) 
             fontWeight="600"
             textAnchor="middle"
             dominantBaseline="middle"
-            fill="white"
+            fill="var(--color-foreground)"
           >
             {labels[i]}
           </text>
         );
       })}
+      <text
+        x={size - 4}
+        y={size - 4}
+        fontSize="7"
+        fill="var(--color-muted-foreground)"
+        textAnchor="end"
+      >
+        單位：完成進度 (%)
+      </text>
     </svg>
   );
 }
