@@ -52,6 +52,9 @@ function MentorDetailPage() {
   const { mentorId } = Route.useParams();
   const mentor = getMentor(mentorId)!;
   const navigate = useNavigate();
+  useEffect(() => {
+    logActivity({ station: "map", type: "view_mentor", detail: `查看 ${mentor.name}・${mentor.job}` });
+  }, [mentor.name, mentor.job]);
   const [step, setStep] = useState<Step>("idle");
   const [bookingType, setBookingType] = useState<BookingType | null>(null);
   const [slot, setSlot] = useState<MentorSlot | null>(null);
