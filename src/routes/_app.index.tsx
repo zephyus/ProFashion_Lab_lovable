@@ -180,44 +180,44 @@ function HomePage() {
       </Link>
 
       {/* ============ 子視窗 1：進行室（儀表板 + 雷達 + 學群分析） ============ */}
-      <ChamberCard title="進行室" delay={120}>
+      <ChamberCard delay={120}>
         <div className="grid grid-cols-[1fr_auto] items-center gap-3">
           <RadarChart
             values={[explorePct, cafePct, mapPct, callPct]}
-            labels={["自我覺察", "職業視野", "路徑規劃", "對話應對"]}
+            labels={["發現小秘 me", "職業咖啡館", "職圖", "您撥的號碼是未來"]}
           />
           <div className="flex flex-col gap-1.5 text-[11px]">
             {stations.map((s) => (
               <Link
                 key={s.key}
                 to={s.to}
-                className="press flex items-center justify-between gap-2 rounded-lg bg-white/55 px-2 py-1.5 backdrop-blur-sm transition hover:bg-white"
+                className="press flex items-center justify-between gap-2 rounded-lg bg-white/10 px-2 py-1.5 backdrop-blur-sm transition hover:bg-white/20"
               >
-                <span className="font-semibold text-foreground">{s.title}</span>
-                <span className="tabular-nums font-bold text-primary-deep">{s.pct}%</span>
+                <span className="font-semibold text-primary-foreground">{s.title}</span>
+                <span className="tabular-nums font-bold text-primary-foreground">{s.pct}%</span>
               </Link>
             ))}
           </div>
         </div>
 
         {/* 綜合分析：適合的學群 */}
-        <div className="mt-3 rounded-xl bg-white/55 p-3 backdrop-blur-sm">
-          <p className="text-[11px] font-bold text-primary-deep">綜合分析 · 適合學群</p>
+        <div className="mt-3 rounded-xl bg-white/10 p-3 backdrop-blur-sm">
+          <p className="text-[11px] font-bold text-primary-foreground/80">綜合分析 · 適合學群</p>
           {overall === 0 ? (
-            <p className="mt-1 text-[12px] text-muted-foreground">
+            <p className="mt-1 text-[12px] text-primary-foreground/70">
               開始體驗任一站點後，這裡會分析你適合 18 學群中的哪幾個方向。
             </p>
           ) : (
             <ul className="mt-2 space-y-1.5">
               {topGroups.map(([name, score], i) => (
                 <li key={name} className="flex items-center gap-2">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-deep text-[10px] font-bold text-primary-foreground">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-foreground text-[10px] font-bold text-primary-deep">
                     {i + 1}
                   </span>
-                  <span className="flex-1 text-[12px] font-semibold text-foreground">{name}</span>
-                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-primary/15">
+                  <span className="flex-1 text-[12px] font-semibold text-primary-foreground">{name}</span>
+                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-white/15">
                     <div
-                      className="h-full rounded-full bg-[image:var(--gradient-hero)] transition-all duration-500"
+                      className="h-full rounded-full bg-primary-foreground transition-all duration-500"
                       style={{ width: `${Math.min(100, Math.round(score))}%` }}
                     />
                   </div>
@@ -229,15 +229,15 @@ function HomePage() {
       </ChamberCard>
 
       {/* ============ 子視窗 2：未來室 ============ */}
-      <ChamberCard title="未來室" delay={180}>
+      <ChamberCard delay={180}>
         <div className="space-y-2">
-          <div className="rounded-xl bg-white/55 p-3 backdrop-blur-sm">
-            <p className="text-[11px] font-semibold text-primary-deep">現在</p>
-            <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nowTip}</p>
+          <div className="rounded-xl bg-white/10 p-3 backdrop-blur-sm">
+            <p className="text-[11px] font-semibold text-primary-foreground/80">現在</p>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-primary-foreground">{nowTip}</p>
           </div>
-          <div className="rounded-xl bg-white/55 p-3 backdrop-blur-sm">
-            <p className="text-[11px] font-semibold text-primary-deep">下一步</p>
-            <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nextTip}</p>
+          <div className="rounded-xl bg-white/10 p-3 backdrop-blur-sm">
+            <p className="text-[11px] font-semibold text-primary-foreground/80">下一步</p>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-primary-foreground">{nextTip}</p>
           </div>
         </div>
       </ChamberCard>
@@ -345,21 +345,16 @@ function HomePage() {
 
 // —— 子視窗外殼 ——
 function ChamberCard({
-  title, delay, children,
+  delay, children,
 }: {
-  title: string;
   delay: number;
   children: React.ReactNode;
 }) {
   return (
     <section
-      className="relative mt-5 overflow-hidden rounded-2xl border border-primary/20 bg-card p-4 shadow-[var(--shadow-card)] animate-rise"
+      className="relative mt-5 overflow-hidden rounded-2xl bg-primary-deep p-4 shadow-[var(--shadow-card)] animate-rise"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <header className="relative mb-3 flex items-center border-b border-dashed border-primary/15 pb-3">
-        <p className="text-[15px] font-bold leading-tight text-foreground">{title}</p>
-      </header>
-
       <div className="relative">{children}</div>
     </section>
   );
@@ -367,10 +362,10 @@ function ChamberCard({
 
 // —— 雷達圖（純 SVG，4 軸） ——
 function RadarChart({ values, labels }: { values: number[]; labels: string[] }) {
-  const size = 180;
+  const size = 200;
   const cx = size / 2;
   const cy = size / 2;
-  const r = 58;
+  const r = 52;
   const n = values.length;
   const angle = (i: number) => (Math.PI * 2 * i) / n - Math.PI / 2;
   const pt = (i: number, v: number) => {
@@ -386,13 +381,13 @@ function RadarChart({ values, labels }: { values: number[]; labels: string[] }) 
   const dataPoints = values.map((v, i) => pt(i, v).join(",")).join(" ");
 
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[180px]">
+    <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[200px]">
       {[25, 50, 75, 100].map((p) => (
         <polygon
           key={p}
           fill="none"
-          stroke="var(--color-primary-deep)"
-          strokeOpacity="0.18"
+          stroke="white"
+          strokeOpacity="0.25"
           points={ringPoints(p)}
         />
       ))}
@@ -405,32 +400,32 @@ function RadarChart({ values, labels }: { values: number[]; labels: string[] }) 
             y1={cy}
             x2={x}
             y2={y}
-            stroke="var(--color-primary-deep)"
-            strokeOpacity="0.15"
+            stroke="white"
+            strokeOpacity="0.22"
           />
         );
       })}
       <polygon
         points={dataPoints}
-        fill="var(--color-primary)"
-        fillOpacity="0.45"
-        stroke="var(--color-primary-deep)"
+        fill="white"
+        fillOpacity="0.55"
+        stroke="white"
         strokeWidth="1.5"
       />
       {values.map((_, i) => {
         const [x, y] = pt(i, 100);
-        const lx = cx + (x - cx) * 1.22;
-        const ly = cy + (y - cy) * 1.22;
+        const lx = cx + (x - cx) * 1.32;
+        const ly = cy + (y - cy) * 1.32;
         return (
           <text
             key={i}
             x={lx}
             y={ly}
-            fontSize="9"
+            fontSize="8.5"
             fontWeight="600"
             textAnchor="middle"
             dominantBaseline="middle"
-            fill="var(--color-foreground)"
+            fill="white"
           >
             {labels[i]}
           </text>
@@ -439,5 +434,6 @@ function RadarChart({ values, labels }: { values: number[]; labels: string[] }) 
     </svg>
   );
 }
+
 
 
