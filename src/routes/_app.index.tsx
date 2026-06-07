@@ -343,25 +343,21 @@ function HomePage() {
   );
 }
 
-// —— 化學實驗室風格子視窗外殼 ——
+// —— 子視窗外殼 ——
 function ChamberCard({
-  title, icon: Icon, delay, children,
+  title, delay, children,
 }: {
   title: string;
-  icon: typeof FlaskConical;
   delay: number;
   children: React.ReactNode;
 }) {
   return (
     <section
-      className="relative mt-5 overflow-hidden rounded-3xl border border-primary/30 bg-primary-soft p-4 shadow-[var(--shadow-card)] animate-rise"
+      className="relative mt-5 overflow-hidden rounded-2xl border border-primary/20 bg-card p-4 shadow-[var(--shadow-card)] animate-rise"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <header className="relative mb-3 flex items-center gap-2.5 border-b border-dashed border-primary/20 pb-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[image:var(--gradient-hero)] text-primary-foreground shadow-sm">
-          <Icon className="h-[16px] w-[16px]" strokeWidth={2} />
-        </div>
-        <p className="text-[14px] font-bold leading-tight text-foreground">{title}</p>
+      <header className="relative mb-3 flex items-center border-b border-dashed border-primary/15 pb-3">
+        <p className="text-[15px] font-bold leading-tight text-foreground">{title}</p>
       </header>
 
       <div className="relative">{children}</div>
