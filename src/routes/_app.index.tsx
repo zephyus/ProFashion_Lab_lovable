@@ -91,6 +91,32 @@ function HomePage() {
           ? "下一步：到「職圖」預約一場真人職人體驗。"
           : "下一步：匯出學習歷程，把調配結果留下來。";
 
+  // —— 綜合分析：12 年國教 18 學群配對 ——
+  const groupScores: Record<string, number> = {
+    "社會與心理學群": explorePct * 0.55 + callPct * 0.25,
+    "教育學群": explorePct * 0.5 + cafePct * 0.25,
+    "文史哲學群": explorePct * 0.45 + cafePct * 0.25,
+    "大眾傳播學群": cafePct * 0.55 + callPct * 0.3,
+    "管理學群": cafePct * 0.5 + mapPct * 0.3,
+    "財經學群": cafePct * 0.45 + mapPct * 0.35,
+    "資訊學群": mapPct * 0.55 + explorePct * 0.2,
+    "工程學群": mapPct * 0.5 + explorePct * 0.25,
+    "建築與設計學群": mapPct * 0.45 + explorePct * 0.3,
+    "外語學群": callPct * 0.6 + cafePct * 0.2,
+    "法政學群": callPct * 0.55 + cafePct * 0.25,
+    "藝術學群": callPct * 0.45 + explorePct * 0.3,
+    "醫藥衛生學群": explorePct * 0.4 + mapPct * 0.35,
+    "生命科學學群": explorePct * 0.35 + mapPct * 0.35,
+    "生物資源學群": mapPct * 0.4 + cafePct * 0.25,
+    "地球與環境學群": mapPct * 0.4 + explorePct * 0.25,
+    "數理化學群": mapPct * 0.45 + explorePct * 0.3,
+    "遊憩與運動學群": callPct * 0.4 + cafePct * 0.3,
+  };
+  const topGroups = Object.entries(groupScores)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+
+
 
   return (
     <div className="px-5 animate-page">
@@ -153,61 +179,69 @@ function HomePage() {
         </div>
       </Link>
 
-      {/* ============ 子視窗 1：職感進行室 ============ */}
+      {/* ============ 子視窗 1：職感進行室（儀表板 + 雷達 + 學群分析） ============ */}
       <ChamberCard title="職感進行室" icon={Beaker} delay={120}>
-        <div className="grid grid-cols-2 gap-2.5">
-          {stations.map((s) => {
-            const Icon = s.icon;
-            return (
+        <div className="grid grid-cols-[1fr_auto] items-center gap-3">
+          <RadarChart
+            values={[explorePct, cafePct, mapPct, callPct]}
+            labels={["自我覺察", "職業視野", "路徑規劃", "對話應對"]}
+          />
+          <div className="flex flex-col gap-1.5 text-[11px]">
+            {stations.map((s) => (
               <Link
                 key={s.key}
                 to={s.to}
-                className="press relative flex h-28 flex-col overflow-hidden rounded-xl border border-primary/15 bg-card transition-colors hover:border-primary/40"
+                className="press flex items-center justify-between gap-2 rounded-lg bg-white/55 px-2 py-1.5 backdrop-blur-sm transition hover:bg-white"
               >
-                {/* 試管液面：底部填滿到 pct */}
-                <div
-                  className="absolute inset-x-0 bottom-0 bg-[image:var(--gradient-hero)] opacity-90 transition-all duration-700"
-                  style={{ height: `${s.pct}%` }}
-                  aria-hidden
-                />
-                <div className="relative flex flex-1 flex-col justify-between p-3">
-                  <div className="flex items-start justify-between">
-                    <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-lg ${s.pct > 50 ? "bg-white/25 text-white" : "bg-primary-soft text-primary-deep"}`}
-                    >
-                      <Icon className="h-[16px] w-[16px]" strokeWidth={1.9} />
-                    </div>
-                    <span
-                      className={`text-[11px] font-bold tabular-nums ${s.pct > 50 ? "text-white" : "text-primary-deep"}`}
-                    >
-                      {s.pct}%
-                    </span>
-                  </div>
-                  <p
-                    className={`text-[13px] font-semibold leading-tight ${s.pct > 50 ? "text-white" : "text-foreground"}`}
-                  >
-                    {s.title}
-                  </p>
-                </div>
+                <span className="font-semibold text-foreground">{s.title}</span>
+                <span className="tabular-nums font-bold text-primary-deep">{s.pct}%</span>
               </Link>
-            );
-          })}
+            ))}
+          </div>
+        </div>
+
+        {/* 綜合分析：適合的學群 */}
+        <div className="mt-3 rounded-xl bg-white/55 p-3 backdrop-blur-sm">
+          <p className="text-[11px] font-bold text-primary-deep">綜合分析 · 適合學群</p>
+          {overall === 0 ? (
+            <p className="mt-1 text-[12px] text-muted-foreground">
+              開始體驗任一站點後，這裡會分析你適合 18 學群中的哪幾個方向。
+            </p>
+          ) : (
+            <ul className="mt-2 space-y-1.5">
+              {topGroups.map(([name, score], i) => (
+                <li key={name} className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-deep text-[10px] font-bold text-primary-foreground">
+                    {i + 1}
+                  </span>
+                  <span className="flex-1 text-[12px] font-semibold text-foreground">{name}</span>
+                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-primary/15">
+                    <div
+                      className="h-full rounded-full bg-[image:var(--gradient-hero)] transition-all duration-500"
+                      style={{ width: `${Math.min(100, Math.round(score))}%` }}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </ChamberCard>
 
       {/* ============ 子視窗 2：職感未來室 ============ */}
       <ChamberCard title="職感未來室" icon={TestTube} delay={180}>
         <div className="space-y-2">
-          <div className="rounded-xl border border-primary/15 bg-card p-3">
+          <div className="rounded-xl bg-white/55 p-3 backdrop-blur-sm">
             <p className="text-[11px] font-semibold text-primary-deep">現在</p>
             <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nowTip}</p>
           </div>
-          <div className="rounded-xl border border-primary/15 bg-card p-3">
+          <div className="rounded-xl bg-white/55 p-3 backdrop-blur-sm">
             <p className="text-[11px] font-semibold text-primary-deep">下一步</p>
             <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nextTip}</p>
           </div>
         </div>
       </ChamberCard>
+
 
 
 
@@ -320,7 +354,7 @@ function ChamberCard({
 }) {
   return (
     <section
-      className="relative mt-5 overflow-hidden rounded-3xl border border-primary/20 bg-card p-4 shadow-[var(--shadow-card)] animate-rise"
+      className="relative mt-5 overflow-hidden rounded-3xl border border-primary/30 bg-primary-soft p-4 shadow-[var(--shadow-card)] animate-rise"
       style={{ animationDelay: `${delay}ms` }}
     >
       <header className="relative mb-3 flex items-center gap-2.5 border-b border-dashed border-primary/20 pb-3">
@@ -334,4 +368,80 @@ function ChamberCard({
     </section>
   );
 }
+
+// —— 雷達圖（純 SVG，4 軸） ——
+function RadarChart({ values, labels }: { values: number[]; labels: string[] }) {
+  const size = 180;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = 58;
+  const n = values.length;
+  const angle = (i: number) => (Math.PI * 2 * i) / n - Math.PI / 2;
+  const pt = (i: number, v: number) => {
+    const a = angle(i);
+    const rr = (Math.max(0, Math.min(100, v)) / 100) * r;
+    return [cx + Math.cos(a) * rr, cy + Math.sin(a) * rr] as const;
+  };
+  const ringPoints = (p: number) =>
+    Array.from({ length: n }, (_, i) => {
+      const [x, y] = pt(i, p);
+      return `${x},${y}`;
+    }).join(" ");
+  const dataPoints = values.map((v, i) => pt(i, v).join(",")).join(" ");
+
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[180px]">
+      {[25, 50, 75, 100].map((p) => (
+        <polygon
+          key={p}
+          fill="none"
+          stroke="var(--color-primary-deep)"
+          strokeOpacity="0.18"
+          points={ringPoints(p)}
+        />
+      ))}
+      {Array.from({ length: n }, (_, i) => {
+        const [x, y] = pt(i, 100);
+        return (
+          <line
+            key={i}
+            x1={cx}
+            y1={cy}
+            x2={x}
+            y2={y}
+            stroke="var(--color-primary-deep)"
+            strokeOpacity="0.15"
+          />
+        );
+      })}
+      <polygon
+        points={dataPoints}
+        fill="var(--color-primary)"
+        fillOpacity="0.45"
+        stroke="var(--color-primary-deep)"
+        strokeWidth="1.5"
+      />
+      {values.map((_, i) => {
+        const [x, y] = pt(i, 100);
+        const lx = cx + (x - cx) * 1.22;
+        const ly = cy + (y - cy) * 1.22;
+        return (
+          <text
+            key={i}
+            x={lx}
+            y={ly}
+            fontSize="9"
+            fontWeight="600"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill="var(--color-foreground)"
+          >
+            {labels[i]}
+          </text>
+        );
+      })}
+    </svg>
+  );
+}
+
 
