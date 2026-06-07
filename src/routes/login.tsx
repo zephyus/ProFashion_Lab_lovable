@@ -22,6 +22,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { xp, completed, tierName } = useXp();
+  const sub = useSubscription();
   const [signingIn, setSigningIn] = useState(false);
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
