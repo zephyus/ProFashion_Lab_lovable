@@ -5,6 +5,7 @@ import { ArrowLeft, Download, Loader2, FileText, Phone as PhoneIcon, Sparkles, T
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { getMyPortfolio } from "@/lib/portfolio.functions";
+import { useTrackVisit } from "@/hooks/useActivity";
 
 export const Route = createFileRoute("/_app/portfolio")({
   head: () => ({ meta: [{ title: "我的學習歷程 — ProFashion Lab" }] }),
