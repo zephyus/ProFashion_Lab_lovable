@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut, FileText, GraduationCap, Users, Crown } from "lucide-react";
+import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut, FileText, GraduationCap, Users, Crown, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useXp } from "@/hooks/useXp";
 import { useRoles } from "@/hooks/useRoles";
 import { useSubscription, FREE_AI_CALL_LIMIT, SUB_BOOKING_LIMIT } from "@/hooks/useSubscription";
-import { useEffect, useState } from "react";
+import { useActivity, STATION_LABEL, type Station } from "@/hooks/useActivity";
 
 export const Route = createFileRoute("/_app/")({
   head: () => ({
@@ -18,29 +18,12 @@ export const Route = createFileRoute("/_app/")({
   component: HomePage,
 });
 
-// —— 訪問次數追蹤（demo） ——
-function readVisits(): Record<string, number> {
-  if (typeof window === "undefined") return {};
-  try { return JSON.parse(localStorage.getItem("pfl_visits_v1") || "{}"); } catch { return {}; }
-}
-
 function HomePage() {
   const { user, loading } = useAuth();
   const { isTeacher } = useRoles();
   const { xp, completed, tierName } = useXp();
   const sub = useSubscription();
-  const [visits, setVisits] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    setVisits(readVisits());
-    const on = () => setVisits(readVisits());
-    window.addEventListener("storage", on);
-    window.addEventListener("visits:update", on);
-    return () => {
-      window.removeEventListener("storage", on);
-      window.removeEventListener("visits:update", on);
-    };
-  }, []);
+  const { activities, clear, countsByStation, total } = useActivity();
 
   const displayName =
     (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ??
@@ -55,13 +38,15 @@ function HomePage() {
     toast.success("已登出");
   };
 
-  // —— 各站進度（demo 推算） ——
-  const explorePct = Math.min(100, completed * 12);
-  const cafePct = Math.min(100, (visits.cafe ?? 0) * 25);
-  const mapPct = Math.min(100, Math.round((sub.bookingsUsed / SUB_BOOKING_LIMIT) * 100));
+  // —— 各站進度（綜合活動次數 + 訂閱配額） ——
+  const explorePct = Math.min(100, completed * 12 + (countsByStation.explore ?? 0) * 4);
+  const cafePct = Math.min(100, (countsByStation.cafe ?? 0) * 10);
+  const mapPct = sub.isSubscribed
+    ? Math.min(100, Math.round((sub.bookingsUsed / SUB_BOOKING_LIMIT) * 100) + (countsByStation.map ?? 0) * 6)
+    : Math.min(100, (countsByStation.map ?? 0) * 12);
   const callPct = sub.isSubscribed
-    ? Math.min(100, ((visits.call ?? 0) * 20))
-    : Math.min(100, Math.round((sub.aiCallsUsed / FREE_AI_CALL_LIMIT) * 100));
+    ? Math.min(100, (countsByStation.call ?? 0) * 10)
+    : Math.min(100, Math.round((sub.aiCallsUsed / FREE_AI_CALL_LIMIT) * 100) + (countsByStation.call ?? 0) * 5);
   const overall = Math.round((explorePct + cafePct + mapPct + callPct) / 4);
 
   const stations = [
