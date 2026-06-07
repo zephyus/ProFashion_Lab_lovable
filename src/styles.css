@@ -34,6 +34,9 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  /* Pantone 127 — bright golden yellow for premium accents */
+  --color-pantone-127: #F0D878;
+
   /* Apple-inspired system font stack */
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
     "Inter", "Noto Sans TC", "PingFang TC", "Helvetica Neue", system-ui, sans-serif;
