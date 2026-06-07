@@ -64,12 +64,12 @@ function AppLayout() {
   };
 
   return (
-    <div className="app-shell mx-auto flex min-h-screen max-w-md flex-col bg-background pb-[72px]">
-      {/* Floating inbox bell */}
+    <div className="app-shell relative mx-auto flex min-h-screen w-full max-w-md flex-col bg-background pb-[72px]">
+      {/* Inbox bell — anchored inside the app shell so it never overflows */}
       <Link
         to="/inbox"
         aria-label="通知收件夾"
-        className="fixed right-3 top-3 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-card/90 text-foreground shadow-[var(--shadow-card)] backdrop-blur-md transition-transform hover:scale-105 md:right-[calc(50%-220px)]"
+        className="absolute right-3 top-3 z-50 flex h-9 w-9 items-center justify-center rounded-full bg-card/90 text-foreground shadow-[var(--shadow-card)] backdrop-blur-md transition-transform hover:scale-105"
       >
         <Bell className="h-[18px] w-[18px]" strokeWidth={1.85} />
         {unread > 0 && (
