@@ -177,6 +177,11 @@ export default function ExploreQuiz({ onBack }: ExploreQuizProps) {
     if (!done || savedRef.current) return;
     savedRef.current = true;
     const r = analyze(scores);
+    logActivity({
+      station: "explore",
+      type: "quiz_completed",
+      detail: `${r.typeName}・核心：${r.core[0].key}・方向：${r.careers.slice(0, 3).join("、")}`,
+    });
     saveQuiz({
       data: {
         archetype: r.typeName,
