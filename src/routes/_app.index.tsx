@@ -154,63 +154,61 @@ function HomePage() {
       </Link>
 
       {/* ============ 子視窗 1：職感進行室 ============ */}
-      <ChamberCard
-        index="01"
-        title="職感進行室"
-        subtitle="Reaction Chamber"
-        icon={Beaker}
-        delay={120}
-      >
-        <ul className="space-y-2">
+      <ChamberCard title="職感進行室" icon={Beaker} delay={120}>
+        <div className="grid grid-cols-2 gap-2.5">
           {stations.map((s) => {
             const Icon = s.icon;
             return (
-              <li key={s.key}>
-                <Link
-                  to={s.to}
-                  className="press group relative flex items-center gap-3 overflow-hidden rounded-xl border border-primary/15 bg-card/70 px-3 py-2.5 backdrop-blur-sm transition-colors hover:border-primary/40"
-                >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary-deep">
-                    <Icon className="h-[16px] w-[16px]" strokeWidth={1.9} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[13px] font-semibold text-foreground truncate">{s.title}</p>
-                      <span className="font-mono text-[10px] font-bold tabular-nums text-primary-deep">{s.pct}%</span>
+              <Link
+                key={s.key}
+                to={s.to}
+                className="press relative flex h-28 flex-col overflow-hidden rounded-xl border border-primary/15 bg-card transition-colors hover:border-primary/40"
+              >
+                {/* 試管液面：底部填滿到 pct */}
+                <div
+                  className="absolute inset-x-0 bottom-0 bg-[image:var(--gradient-hero)] opacity-90 transition-all duration-700"
+                  style={{ height: `${s.pct}%` }}
+                  aria-hidden
+                />
+                <div className="relative flex flex-1 flex-col justify-between p-3">
+                  <div className="flex items-start justify-between">
+                    <div
+                      className={`flex h-8 w-8 items-center justify-center rounded-lg ${s.pct > 50 ? "bg-white/25 text-white" : "bg-primary-soft text-primary-deep"}`}
+                    >
+                      <Icon className="h-[16px] w-[16px]" strokeWidth={1.9} />
                     </div>
-                    <div className="mt-1 h-1 overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full rounded-full bg-[image:var(--gradient-hero)] transition-all duration-500"
-                        style={{ width: `${s.pct}%` }}
-                      />
-                    </div>
+                    <span
+                      className={`text-[11px] font-bold tabular-nums ${s.pct > 50 ? "text-white" : "text-primary-deep"}`}
+                    >
+                      {s.pct}%
+                    </span>
                   </div>
-                </Link>
-              </li>
+                  <p
+                    className={`text-[13px] font-semibold leading-tight ${s.pct > 50 ? "text-white" : "text-foreground"}`}
+                  >
+                    {s.title}
+                  </p>
+                </div>
+              </Link>
             );
           })}
-        </ul>
+        </div>
       </ChamberCard>
 
       {/* ============ 子視窗 2：職感未來室 ============ */}
-      <ChamberCard
-        index="02"
-        title="職感未來室"
-        subtitle="Future Chamber"
-        icon={TestTube}
-        delay={180}
-      >
+      <ChamberCard title="職感未來室" icon={TestTube} delay={180}>
         <div className="space-y-2">
-          <div className="rounded-xl border border-primary/15 bg-card/70 p-3 backdrop-blur-sm">
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Now · 現在</p>
+          <div className="rounded-xl border border-primary/15 bg-card p-3">
+            <p className="text-[11px] font-semibold text-primary-deep">現在</p>
             <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nowTip}</p>
           </div>
-          <div className="rounded-xl border border-primary/15 bg-card/70 p-3 backdrop-blur-sm">
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Next · 下一步</p>
+          <div className="rounded-xl border border-primary/15 bg-card p-3">
+            <p className="text-[11px] font-semibold text-primary-deep">下一步</p>
             <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nextTip}</p>
           </div>
         </div>
       </ChamberCard>
+
 
 
       {/* 訂閱方案 */}
