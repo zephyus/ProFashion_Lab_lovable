@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut, FileText, GraduationCap, Users, Crown, FlaskConical, Beaker, TestTube } from "lucide-react";
+import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut, FileText, GraduationCap, Users, Crown } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -179,8 +179,8 @@ function HomePage() {
         </div>
       </Link>
 
-      {/* ============ 子視窗 1：職感進行室（儀表板 + 雷達 + 學群分析） ============ */}
-      <ChamberCard title="職感進行室" icon={Beaker} delay={120}>
+      {/* ============ 子視窗 1：進行室（儀表板 + 雷達 + 學群分析） ============ */}
+      <ChamberCard title="進行室" delay={120}>
         <div className="grid grid-cols-[1fr_auto] items-center gap-3">
           <RadarChart
             values={[explorePct, cafePct, mapPct, callPct]}
@@ -228,8 +228,8 @@ function HomePage() {
         </div>
       </ChamberCard>
 
-      {/* ============ 子視窗 2：職感未來室 ============ */}
-      <ChamberCard title="職感未來室" icon={TestTube} delay={180}>
+      {/* ============ 子視窗 2：未來室 ============ */}
+      <ChamberCard title="未來室" delay={180}>
         <div className="space-y-2">
           <div className="rounded-xl bg-white/55 p-3 backdrop-blur-sm">
             <p className="text-[11px] font-semibold text-primary-deep">現在</p>
@@ -343,25 +343,21 @@ function HomePage() {
   );
 }
 
-// —— 化學實驗室風格子視窗外殼 ——
+// —— 子視窗外殼 ——
 function ChamberCard({
-  title, icon: Icon, delay, children,
+  title, delay, children,
 }: {
   title: string;
-  icon: typeof FlaskConical;
   delay: number;
   children: React.ReactNode;
 }) {
   return (
     <section
-      className="relative mt-5 overflow-hidden rounded-3xl border border-primary/30 bg-primary-soft p-4 shadow-[var(--shadow-card)] animate-rise"
+      className="relative mt-5 overflow-hidden rounded-2xl border border-primary/20 bg-card p-4 shadow-[var(--shadow-card)] animate-rise"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <header className="relative mb-3 flex items-center gap-2.5 border-b border-dashed border-primary/20 pb-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[image:var(--gradient-hero)] text-primary-foreground shadow-sm">
-          <Icon className="h-[16px] w-[16px]" strokeWidth={2} />
-        </div>
-        <p className="text-[14px] font-bold leading-tight text-foreground">{title}</p>
+      <header className="relative mb-3 flex items-center border-b border-dashed border-primary/15 pb-3">
+        <p className="text-[15px] font-bold leading-tight text-foreground">{title}</p>
       </header>
 
       <div className="relative">{children}</div>
