@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowLeft,
   MapPin,
@@ -11,13 +12,18 @@ import {
   Calendar,
   User,
   Users,
+  ShieldAlert,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CATEGORY_META, MentorSlot, getMentor } from "@/lib/mentors";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { listMyParents, submitConsentRequest } from "@/lib/parent.functions";
+
 
 type BookingType = "individual" | "class";
 
