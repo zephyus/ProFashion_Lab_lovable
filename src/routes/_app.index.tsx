@@ -180,11 +180,11 @@ function HomePage() {
       </Link>
 
       {/* ============ 子視窗 1：進行室（儀表板 + 雷達 + 學群分析） ============ */}
-      <ChamberCard title="進行室" delay={120}>
+      <ChamberCard delay={120}>
         <div className="grid grid-cols-[1fr_auto] items-center gap-3">
           <RadarChart
             values={[explorePct, cafePct, mapPct, callPct]}
-            labels={["自我覺察", "職業視野", "路徑規劃", "對話應對"]}
+            labels={["發現小秘 me", "職業咖啡館", "職圖", "您撥的號碼是未來"]}
           />
           <div className="flex flex-col gap-1.5 text-[11px]">
             {stations.map((s) => (
