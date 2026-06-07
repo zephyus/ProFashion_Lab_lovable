@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut, FileText, GraduationCap, Users, Crown } from "lucide-react";
+import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut, FileText, GraduationCap, Users, Crown, FlaskConical, Beaker, Atom, TestTube, Compass, BookOpen, Target } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useXp } from "@/hooks/useXp";
 import { useRoles } from "@/hooks/useRoles";
-import { useSubscription, SUB_PRICE } from "@/hooks/useSubscription";
+import { useSubscription, SUB_PRICE, FREE_AI_CALL_LIMIT, SUB_BOOKING_LIMIT } from "@/hooks/useSubscription";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/_app/")({
   head: () => ({
@@ -17,42 +18,30 @@ export const Route = createFileRoute("/_app/")({
   component: HomePage,
 });
 
-const stations = [
-  {
-    key: "explore",
-    icon: Sparkles,
-    title: "發現小秘 me",
-    desc: "認識你自己。",
-    to: "/explore",
-  },
-  {
-    key: "cafe",
-    icon: Coffee,
-    title: "職業咖啡館",
-    desc: "聽前輩怎麼說。",
-    to: "/cafe",
-  },
-  {
-    key: "map",
-    icon: MapPin,
-    title: "職圖",
-    desc: "看見你的路徑。",
-    to: "/map",
-  },
-  {
-    key: "call",
-    icon: Phone,
-    title: "您撥的號碼是未來",
-    desc: "預演關鍵時刻。",
-    to: "/call",
-  },
-] as const;
+// —— 訪問次數追蹤（demo） ——
+function readVisits(): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try { return JSON.parse(localStorage.getItem("pfl_visits_v1") || "{}"); } catch { return {}; }
+}
 
 function HomePage() {
   const { user, loading } = useAuth();
   const { isTeacher } = useRoles();
   const { xp, completed, tierName } = useXp();
   const sub = useSubscription();
+  const [visits, setVisits] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    setVisits(readVisits());
+    const on = () => setVisits(readVisits());
+    window.addEventListener("storage", on);
+    window.addEventListener("visits:update", on);
+    return () => {
+      window.removeEventListener("storage", on);
+      window.removeEventListener("visits:update", on);
+    };
+  }, []);
+
   const displayName =
     (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ??
     (user?.user_metadata as { name?: string } | undefined)?.name ??
@@ -62,12 +51,50 @@ function HomePage() {
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast.error("登出失敗，請再試一次");
-      return;
-    }
+    if (error) { toast.error("登出失敗，請再試一次"); return; }
     toast.success("已登出");
   };
+
+  // —— 各站進度（demo 推算） ——
+  const explorePct = Math.min(100, completed * 12);
+  const cafePct = Math.min(100, (visits.cafe ?? 0) * 25);
+  const mapPct = Math.min(100, Math.round((sub.bookingsUsed / SUB_BOOKING_LIMIT) * 100));
+  const callPct = sub.isSubscribed
+    ? Math.min(100, ((visits.call ?? 0) * 20))
+    : Math.min(100, Math.round((sub.aiCallsUsed / FREE_AI_CALL_LIMIT) * 100));
+  const overall = Math.round((explorePct + cafePct + mapPct + callPct) / 4);
+
+  const stations = [
+    { key: "explore", icon: Sparkles, title: "發現小秘 me", desc: "認識你自己", to: "/explore", pct: explorePct, formula: "C₁₆H₂₂" },
+    { key: "cafe", icon: Coffee, title: "職業咖啡館", desc: "聽前輩怎麼說", to: "/cafe", pct: cafePct, formula: "C₈H₁₀N₄O₂" },
+    { key: "map", icon: MapPin, title: "職圖", desc: "看見你的路徑", to: "/map", pct: mapPct, formula: "Fe₂O₃" },
+    { key: "call", icon: Phone, title: "您撥的號碼是未來", desc: "預演關鍵時刻", to: "/call", pct: callPct, formula: "Ag₂S" },
+  ] as const;
+
+  // —— 未來室階段建議 ——
+  const futureStages = [
+    {
+      icon: Compass,
+      stage: "現在 · 國中探索期",
+      label: "Phase 01",
+      tip: "把每天「我覺得有趣」記下來。完成 3 次小秘me 測驗 + 2 次職業咖啡館，可以看出你的興趣輪廓。",
+      chip: overall < 30 ? "剛開始" : overall < 70 ? "進行中" : "輪廓清晰",
+    },
+    {
+      icon: BookOpen,
+      stage: "下一步 · 選高中／高職",
+      label: "Phase 02",
+      tip: "技術型 vs 學術型？綜合高中先觀望？用「職圖」對應你的興趣科系，再用「您撥的號碼是未來」預演面試與選組對話。",
+      chip: "可開始準備",
+    },
+    {
+      icon: Target,
+      stage: "未來 · 大學科系與職涯",
+      label: "Phase 03",
+      tip: "高一下決定選組、高二想學群、高三填志願。把現在的小秘me 結果存進學習歷程，三年後你會感謝自己。",
+      chip: "持續累積",
+    },
+  ] as const;
 
   return (
     <div className="px-5 animate-page">
@@ -77,9 +104,7 @@ function HomePage() {
           <span className="text-footnote font-semibold tracking-wide text-foreground/80">
             ProFashion <span className="text-muted-foreground">Lab</span>
           </span>
-          <span className="text-[10px] tracking-widest text-muted-foreground">
-            職感實驗室
-          </span>
+          <span className="text-[10px] tracking-widest text-muted-foreground">職感實驗室</span>
         </div>
         {loading ? (
           <div className="h-7 w-7 animate-pulse rounded-full bg-muted" />
@@ -92,18 +117,13 @@ function HomePage() {
                 {displayName.charAt(0).toUpperCase() || "U"}
               </div>
             )}
-            <button
-              onClick={handleLogout}
-              aria-label="登出"
-              className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
+            <button onClick={handleLogout} aria-label="登出"
+              className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
               <LogOut className="h-4 w-4" strokeWidth={1.85} />
             </button>
           </div>
         ) : (
-          <Link to="/login" className="text-subhead font-semibold text-primary-deep transition-opacity hover:opacity-70">
-            登入
-          </Link>
+          <Link to="/login" className="text-subhead font-semibold text-primary-deep transition-opacity hover:opacity-70">登入</Link>
         )}
       </header>
 
@@ -116,7 +136,7 @@ function HomePage() {
         </h1>
       </section>
 
-      {/* XP card — slim */}
+      {/* XP card */}
       <Link
         to="/explore"
         className="press flex items-center justify-between gap-4 rounded-2xl bg-[image:var(--gradient-hero)] px-5 py-4 text-primary-foreground shadow-[var(--shadow-card)] animate-rise"
@@ -137,30 +157,106 @@ function HomePage() {
         </div>
       </Link>
 
-      {/* 四大區域 — 2×2 grid */}
-      <div className="mt-6 grid grid-cols-2 gap-3 animate-rise" style={{ animationDelay: "120ms" }}>
-        {stations.map((s) => {
-          const Icon = s.icon;
-          return (
-            <Link
-              key={s.key}
-              to={s.to}
-              className="press flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 transition-colors hover:bg-muted/30"
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
-                <Icon className="h-[18px] w-[18px]" strokeWidth={1.9} />
+      {/* ============ 子視窗 1：職感進行室 ============ */}
+      <ChamberCard
+        index="01"
+        title="職感進行室"
+        subtitle="Reaction Chamber · 進行中的調配"
+        icon={Beaker}
+        delay={120}
+      >
+        <div className="grid grid-cols-2 gap-2.5">
+          {stations.map((s) => {
+            const Icon = s.icon;
+            return (
+              <Link
+                key={s.key}
+                to={s.to}
+                className="press group relative flex flex-col gap-2.5 overflow-hidden rounded-xl border border-primary/20 bg-card/60 p-3 backdrop-blur-sm transition-all hover:border-primary/50 hover:bg-card"
+              >
+                {/* 試管液面動畫底色 */}
+                <div
+                  className="absolute inset-x-0 bottom-0 origin-bottom bg-[image:var(--gradient-hero)] opacity-[0.12] transition-all duration-700"
+                  style={{ height: `${s.pct}%` }}
+                  aria-hidden
+                />
+                <div className="relative flex items-start justify-between">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-soft text-primary-deep">
+                    <Icon className="h-[16px] w-[16px]" strokeWidth={1.9} />
+                  </div>
+                  <span className="font-mono text-[9px] tracking-wider text-muted-foreground">{s.formula}</span>
+                </div>
+                <div className="relative min-w-0">
+                  <p className="text-[13px] font-semibold leading-tight text-foreground">{s.title}</p>
+                  <p className="mt-0.5 text-[10px] leading-snug text-muted-foreground">{s.desc}</p>
+                </div>
+                {/* 進度條 */}
+                <div className="relative mt-auto">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Progress</span>
+                    <span className="font-mono text-[10px] font-bold tabular-nums text-primary-deep">{s.pct}%</span>
+                  </div>
+                  <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-[image:var(--gradient-hero)] transition-all duration-500"
+                      style={{ width: `${s.pct}%` }}
+                    />
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* 整體濃度 */}
+        <div className="mt-3 flex items-center justify-between rounded-xl border border-dashed border-primary/30 bg-primary-soft/40 px-3 py-2">
+          <div className="flex items-center gap-2">
+            <Atom className="h-3.5 w-3.5 text-primary-deep" strokeWidth={1.9} />
+            <span className="text-[11px] font-semibold text-foreground">調配濃度</span>
+          </div>
+          <span className="font-mono text-[11px] font-bold tabular-nums text-primary-deep">{overall}%</span>
+        </div>
+      </ChamberCard>
+
+      {/* ============ 子視窗 2：職感未來室 ============ */}
+      <ChamberCard
+        index="02"
+        title="職感未來室"
+        subtitle="Future Chamber · 從國中通往大學的配方"
+        icon={TestTube}
+        delay={180}
+      >
+        <div className="space-y-2.5">
+          {futureStages.map((f, i) => {
+            const Icon = f.icon;
+            return (
+              <div key={i} className="relative rounded-xl border border-primary/15 bg-card/60 p-3 backdrop-blur-sm">
+                <div className="flex items-start gap-3">
+                  <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary-deep">
+                    <Icon className="h-[17px] w-[17px]" strokeWidth={1.9} />
+                    {i < futureStages.length - 1 && (
+                      <span className="absolute left-1/2 top-full h-3 w-px -translate-x-1/2 bg-primary/30" aria-hidden />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[13px] font-semibold text-foreground">{f.stage}</p>
+                      <span className="font-mono text-[9px] tracking-wider text-muted-foreground">{f.label}</span>
+                    </div>
+                    <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{f.tip}</p>
+                    <span className="mt-2 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary-deep">
+                      {f.chip}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-subhead font-semibold text-foreground">{s.title}</p>
-                <p className="mt-1 text-footnote leading-snug">{s.desc}</p>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      </ChamberCard>
 
       {/* 訂閱方案 */}
-      <div className="mt-4 animate-rise" style={{ animationDelay: "140ms" }}>
+      <div className="mt-4 animate-rise" style={{ animationDelay: "220ms" }}>
         {sub.isSubscribed ? (
           <div className="rounded-2xl bg-[image:var(--gradient-hero)] p-4 text-primary-foreground shadow-[var(--shadow-card)]">
             <div className="flex items-center justify-between">
@@ -170,8 +266,7 @@ function HomePage() {
               </div>
               <button
                 onClick={() => { sub.unsubscribe(); toast.success("已取消訂閱（demo）"); }}
-                className="rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur"
-              >
+                className="rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur">
                 取消
               </button>
             </div>
@@ -182,8 +277,7 @@ function HomePage() {
         ) : (
           <button
             onClick={() => { sub.subscribe(); toast.success(`已升級訂閱（demo）— NT$${SUB_PRICE}/月`); }}
-            className="press flex w-full items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary-soft px-4 py-3.5 text-left"
-          >
+            className="press flex w-full items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary-soft px-4 py-3.5 text-left">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[image:var(--gradient-hero)] text-primary-foreground">
                 <Crown className="h-[18px] w-[18px]" strokeWidth={1.9} />
@@ -202,11 +296,8 @@ function HomePage() {
 
       {/* 已登入：學習歷程 + 教師入口 */}
       {user && (
-        <div className="mt-4 space-y-2.5 animate-rise" style={{ animationDelay: "150ms" }}>
-          <Link
-            to="/portfolio"
-            className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30"
-          >
+        <div className="mt-4 space-y-2.5 animate-rise" style={{ animationDelay: "240ms" }}>
+          <Link to="/portfolio" className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
                 <FileText className="h-[18px] w-[18px]" strokeWidth={1.9} />
@@ -219,30 +310,21 @@ function HomePage() {
             <ArrowRight className="h-4 w-4 text-muted-foreground" />
           </Link>
 
-          <Link
-            to={isTeacher ? "/teacher" : "/teacher-signup"}
-            className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30"
-          >
+          <Link to={isTeacher ? "/teacher" : "/teacher-signup"}
+            className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
                 <GraduationCap className="h-[18px] w-[18px]" strokeWidth={1.9} />
               </div>
               <div>
-                <p className="text-subhead font-semibold text-foreground">
-                  {isTeacher ? "教師後台" : "我是老師"}
-                </p>
-                <p className="text-caption text-muted-foreground">
-                  {isTeacher ? "管理班級、查看學員進度" : "輸入註冊碼升級為教師"}
-                </p>
+                <p className="text-subhead font-semibold text-foreground">{isTeacher ? "教師後台" : "我是老師"}</p>
+                <p className="text-caption text-muted-foreground">{isTeacher ? "管理班級、查看學員進度" : "輸入註冊碼升級為教師"}</p>
               </div>
             </div>
             <ArrowRight className="h-4 w-4 text-muted-foreground" />
           </Link>
 
-          <Link
-            to="/join"
-            className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30"
-          >
+          <Link to="/join" className="press flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-muted/30">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary-deep">
                 <Users className="h-[18px] w-[18px]" strokeWidth={1.9} />
@@ -257,20 +339,64 @@ function HomePage() {
         </div>
       )}
 
-      {/* Guest CTA */}
       {!user && !loading && (
-        <Link
-          to="/login"
+        <Link to="/login"
           className="press mt-6 flex items-center justify-between rounded-2xl bg-primary px-5 py-4 text-primary-foreground animate-rise"
-          style={{ animationDelay: "180ms" }}
-        >
+          style={{ animationDelay: "260ms" }}>
           <p className="text-subhead font-semibold">登入以保留你的軌跡</p>
-
           <ArrowRight className="h-5 w-5" strokeWidth={2} />
         </Link>
       )}
 
       <div className="h-12" />
     </div>
+  );
+}
+
+// —— 化學實驗室風格子視窗外殼 ——
+function ChamberCard({
+  index, title, subtitle, icon: Icon, delay, children,
+}: {
+  index: string;
+  title: string;
+  subtitle: string;
+  icon: typeof FlaskConical;
+  delay: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      className="relative mt-5 overflow-hidden rounded-3xl border border-primary/20 bg-card/70 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl animate-rise"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      {/* 玻璃反光光柱 */}
+      <div className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-primary/15 blur-3xl" aria-hidden />
+      <div className="pointer-events-none absolute -bottom-16 -left-8 h-32 w-32 rounded-full bg-primary-deep/10 blur-3xl" aria-hidden />
+      {/* 網格刻度 */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "linear-gradient(var(--color-foreground) 1px, transparent 1px), linear-gradient(90deg, var(--color-foreground) 1px, transparent 1px)",
+          backgroundSize: "16px 16px",
+        }}
+        aria-hidden
+      />
+
+      <header className="relative mb-3 flex items-center justify-between border-b border-dashed border-primary/20 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[image:var(--gradient-hero)] text-primary-foreground shadow-sm">
+            <Icon className="h-[16px] w-[16px]" strokeWidth={2} />
+          </div>
+          <div>
+            <p className="text-[13px] font-bold leading-tight text-foreground">{title}</p>
+            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">{subtitle}</p>
+          </div>
+        </div>
+        <span className="font-mono text-[10px] tracking-widest text-primary-deep">No.{index}</span>
+      </header>
+
+      <div className="relative">{children}</div>
+    </section>
   );
 }
