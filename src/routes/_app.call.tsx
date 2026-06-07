@@ -14,6 +14,9 @@ import {
 } from "@/lib/local-tts/kokoroTts";
 import { splitTextForTts } from "@/lib/local-tts/wav";
 import { toast } from "sonner";
+import { useSubscription } from "@/hooks/useSubscription";
+import { SubscribeDialog } from "@/components/SubscribeDialog";
+import { Crown } from "lucide-react";
 
 
 
@@ -197,6 +200,17 @@ function CallPage() {
   const [mode, setMode] = useState<Mode>("real");
   const [active, setActive] = useState<Persona | null>(null);
   const [activeIdx, setActiveIdx] = useState(0);
+  const sub = useSubscription();
+  const [paywallOpen, setPaywallOpen] = useState(false);
+
+  const tryStartCall = useCallback((p: Persona, i: number) => {
+    if (!sub.canMakeAiCall) {
+      setPaywallOpen(true);
+      return;
+    }
+    sub.consumeAiCall();
+    setActive(p); setActiveIdx(i); setLineIdx(0); setSeconds(0);
+  }, [sub]);
   const [lineIdx, setLineIdx] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [muted, setMuted] = useState(false);
@@ -649,7 +663,36 @@ function CallPage() {
         <p className="mt-3 text-body text-muted-foreground">
           撥一通電話聽真實的職人，或走進五分鐘廣播劇，先把未來走一遍。
         </p>
+        <div className="mt-3 flex items-center justify-between gap-2 rounded-2xl border border-border bg-card px-3.5 py-2.5">
+          <div className="flex items-center gap-2">
+            <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${sub.isSubscribed ? "bg-[image:var(--gradient-hero)] text-primary-foreground" : "bg-primary-soft text-primary-deep"}`}>
+              <Crown className="h-3.5 w-3.5" />
+            </div>
+            <div className="text-[12px] leading-tight">
+              {sub.isSubscribed ? (
+                <p className="font-semibold text-foreground">PRO 訂閱・AI 語音無限</p>
+              ) : (
+                <>
+                  <p className="font-semibold text-foreground">免費方案</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    本月剩餘 <b className="text-primary-deep tabular-nums">{sub.aiCallsRemaining}</b> / {sub.aiCallsLimit} 通
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+          {!sub.isSubscribed && (
+            <button
+              onClick={() => setPaywallOpen(true)}
+              className="press rounded-full bg-primary px-3 py-1.5 text-[11px] font-bold text-primary-foreground"
+            >
+              升級
+            </button>
+          )}
+        </div>
       </header>
+
+      <SubscribeDialog open={paywallOpen} onClose={() => setPaywallOpen(false)} reason="ai" />
 
       {/* Mode tabs */}
       <div className="-mx-5 mb-5 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -677,7 +720,7 @@ function CallPage() {
               </div>
               <div className="flex items-center justify-between gap-3 px-5 py-4">
                 <p className="text-xs text-muted-foreground">{p.intro}</p>
-                <button onClick={() => { setActive(p); setActiveIdx(i); setLineIdx(0); setSeconds(0); }}
+                <button onClick={() => tryStartCall(p, i)}
                   className="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-card)] active:scale-95">
                   <Phone className="h-3.5 w-3.5" /> 撥打
                 </button>

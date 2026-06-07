@@ -18,6 +18,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CATEGORY_META, MentorSlot, getMentor } from "@/lib/mentors";
 import { cn } from "@/lib/utils";
+import { useSubscription, BOOKING_PRICE } from "@/hooks/useSubscription";
+import { SubscribeDialog } from "@/components/SubscribeDialog";
+import { Crown } from "lucide-react";
 
 type BookingType = "individual" | "class";
 
@@ -78,6 +81,22 @@ function MentorDetailPage() {
     setErrors({});
   };
 
+  const sub = useSubscription();
+  const [paywallOpen, setPaywallOpen] = useState(false);
+  const [paid, setPaid] = useState(false); // 單次付費完成 flag
+
+  const handleStartBooking = () => {
+    if (sub.canBookFree) {
+      setStep("type");
+      return;
+    }
+    if (paid) {
+      setStep("type");
+      return;
+    }
+    setPaywallOpen(true);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const errs: typeof errors = {};
@@ -93,6 +112,8 @@ function MentorDetailPage() {
     }
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
+    // 訂閱會員消耗一次配額；單次付費者已在 paid flag 內處理
+    if (sub.canBookFree) sub.consumeBooking();
     setStep("done");
   };
 
@@ -187,17 +208,43 @@ function MentorDetailPage() {
 
       {/* Floating CTA */}
       {step === "idle" && (
-        <div className="fixed bottom-20 left-1/2 z-40 w-full max-w-md -translate-x-1/2 px-5">
+        <div className="fixed bottom-20 left-1/2 z-40 w-full max-w-md -translate-x-1/2 space-y-2 px-5">
+          <div className="flex items-center justify-between gap-2 rounded-2xl border border-border bg-card/95 px-3.5 py-2 shadow-[var(--shadow-card)] backdrop-blur">
+            <div className="flex items-center gap-2">
+              <Crown className={`h-3.5 w-3.5 ${sub.isSubscribed ? "text-primary-deep" : "text-muted-foreground"}`} />
+              <span className="text-[11px] leading-tight">
+                {sub.isSubscribed ? (
+                  <>PRO 會員・本月剩 <b className="text-primary-deep tabular-nums">{sub.bookingsRemaining}</b> / {sub.bookingsLimit} 次免費</>
+                ) : paid ? (
+                  <>已付費 <b className="text-primary-deep">NT${BOOKING_PRICE}</b>，可填寫報名</>
+                ) : (
+                  <>單次體驗 <b className="text-primary-deep">NT${BOOKING_PRICE}</b>　或　訂閱 PRO 每月 5 次免費</>
+                )}
+              </span>
+            </div>
+          </div>
           <Button
             className="w-full bg-[image:var(--gradient-hero)] text-base shadow-[var(--shadow-float)]"
             size="lg"
-            onClick={() => setStep("type")}
+            onClick={handleStartBooking}
             disabled={!mentor.available}
           >
-            {mentor.available ? "報名體驗" : "目前無可預約時段"}
+            {!mentor.available
+              ? "目前無可預約時段"
+              : sub.canBookFree || paid
+                ? "報名體驗"
+                : `付費報名 NT$${BOOKING_PRICE}`}
           </Button>
         </div>
       )}
+
+      <SubscribeDialog
+        open={paywallOpen}
+        onClose={() => setPaywallOpen(false)}
+        reason="booking"
+        onPaid={() => { setPaid(true); setStep("type"); }}
+      />
+
 
       {/* Booking sheet */}
       {step !== "idle" && (
