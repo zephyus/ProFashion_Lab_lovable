@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut, FileText, GraduationCap, Users, Crown } from "lucide-react";
+import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut, FileText, GraduationCap, Users, Crown, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useXp } from "@/hooks/useXp";
 import { useRoles } from "@/hooks/useRoles";
 import { useSubscription, FREE_AI_CALL_LIMIT, SUB_BOOKING_LIMIT } from "@/hooks/useSubscription";
-import { useEffect, useState } from "react";
+import { useActivity, STATION_LABEL, type Station } from "@/hooks/useActivity";
 
 export const Route = createFileRoute("/_app/")({
   head: () => ({
@@ -18,29 +18,12 @@ export const Route = createFileRoute("/_app/")({
   component: HomePage,
 });
 
-// —— 訪問次數追蹤（demo） ——
-function readVisits(): Record<string, number> {
-  if (typeof window === "undefined") return {};
-  try { return JSON.parse(localStorage.getItem("pfl_visits_v1") || "{}"); } catch { return {}; }
-}
-
 function HomePage() {
   const { user, loading } = useAuth();
   const { isTeacher } = useRoles();
   const { xp, completed, tierName } = useXp();
   const sub = useSubscription();
-  const [visits, setVisits] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    setVisits(readVisits());
-    const on = () => setVisits(readVisits());
-    window.addEventListener("storage", on);
-    window.addEventListener("visits:update", on);
-    return () => {
-      window.removeEventListener("storage", on);
-      window.removeEventListener("visits:update", on);
-    };
-  }, []);
+  const { activities, clear, countsByStation, total } = useActivity();
 
   const displayName =
     (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ??
@@ -55,13 +38,15 @@ function HomePage() {
     toast.success("已登出");
   };
 
-  // —— 各站進度（demo 推算） ——
-  const explorePct = Math.min(100, completed * 12);
-  const cafePct = Math.min(100, (visits.cafe ?? 0) * 25);
-  const mapPct = Math.min(100, Math.round((sub.bookingsUsed / SUB_BOOKING_LIMIT) * 100));
+  // —— 各站進度（綜合活動次數 + 訂閱配額） ——
+  const explorePct = Math.min(100, completed * 12 + (countsByStation.explore ?? 0) * 4);
+  const cafePct = Math.min(100, (countsByStation.cafe ?? 0) * 10);
+  const mapPct = sub.isSubscribed
+    ? Math.min(100, Math.round((sub.bookingsUsed / SUB_BOOKING_LIMIT) * 100) + (countsByStation.map ?? 0) * 6)
+    : Math.min(100, (countsByStation.map ?? 0) * 12);
   const callPct = sub.isSubscribed
-    ? Math.min(100, ((visits.call ?? 0) * 20))
-    : Math.min(100, Math.round((sub.aiCallsUsed / FREE_AI_CALL_LIMIT) * 100));
+    ? Math.min(100, (countsByStation.call ?? 0) * 10)
+    : Math.min(100, Math.round((sub.aiCallsUsed / FREE_AI_CALL_LIMIT) * 100) + (countsByStation.call ?? 0) * 5);
   const overall = Math.round((explorePct + cafePct + mapPct + callPct) / 4);
 
   const stations = [
@@ -250,6 +235,87 @@ function HomePage() {
         </div>
       </section>
 
+      {/* 活動紀錄 */}
+      <section
+        className="mb-6 rounded-[28px] border border-black/5 bg-white p-5 shadow-sm animate-rise"
+        style={{ animationDelay: "200ms" }}
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h3 className="text-[11px] font-semibold tracking-wide text-teal-600">活動紀錄</h3>
+            <p className="mt-0.5 text-[11px] text-neutral-500">
+              {total === 0 ? "尚無紀錄" : `共 ${total} 筆，登入與否皆儲存於此裝置`}
+            </p>
+          </div>
+          {total > 0 && (
+            <button
+              onClick={() => { clear(); toast.success("已清空紀錄"); }}
+              className="press inline-flex items-center gap-1 rounded-full border border-black/5 bg-[#f2f2f7] px-2.5 py-1 text-[11px] font-medium text-neutral-600 hover:bg-neutral-200"
+            >
+              <Trash2 className="h-3 w-3" /> 清空
+            </button>
+          )}
+        </div>
+
+        {total === 0 ? (
+          <p className="rounded-2xl bg-[#f2f2f7] px-4 py-6 text-center text-[13px] text-neutral-500">
+            點開任一站點，就會自動記錄你的探索軌跡。
+          </p>
+        ) : (
+          <>
+            <div className="mb-4 grid grid-cols-4 gap-2">
+              {(["explore", "cafe", "map", "call"] as Station[]).map((s) => (
+                <div key={s} className="rounded-xl bg-[#f2f2f7] px-2 py-2.5 text-center">
+                  <p className="truncate text-[10px] text-neutral-500">{STATION_LABEL[s]}</p>
+                  <p className="mt-0.5 text-[15px] font-bold tabular-nums text-neutral-900">
+                    {countsByStation[s] ?? 0}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <ul className="max-h-[420px] divide-y divide-black/5 overflow-y-auto">
+              {activities.slice(0, 30).map((a) => (
+                <li key={a.id} className="flex gap-3 py-2.5">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-700">
+                    {a.station === "explore" ? <Sparkles className="h-4 w-4" /> :
+                      a.station === "cafe" ? <Coffee className="h-4 w-4" /> :
+                      a.station === "map" ? <MapPin className="h-4 w-4" /> :
+                      a.station === "call" ? <Phone className="h-4 w-4" /> :
+                      <FileText className="h-4 w-4" />}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className="truncate text-[13px] font-semibold text-neutral-900">
+                        {STATION_LABEL[a.station]}
+                      </p>
+                      <time className="shrink-0 text-[10px] tabular-nums text-neutral-500">
+                        {formatTs(a.ts)}
+                      </time>
+                    </div>
+                    <p className="mt-0.5 line-clamp-2 text-[12px] text-neutral-600">
+                      {a.detail ?? a.type}
+                      {typeof a.xp === "number" && a.xp > 0 && (
+                        <span className="ml-1.5 inline-flex items-center rounded-full bg-teal-600/10 px-1.5 py-px text-[10px] font-bold text-teal-700">
+                          +{a.xp} XP
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            {activities.length > 30 && (
+              <p className="mt-2 text-center text-[11px] text-neutral-400">
+                顯示最近 30 筆 / 共 {activities.length} 筆
+              </p>
+            )}
+          </>
+        )}
+      </section>
+
+
+
       {/* 訂閱狀態（已登入且已訂閱） */}
       {user && sub.isSubscribed && (
         <div className="mb-4 animate-rise" style={{ animationDelay: "220ms" }}>
@@ -342,6 +408,16 @@ function HomePage() {
     </div>
   );
 }
+
+function formatTs(ts: number): string {
+  const d = new Date(ts);
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  if (sameDay) return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 
 
 

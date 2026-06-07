@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { useSubscription, BOOKING_PRICE } from "@/hooks/useSubscription";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { Crown } from "lucide-react";
+import { logActivity } from "@/hooks/useActivity";
 
 type BookingType = "individual" | "class";
 
@@ -51,6 +52,9 @@ function MentorDetailPage() {
   const { mentorId } = Route.useParams();
   const mentor = getMentor(mentorId)!;
   const navigate = useNavigate();
+  useEffect(() => {
+    logActivity({ station: "map", type: "view_mentor", detail: `查看 ${mentor.name}・${mentor.job}` });
+  }, [mentor.name, mentor.job]);
   const [step, setStep] = useState<Step>("idle");
   const [bookingType, setBookingType] = useState<BookingType | null>(null);
   const [slot, setSlot] = useState<MentorSlot | null>(null);
@@ -114,6 +118,11 @@ function MentorDetailPage() {
     if (Object.keys(errs).length > 0) return;
     // 訂閱會員消耗一次配額；單次付費者已在 paid flag 內處理
     if (sub.canBookFree) sub.consumeBooking();
+    logActivity({
+      station: "map",
+      type: "booking",
+      detail: `預約 ${mentor.name}${slot ? `・${slot.date} ${slot.time}` : ""}${bookingType === "class" ? `（${school} ${className}）` : ""}`,
+    });
     setStep("done");
   };
 

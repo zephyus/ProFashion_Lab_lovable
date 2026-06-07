@@ -15,6 +15,7 @@ import {
 import { splitTextForTts } from "@/lib/local-tts/wav";
 import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useTrackVisit, logActivity } from "@/hooks/useActivity";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
 import { Crown } from "lucide-react";
 
@@ -197,6 +198,7 @@ const hybridPersonas: Persona[] = [
 ];
 
 function CallPage() {
+  useTrackVisit("call");
   const [mode, setMode] = useState<Mode>("real");
   const [active, setActive] = useState<Persona | null>(null);
   const [activeIdx, setActiveIdx] = useState(0);
@@ -392,6 +394,11 @@ function CallPage() {
     synthSeqRef.current++;
     // 留存通話紀錄（至少聽完一句才記）；未登入或失敗都靜默
     if (active && (lineIdx > 0 || chat.length > 0)) {
+      logActivity({
+        station: "call",
+        type: "call_completed",
+        detail: `與 ${active.name}・${active.job} 通話 ${seconds} 秒（${chat.length} 訊息）`,
+      });
       void saveCallFn({
         data: {
           persona_id: active.id,

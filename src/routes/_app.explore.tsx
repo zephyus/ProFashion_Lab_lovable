@@ -4,6 +4,7 @@ import { Gamepad2, Trophy, ChevronRight, Briefcase, RefreshCw } from "lucide-rea
 import ExploreQuiz from "../components/ExploreQuiz";
 import { internMissions } from "../lib/intern-missions";
 import { useXp } from "@/hooks/useXp";
+import { useTrackVisit, logActivity } from "@/hooks/useActivity";
 
 export const Route = createFileRoute("/_app/explore")({
   head: () => ({ meta: [{ title: "發現 — 職感 Zhígǎn" }] }),
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/_app/explore")({
 type Game = "menu" | "quiz" | "intern";
 
 function ExplorePage() {
+  useTrackVisit("explore");
   const [game, setGame] = useState<Game>("menu");
 
   // —— 測驗 ——
@@ -116,6 +118,7 @@ function InternGame({ onBack }: { onBack: () => void }) {
     const gain = which === "A" ? mission.rewardA : mission.rewardB;
     const text = which === "A" ? mission.successA : mission.successB;
     addXp(gain);
+    logActivity({ station: "explore", type: "intern_choice", detail: `${mission.title}：${text}`, xp: gain });
     setResult({ text, gain });
   };
 

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Heart, MessageCircle, Send, Briefcase } from "lucide-react";
+import { useTrackVisit, logActivity } from "@/hooks/useActivity";
 
 export const Route = createFileRoute("/_app/cafe")({
   head: () => ({ meta: [{ title: "故事 — 職感 Zhígǎn" }] }),
@@ -38,14 +39,22 @@ const initial: Post[] = [
 ];
 
 function CafePage() {
+  useTrackVisit("cafe");
   const [posts, setPosts] = useState(initial);
   const [openId, setOpenId] = useState<number | null>(null);
   const [draft, setDraft] = useState("");
 
-  const toggleLike = (id: number) => setPosts((p) => p.map((x) => x.id === id ? { ...x, liked: !x.liked, likes: x.likes + (x.liked ? -1 : 1) } : x));
+  const toggleLike = (id: number) => setPosts((p) => p.map((x) => {
+    if (x.id !== id) return x;
+    const liked = !x.liked;
+    if (liked) logActivity({ station: "cafe", type: "like_post", detail: `按讚 ${x.author}・${x.role}` });
+    return { ...x, liked, likes: x.likes + (liked ? 1 : -1) };
+  }));
   const addComment = (id: number) => {
     if (!draft.trim()) return;
+    const post = posts.find((x) => x.id === id);
     setPosts((p) => p.map((x) => x.id === id ? { ...x, comments: [...x.comments, { user: "你", text: draft }] } : x));
+    if (post) logActivity({ station: "cafe", type: "comment", detail: `對 ${post.author}：${draft.slice(0, 30)}` });
     setDraft("");
   };
 

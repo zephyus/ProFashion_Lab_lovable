@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/carousel";
 import { CATEGORY_META, MENTORS, MentorCategory } from "@/lib/mentors";
 import { cn } from "@/lib/utils";
+import { useTrackVisit } from "@/hooks/useActivity";
 
 export const Route = createFileRoute("/_app/map")({
   head: () => ({ meta: [{ title: "地圖 — 職感 Zhígǎn" }] }),
@@ -28,6 +29,7 @@ const FILTERS: { key: Filter; label: string }[] = [
 ];
 
 function MapPage() {
+  useTrackVisit("map");
   const { pathname } = useLocation();
   const [filter, setFilter] = useState<Filter>("all");
   const [api, setApi] = useState<CarouselApi | null>(null);

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronRight, RotateCcw, ArrowLeft } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { saveQuizResult } from "@/lib/portfolio.functions";
+import { logActivity } from "@/hooks/useActivity";
 
 // 不對外暴露量表名稱：內部使用代號
 // H_* 為 Holland 六型；P_* 為人格傾向；C_* 為核心職能
@@ -176,6 +177,11 @@ export default function ExploreQuiz({ onBack }: ExploreQuizProps) {
     if (!done || savedRef.current) return;
     savedRef.current = true;
     const r = analyze(scores);
+    logActivity({
+      station: "explore",
+      type: "quiz_completed",
+      detail: `${r.typeName}・核心：${r.core[0].key}・方向：${r.careers.slice(0, 3).join("、")}`,
+    });
     saveQuiz({
       data: {
         archetype: r.typeName,
