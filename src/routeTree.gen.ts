@@ -16,6 +16,7 @@ import { Route as AppTeacherSignupRouteImport } from './routes/_app.teacher-sign
 import { Route as AppPortfolioRouteImport } from './routes/_app.portfolio'
 import { Route as AppMapRouteImport } from './routes/_app.map'
 import { Route as AppJoinRouteImport } from './routes/_app.join'
+import { Route as AppInboxRouteImport } from './routes/_app.inbox'
 import { Route as AppExploreRouteImport } from './routes/_app.explore'
 import { Route as AppCallRouteImport } from './routes/_app.call'
 import { Route as AppCafeRouteImport } from './routes/_app.cafe'
@@ -57,6 +58,11 @@ const AppJoinRoute = AppJoinRouteImport.update({
   path: '/join',
   getParentRoute: () => AppRoute,
 } as any)
+const AppInboxRoute = AppInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppExploreRoute = AppExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/cafe': typeof AppCafeRoute
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
+  '/inbox': typeof AppInboxRoute
   '/join': typeof AppJoinRoute
   '/map': typeof AppMapRouteWithChildren
   '/portfolio': typeof AppPortfolioRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/cafe': typeof AppCafeRoute
   '/call': typeof AppCallRoute
   '/explore': typeof AppExploreRoute
+  '/inbox': typeof AppInboxRoute
   '/join': typeof AppJoinRoute
   '/map': typeof AppMapRouteWithChildren
   '/portfolio': typeof AppPortfolioRoute
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/_app/cafe': typeof AppCafeRoute
   '/_app/call': typeof AppCallRoute
   '/_app/explore': typeof AppExploreRoute
+  '/_app/inbox': typeof AppInboxRoute
   '/_app/join': typeof AppJoinRoute
   '/_app/map': typeof AppMapRouteWithChildren
   '/_app/portfolio': typeof AppPortfolioRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/cafe'
     | '/call'
     | '/explore'
+    | '/inbox'
     | '/join'
     | '/map'
     | '/portfolio'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/cafe'
     | '/call'
     | '/explore'
+    | '/inbox'
     | '/join'
     | '/map'
     | '/portfolio'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/_app/cafe'
     | '/_app/call'
     | '/_app/explore'
+    | '/_app/inbox'
     | '/_app/join'
     | '/_app/map'
     | '/_app/portfolio'
@@ -234,6 +246,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppJoinRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/inbox': {
+      id: '/_app/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AppInboxRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/explore': {
       id: '/_app/explore'
       path: '/explore'
@@ -294,6 +313,7 @@ interface AppRouteChildren {
   AppCafeRoute: typeof AppCafeRoute
   AppCallRoute: typeof AppCallRoute
   AppExploreRoute: typeof AppExploreRoute
+  AppInboxRoute: typeof AppInboxRoute
   AppJoinRoute: typeof AppJoinRoute
   AppMapRoute: typeof AppMapRouteWithChildren
   AppPortfolioRoute: typeof AppPortfolioRoute
@@ -307,6 +327,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCafeRoute: AppCafeRoute,
   AppCallRoute: AppCallRoute,
   AppExploreRoute: AppExploreRoute,
+  AppInboxRoute: AppInboxRoute,
   AppJoinRoute: AppJoinRoute,
   AppMapRoute: AppMapRouteWithChildren,
   AppPortfolioRoute: AppPortfolioRoute,
@@ -325,3 +346,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
