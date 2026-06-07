@@ -179,8 +179,8 @@ function HomePage() {
         </div>
       </Link>
 
-      {/* ============ 子視窗 1：職感進行室（儀表板 + 雷達 + 學群分析） ============ */}
-      <ChamberCard title="職感進行室" icon={Beaker} delay={120}>
+      {/* ============ 子視窗 1：進行室（儀表板 + 雷達 + 學群分析） ============ */}
+      <ChamberCard title="進行室" delay={120}>
         <div className="grid grid-cols-[1fr_auto] items-center gap-3">
           <RadarChart
             values={[explorePct, cafePct, mapPct, callPct]}
