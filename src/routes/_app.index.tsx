@@ -181,23 +181,17 @@ function HomePage() {
 
       {/* ============ 子視窗 1：進行室（儀表板 + 雷達 + 學群分析） ============ */}
       <ChamberCard delay={120}>
-        <div className="grid grid-cols-[1fr_auto] items-center gap-3">
-          <RadarChart
-            values={[explorePct, cafePct, mapPct, callPct]}
-            labels={["發現小秘 me", "職業咖啡館", "職圖", "您撥的號碼是未來"]}
-          />
-          <div className="flex flex-col gap-1.5 text-[11px]">
-            {stations.map((s) => (
-              <Link
-                key={s.key}
-                to={s.to}
-                className="press flex items-center justify-between gap-2 rounded-lg bg-primary-soft px-2 py-1.5 transition hover:bg-primary-soft/70"
-              >
-                <span className="font-semibold text-foreground">{s.title}</span>
-                <span className="tabular-nums font-bold text-primary-deep">{s.pct}%</span>
-              </Link>
-            ))}
-          </div>
+        <div className="grid grid-cols-2 gap-2 text-[11px]">
+          {stations.map((s) => (
+            <Link
+              key={s.key}
+              to={s.to}
+              className="press flex flex-col items-center gap-1 rounded-lg bg-primary-soft px-2 py-2.5 transition hover:bg-primary-soft/70"
+            >
+              <span className="font-semibold text-foreground">{s.title}</span>
+              <span className="tabular-nums font-bold text-primary-deep">{s.pct}%</span>
+            </Link>
+          ))}
         </div>
 
         {/* 綜合分析：適合的學群 */}
@@ -240,9 +234,9 @@ function HomePage() {
 
 
 
-      {/* 訂閱方案 */}
-      <div className="mt-4 animate-rise" style={{ animationDelay: "220ms" }}>
-        {sub.isSubscribed ? (
+      {/* 訂閱狀態（已登入） */}
+      {user && sub.isSubscribed && (
+        <div className="mt-4 animate-rise" style={{ animationDelay: "220ms" }}>
           <div className="rounded-2xl bg-[image:var(--gradient-hero)] p-4 text-primary-foreground shadow-[var(--shadow-card)]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -259,25 +253,8 @@ function HomePage() {
               AI 語音無限 ・ 職圖本月剩 {sub.bookingsRemaining} / {sub.bookingsLimit} 次免費
             </p>
           </div>
-        ) : (
-          <button
-            onClick={() => { sub.subscribe(); toast.success(`已升級訂閱（demo）— NT$${SUB_PRICE}/月`); }}
-            className="press flex w-full items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary-soft px-4 py-3.5 text-left">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[image:var(--gradient-hero)] text-primary-foreground">
-                <Crown className="h-[18px] w-[18px]" strokeWidth={1.9} />
-              </div>
-              <div>
-                <p className="text-subhead font-semibold text-foreground">升級 職感 PRO</p>
-                <p className="text-caption text-muted-foreground">
-                  AI 語音無限・職圖每月 5 次　NT${SUB_PRICE}/月
-                </p>
-              </div>
-            </div>
-            <ArrowRight className="h-4 w-4 text-primary-deep" />
-          </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* 已登入：學習歷程 + 教師入口 */}
       {user && (
@@ -325,12 +302,29 @@ function HomePage() {
       )}
 
       {!user && !loading && (
-        <Link to="/login"
-          className="press mt-6 flex items-center justify-between rounded-2xl bg-primary px-5 py-4 text-primary-foreground animate-rise"
-          style={{ animationDelay: "260ms" }}>
-          <p className="text-subhead font-semibold">登入以保留你的軌跡</p>
-          <ArrowRight className="h-5 w-5" strokeWidth={2} />
-        </Link>
+        <div className="mt-6 space-y-3 animate-rise" style={{ animationDelay: "260ms" }}>
+          <button
+            onClick={() => { sub.subscribe(); toast.success(`已升級訂閱（demo）— NT$${SUB_PRICE}/月`); }}
+            className="press flex w-full items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary-soft px-4 py-3.5 text-left">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[image:var(--gradient-hero)] text-primary-foreground">
+                <Crown className="h-[18px] w-[18px]" strokeWidth={1.9} />
+              </div>
+              <div>
+                <p className="text-subhead font-semibold text-foreground">升級 職感 PRO</p>
+                <p className="text-caption text-muted-foreground">
+                  AI 語音無限・職圖每月 5 次　NT${SUB_PRICE}/月
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-primary-deep" />
+          </button>
+          <Link to="/login"
+            className="press flex items-center justify-between rounded-2xl bg-primary px-5 py-4 text-primary-foreground">
+            <p className="text-subhead font-semibold">登入以保留你的軌跡</p>
+            <ArrowRight className="h-5 w-5" strokeWidth={2} />
+          </Link>
+        </div>
       )}
 
       <div className="h-12" />
@@ -352,105 +346,6 @@ function ChamberCard({
     >
       <div className="relative">{children}</div>
     </section>
-  );
-}
-
-// —— 雷達圖（純 SVG，4 軸） ——
-function RadarChart({ values, labels }: { values: number[]; labels: string[] }) {
-  const size = 200;
-  const cx = size / 2;
-  const cy = size / 2;
-  const r = 52;
-  const n = values.length;
-  const angle = (i: number) => (Math.PI * 2 * i) / n - Math.PI / 2;
-  const pt = (i: number, v: number) => {
-    const a = angle(i);
-    const rr = (Math.max(0, Math.min(100, v)) / 100) * r;
-    return [cx + Math.cos(a) * rr, cy + Math.sin(a) * rr] as const;
-  };
-  const ringPoints = (p: number) =>
-    Array.from({ length: n }, (_, i) => {
-      const [x, y] = pt(i, p);
-      return `${x},${y}`;
-    }).join(" ");
-  const dataPoints = values.map((v, i) => pt(i, v).join(",")).join(" ");
-
-  return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[200px]">
-      {[25, 50, 75, 100].map((p) => (
-        <polygon
-          key={p}
-          fill="none"
-          stroke="var(--color-primary-deep)"
-          strokeOpacity="0.18"
-          points={ringPoints(p)}
-        />
-      ))}
-      {Array.from({ length: n }, (_, i) => {
-        const [x, y] = pt(i, 100);
-        return (
-          <line
-            key={i}
-            x1={cx}
-            y1={cy}
-            x2={x}
-            y2={y}
-            stroke="var(--color-primary-deep)"
-            strokeOpacity="0.15"
-          />
-        );
-      })}
-      <polygon
-        points={dataPoints}
-        fill="var(--color-primary)"
-        fillOpacity="0.45"
-        stroke="var(--color-primary-deep)"
-        strokeWidth="1.5"
-      />
-      {[25, 50, 75, 100].map((p) => {
-        const [x, y] = pt(0, p);
-        return (
-          <text
-            key={p}
-            x={x + 3}
-            y={y - 1}
-            fontSize="6.5"
-            fill="var(--color-muted-foreground)"
-            textAnchor="start"
-          >
-            {p}
-          </text>
-        );
-      })}
-      {values.map((_, i) => {
-        const [x, y] = pt(i, 100);
-        const lx = cx + (x - cx) * 1.32;
-        const ly = cy + (y - cy) * 1.32;
-        return (
-          <text
-            key={i}
-            x={lx}
-            y={ly}
-            fontSize="8.5"
-            fontWeight="600"
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fill="var(--color-foreground)"
-          >
-            {labels[i]}
-          </text>
-        );
-      })}
-      <text
-        x={size - 4}
-        y={size - 4}
-        fontSize="7"
-        fill="var(--color-muted-foreground)"
-        textAnchor="end"
-      >
-        單位：完成進度 (%)
-      </text>
-    </svg>
   );
 }
 
