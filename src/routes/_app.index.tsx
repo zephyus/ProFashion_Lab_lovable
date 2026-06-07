@@ -311,48 +311,27 @@ function HomePage() {
 
 // —— 化學實驗室風格子視窗外殼 ——
 function ChamberCard({
-  index, title, subtitle, icon: Icon, delay, children,
+  title, icon: Icon, delay, children,
 }: {
-  index: string;
   title: string;
-  subtitle: string;
   icon: typeof FlaskConical;
   delay: number;
   children: React.ReactNode;
 }) {
   return (
     <section
-      className="relative mt-5 overflow-hidden rounded-3xl border border-primary/20 bg-card/70 p-4 shadow-[var(--shadow-card)] backdrop-blur-xl animate-rise"
+      className="relative mt-5 overflow-hidden rounded-3xl border border-primary/20 bg-card p-4 shadow-[var(--shadow-card)] animate-rise"
       style={{ animationDelay: `${delay}ms` }}
     >
-      {/* 玻璃反光光柱 */}
-      <div className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-primary/15 blur-3xl" aria-hidden />
-      <div className="pointer-events-none absolute -bottom-16 -left-8 h-32 w-32 rounded-full bg-primary-deep/10 blur-3xl" aria-hidden />
-      {/* 網格刻度 */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage:
-            "linear-gradient(var(--color-foreground) 1px, transparent 1px), linear-gradient(90deg, var(--color-foreground) 1px, transparent 1px)",
-          backgroundSize: "16px 16px",
-        }}
-        aria-hidden
-      />
-
-      <header className="relative mb-3 flex items-center justify-between border-b border-dashed border-primary/20 pb-3">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[image:var(--gradient-hero)] text-primary-foreground shadow-sm">
-            <Icon className="h-[16px] w-[16px]" strokeWidth={2} />
-          </div>
-          <div>
-            <p className="text-[13px] font-bold leading-tight text-foreground">{title}</p>
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">{subtitle}</p>
-          </div>
+      <header className="relative mb-3 flex items-center gap-2.5 border-b border-dashed border-primary/20 pb-3">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[image:var(--gradient-hero)] text-primary-foreground shadow-sm">
+          <Icon className="h-[16px] w-[16px]" strokeWidth={2} />
         </div>
-        <span className="font-mono text-[10px] tracking-widest text-primary-deep">No.{index}</span>
+        <p className="text-[14px] font-bold leading-tight text-foreground">{title}</p>
       </header>
 
       <div className="relative">{children}</div>
     </section>
   );
 }
+
