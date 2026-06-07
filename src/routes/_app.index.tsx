@@ -229,15 +229,15 @@ function HomePage() {
       </ChamberCard>
 
       {/* ============ 子視窗 2：未來室 ============ */}
-      <ChamberCard title="未來室" delay={180}>
+      <ChamberCard delay={180}>
         <div className="space-y-2">
-          <div className="rounded-xl bg-white/55 p-3 backdrop-blur-sm">
-            <p className="text-[11px] font-semibold text-primary-deep">現在</p>
-            <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nowTip}</p>
+          <div className="rounded-xl bg-white/10 p-3 backdrop-blur-sm">
+            <p className="text-[11px] font-semibold text-primary-foreground/80">現在</p>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-primary-foreground">{nowTip}</p>
           </div>
-          <div className="rounded-xl bg-white/55 p-3 backdrop-blur-sm">
-            <p className="text-[11px] font-semibold text-primary-deep">下一步</p>
-            <p className="mt-1 text-[12.5px] leading-relaxed text-foreground">{nextTip}</p>
+          <div className="rounded-xl bg-white/10 p-3 backdrop-blur-sm">
+            <p className="text-[11px] font-semibold text-primary-foreground/80">下一步</p>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-primary-foreground">{nextTip}</p>
           </div>
         </div>
       </ChamberCard>
