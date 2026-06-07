@@ -91,6 +91,32 @@ function HomePage() {
           ? "下一步：到「職圖」預約一場真人職人體驗。"
           : "下一步：匯出學習歷程，把調配結果留下來。";
 
+  // —— 綜合分析：12 年國教 18 學群配對 ——
+  const groupScores: Record<string, number> = {
+    "社會與心理學群": explorePct * 0.55 + callPct * 0.25,
+    "教育學群": explorePct * 0.5 + cafePct * 0.25,
+    "文史哲學群": explorePct * 0.45 + cafePct * 0.25,
+    "大眾傳播學群": cafePct * 0.55 + callPct * 0.3,
+    "管理學群": cafePct * 0.5 + mapPct * 0.3,
+    "財經學群": cafePct * 0.45 + mapPct * 0.35,
+    "資訊學群": mapPct * 0.55 + explorePct * 0.2,
+    "工程學群": mapPct * 0.5 + explorePct * 0.25,
+    "建築與設計學群": mapPct * 0.45 + explorePct * 0.3,
+    "外語學群": callPct * 0.6 + cafePct * 0.2,
+    "法政學群": callPct * 0.55 + cafePct * 0.25,
+    "藝術學群": callPct * 0.45 + explorePct * 0.3,
+    "醫藥衛生學群": explorePct * 0.4 + mapPct * 0.35,
+    "生命科學學群": explorePct * 0.35 + mapPct * 0.35,
+    "生物資源學群": mapPct * 0.4 + cafePct * 0.25,
+    "地球與環境學群": mapPct * 0.4 + explorePct * 0.25,
+    "數理化學群": mapPct * 0.45 + explorePct * 0.3,
+    "遊憩與運動學群": callPct * 0.4 + cafePct * 0.3,
+  };
+  const topGroups = Object.entries(groupScores)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+
+
 
   return (
     <div className="px-5 animate-page">
