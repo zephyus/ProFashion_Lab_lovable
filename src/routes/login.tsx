@@ -194,7 +194,32 @@ function LoginPage() {
               </div>
             </div>
 
+            {!sub.isSubscribed && (
+              <div className="mx-auto mt-4 w-full max-w-[320px] rounded-2xl border border-primary/15 bg-card p-4 shadow-[var(--shadow-card)]">
+                <p className="text-subhead font-semibold text-foreground">訂閱方案</p>
+                <div className="mt-3 rounded-xl border border-primary/20 bg-primary-soft p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-callout font-bold text-primary-deep">職感 PRO</p>
+                    <p className="text-title-2 font-bold text-primary-deep">NT${SUB_PRICE}<span className="text-[12px] font-medium text-muted-foreground">/月</span></p>
+                  </div>
+                  <ul className="mt-2 space-y-1 text-[12px] text-foreground">
+                    <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-primary-deep" />AI 語音對話無限次</li>
+                    <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-primary-deep" />職圖每月 5 次免費體驗</li>
+                    <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-primary-deep" />雲端同步學習歷程</li>
+                  </ul>
+                </div>
+                <button
+                  onClick={() => { sub.subscribe(); toast.success(`已選擇 PRO 方案（demo）— NT$${SUB_PRICE}/月`); }}
+                  className="press mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-hero)] px-4 py-3 text-callout font-semibold text-primary-foreground shadow-sm"
+                >
+                  <Crown className="h-4 w-4" strokeWidth={2} />
+                  選擇 PRO 方案
+                </button>
+              </div>
+            )}
+
             <div className="mx-auto mt-6 flex w-full max-w-[320px] flex-col gap-2">
+
               <button
                 onClick={() => navigate({ to: "/explore" })}
                 className="press rounded-xl bg-primary px-4 py-3 text-callout font-semibold text-primary-foreground"
