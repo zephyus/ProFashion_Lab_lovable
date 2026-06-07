@@ -228,8 +228,8 @@ function HomePage() {
         </div>
       </ChamberCard>
 
-      {/* ============ 子視窗 2：職感未來室 ============ */}
-      <ChamberCard title="職感未來室" icon={TestTube} delay={180}>
+      {/* ============ 子視窗 2：未來室 ============ */}
+      <ChamberCard title="未來室" delay={180}>
         <div className="space-y-2">
           <div className="rounded-xl bg-white/55 p-3 backdrop-blur-sm">
             <p className="text-[11px] font-semibold text-primary-deep">現在</p>
