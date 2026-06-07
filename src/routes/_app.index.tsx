@@ -347,7 +347,7 @@ function ChamberCard({
 }) {
   return (
     <section
-      className="relative mt-5 overflow-hidden rounded-2xl bg-primary-deep p-4 shadow-[var(--shadow-card)] animate-rise"
+      className="relative mt-5 overflow-hidden rounded-2xl border border-primary/15 bg-card p-4 shadow-[var(--shadow-card)] animate-rise"
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className="relative">{children}</div>
