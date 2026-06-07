@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Heart, MessageCircle, Send, Briefcase } from "lucide-react";
+import { useTrackVisit, logActivity } from "@/hooks/useActivity";
 
 export const Route = createFileRoute("/_app/cafe")({
   head: () => ({ meta: [{ title: "故事 — 職感 Zhígǎn" }] }),
