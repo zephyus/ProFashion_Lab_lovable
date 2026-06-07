@@ -32,6 +32,7 @@ function eventLabel(type: string): string {
 }
 
 function PortfolioPage() {
+  useTrackVisit("portfolio");
   const { user, loading: authLoading } = useAuth();
   const fetchPortfolio = useServerFn(getMyPortfolio);
   const [data, setData] = useState<PortfolioData | null>(null);
