@@ -179,19 +179,25 @@ function HomePage() {
         </div>
       </Link>
 
-      {/* ============ 子視窗 1：進行室（儀表板 + 學群分析） ============ */}
+      {/* ============ 子視窗 1：進行室（儀表板 + 雷達 + 學群分析） ============ */}
       <ChamberCard delay={120}>
-        <div className="flex flex-col gap-1.5 text-[11px]">
-          {stations.map((s) => (
-            <Link
-              key={s.key}
-              to={s.to}
-              className="press flex items-center justify-between gap-2 rounded-lg bg-primary-soft px-2 py-1.5 transition hover:bg-primary-soft/70"
-            >
-              <span className="font-semibold text-foreground">{s.title}</span>
-              <span className="tabular-nums font-bold text-primary-deep">{s.pct}%</span>
-            </Link>
-          ))}
+        <div className="grid grid-cols-[1fr_auto] items-center gap-3">
+          <RadarChart
+            values={[explorePct, cafePct, mapPct, callPct]}
+            labels={["發現小秘 me", "職業咖啡館", "職圖", "您撥的號碼是未來"]}
+          />
+          <div className="flex flex-col gap-1.5 text-[11px]">
+            {stations.map((s) => (
+              <Link
+                key={s.key}
+                to={s.to}
+                className="press flex items-center justify-between gap-2 rounded-lg bg-primary-soft px-2 py-1.5 transition hover:bg-primary-soft/70"
+              >
+                <span className="font-semibold text-foreground">{s.title}</span>
+                <span className="tabular-nums font-bold text-primary-deep">{s.pct}%</span>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* 綜合分析：適合的學群 */}
