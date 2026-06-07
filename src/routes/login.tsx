@@ -1,11 +1,14 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Trophy, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { useXp } from "@/hooks/useXp";
 import { supabase } from "@/integrations/supabase/client";
+import { ensureDemoParentSetup } from "@/lib/parent.functions";
+
 
 export const Route = createFileRoute("/login")({
   head: () => ({
