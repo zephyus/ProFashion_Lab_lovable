@@ -21,6 +21,8 @@ const rightTabs = [
   { to: "/call", label: "您撥的號碼是未來", icon: Phone },
 ] as const;
 
+const APP_NAV_OFFSET = "calc(104px + env(safe-area-inset-bottom))";
+
 function AppLayout() {
   const { pathname } = useLocation();
   const homeActive = pathname === "/" || pathname === "/_app" || pathname === "/_app/";
@@ -61,12 +63,15 @@ function AppLayout() {
   };
 
   return (
-    <div className="app-shell mx-auto flex min-h-screen max-w-md flex-col bg-background pb-[72px]">
-      <main className="flex-1">
+    <div
+      className="app-shell mx-auto flex min-h-screen max-w-md flex-col bg-background"
+      style={{ paddingBottom: APP_NAV_OFFSET }}
+    >
+      <main className="flex-1 pb-4">
         <Outlet />
       </main>
 
-      <nav className="app-shell-nav fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-border bg-card/85 backdrop-blur-xl print:hidden">
+      <nav className="app-shell-nav fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-border bg-card shadow-[0_-14px_28px_-20px_rgb(15_23_42_/_.22)] supports-[backdrop-filter]:bg-card/96 supports-[backdrop-filter]:backdrop-blur-xl print:hidden">
         <ul className="grid grid-cols-5 px-1">
           {leftTabs.map(renderTab)}
           <li key="lab-home">
