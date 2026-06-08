@@ -105,7 +105,7 @@ function HomePage() {
 
   return (
     <div
-      className="min-h-screen bg-[#f2f2f7] px-5 pb-8 text-neutral-900 animate-page"
+      className="min-h-full bg-[#f2f2f7] px-5 pb-8 text-neutral-900 animate-page"
       style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif" }}
     >
       {/* Top bar */}

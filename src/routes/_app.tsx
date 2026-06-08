@@ -21,7 +21,7 @@ const rightTabs = [
   { to: "/call", label: "您撥的號碼是未來", icon: Phone },
 ] as const;
 
-const APP_NAV_OFFSET = "calc(104px + env(safe-area-inset-bottom))";
+const APP_NAV_OFFSET = "calc(84px + env(safe-area-inset-bottom))";
 
 function AppLayout() {
   const { pathname } = useLocation();

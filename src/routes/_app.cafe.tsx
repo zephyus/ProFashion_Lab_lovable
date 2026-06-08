@@ -401,7 +401,7 @@ function CafePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[image:var(--gradient-soft)] px-5 pb-28 pt-10 text-foreground animate-page">
+    <div className="min-h-full bg-[image:var(--gradient-soft)] px-5 pb-28 pt-10 text-foreground animate-page">
       <header className="animate-rise">
         <p className="text-caption font-bold uppercase tracking-widest text-primary-deep">
           職業咖啡館
