@@ -1,11 +1,11 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Trophy, LogOut, Crown } from "lucide-react";
+import { ArrowLeft, Trophy, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { useXp } from "@/hooks/useXp";
-import { useSubscription, SUB_PRICE } from "@/hooks/useSubscription";
+import { SubscriptionPlanCard } from "@/components/SubscriptionPlanCard";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/login")({
@@ -22,7 +22,6 @@ function LoginPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { xp, completed, tierName } = useXp();
-  const sub = useSubscription();
   const [signingIn, setSigningIn] = useState(false);
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
@@ -194,32 +193,9 @@ function LoginPage() {
               </div>
             </div>
 
-            {!sub.isSubscribed && (
-              <div className="mx-auto mt-4 w-full max-w-[320px] rounded-2xl border border-primary/15 bg-card p-4 shadow-[var(--shadow-card)]">
-                <p className="text-subhead font-semibold text-foreground">訂閱方案</p>
-                <div className="mt-3 rounded-xl border border-primary/20 bg-primary-soft p-3">
-                  <div className="flex items-center justify-between">
-                    <p className="text-callout font-bold text-primary-deep">職感 PRO</p>
-                    <p className="text-title-2 font-bold text-primary-deep">NT${SUB_PRICE}<span className="text-[12px] font-medium text-muted-foreground">/月</span></p>
-                  </div>
-                  <ul className="mt-2 space-y-1 text-[12px] text-foreground">
-                    <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-primary-deep" />AI 語音對話無限次</li>
-                    <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-primary-deep" />職圖每月 5 次免費體驗</li>
-                    <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-primary-deep" />雲端同步學習歷程</li>
-                  </ul>
-                </div>
-                <button
-                  onClick={() => { sub.subscribe(); toast.success(`已選擇 PRO 方案（demo）— NT$${SUB_PRICE}/月`); }}
-                  className="press mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-hero)] px-4 py-3 text-callout font-semibold text-primary-foreground shadow-sm"
-                >
-                  <Crown className="h-4 w-4" strokeWidth={2} />
-                  選擇 PRO 方案
-                </button>
-              </div>
-            )}
+            <SubscriptionPlanCard className="mx-auto mt-4 w-full max-w-[320px]" />
 
             <div className="mx-auto mt-6 flex w-full max-w-[320px] flex-col gap-2">
-
               <button
                 onClick={() => navigate({ to: "/explore" })}
                 className="press rounded-xl bg-primary px-4 py-3 text-callout font-semibold text-primary-foreground"
@@ -314,31 +290,7 @@ function LoginPage() {
                 </div>
               </div>
 
-              {!sub.isSubscribed && (
-                <div className="mt-5 rounded-2xl border border-primary/15 bg-card p-4 shadow-[var(--shadow-card)]">
-                  <p className="text-subhead font-semibold text-foreground">訂閱方案</p>
-                  <div className="mt-3 rounded-xl border border-primary/20 bg-primary-soft p-3">
-                    <div className="flex items-center justify-between">
-                      <p className="text-callout font-bold text-primary-deep">職感 PRO</p>
-                      <p className="text-title-2 font-bold text-primary-deep">NT${SUB_PRICE}<span className="text-[12px] font-medium text-muted-foreground">/月</span></p>
-                    </div>
-                    <ul className="mt-2 space-y-1 text-[12px] text-foreground">
-                      <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-primary-deep" />AI 語音對話無限次</li>
-                      <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-primary-deep" />職圖每月 5 次免費體驗</li>
-                      <li className="flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-primary-deep" />雲端同步學習歷程</li>
-                    </ul>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => { sub.subscribe(); toast.success(`已選擇 PRO 方案（demo）— NT$${SUB_PRICE}/月`); }}
-                    className="press mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[image:var(--gradient-hero)] px-4 py-3 text-callout font-semibold text-primary-foreground shadow-sm"
-                  >
-                    <Crown className="h-4 w-4" strokeWidth={2} />
-                    選擇 PRO 方案
-                  </button>
-                </div>
-              )}
-
+              <SubscriptionPlanCard className="mt-5" />
 
               <p className="mt-4 text-center text-caption">
                 {mode === "signin" ? "還沒有帳號？" : "已經有帳號？"}
@@ -358,11 +310,8 @@ function LoginPage() {
         )}
       </div>
 
-
       <footer className="pb-8">
-        <p className="text-center text-caption">
-          登入即表示同意服務條款與隱私權政策
-        </p>
+        <p className="text-center text-caption">登入即表示同意服務條款與隱私權政策</p>
       </footer>
     </div>
   );

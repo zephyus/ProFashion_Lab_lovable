@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-const KEY = "pfl_activity_v1";
+const KEY = "pfl_activity_v3";
 const MAX = 200;
 
 export type Station = "explore" | "cafe" | "map" | "call" | "portfolio" | "lab";
