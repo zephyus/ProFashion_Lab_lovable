@@ -1,5 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Trophy, ArrowRight, Sparkles, Coffee, MapPin, Phone, LogOut, FileText, GraduationCap, Users, Crown } from "lucide-react";
+import {
+  Trophy,
+  ArrowRight,
+  Sparkles,
+  Coffee,
+  MapPin,
+  Phone,
+  LogOut,
+  FileText,
+  GraduationCap,
+  Users,
+  Crown,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,7 +24,11 @@ export const Route = createFileRoute("/_app/")({
   head: () => ({
     meta: [
       { title: "ProFashion Lab — 四種方式探索職涯" },
-      { name: "description", content: "發現小秘me、職業咖啡館、職圖、您撥的號碼是未來——四種方式，把模糊的未來變成具體的下一步。" },
+      {
+        name: "description",
+        content:
+          "發現小秘me、職業咖啡館、職圖、您撥的號碼是未來——四種方式，把模糊的未來變成具體的下一步。",
+      },
     ],
   }),
   component: HomePage,
@@ -34,7 +50,10 @@ function HomePage() {
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) { toast.error("登出失敗，請再試一次"); return; }
+    if (error) {
+      toast.error("登出失敗，請再試一次");
+      return;
+    }
     toast.success("已登出");
   };
 
@@ -42,11 +61,17 @@ function HomePage() {
   const explorePct = Math.min(100, completed * 12 + (countsByStation.explore ?? 0) * 4);
   const cafePct = Math.min(100, (countsByStation.cafe ?? 0) * 10);
   const mapPct = sub.isSubscribed
-    ? Math.min(100, Math.round((sub.bookingsUsed / SUB_BOOKING_LIMIT) * 100) + (countsByStation.map ?? 0) * 6)
+    ? Math.min(
+        100,
+        Math.round((sub.bookingsUsed / SUB_BOOKING_LIMIT) * 100) + (countsByStation.map ?? 0) * 6,
+      )
     : Math.min(100, (countsByStation.map ?? 0) * 12);
   const callPct = sub.isSubscribed
     ? Math.min(100, (countsByStation.call ?? 0) * 10)
-    : Math.min(100, Math.round((sub.aiCallsUsed / FREE_AI_CALL_LIMIT) * 100) + (countsByStation.call ?? 0) * 5);
+    : Math.min(
+        100,
+        Math.round((sub.aiCallsUsed / FREE_AI_CALL_LIMIT) * 100) + (countsByStation.call ?? 0) * 5,
+      );
   const overall = Math.round((explorePct + cafePct + mapPct + callPct) / 4);
 
   const stations = [
@@ -56,57 +81,38 @@ function HomePage() {
     { key: "call", icon: Phone, title: "您撥的號碼是未來", to: "/call", pct: callPct },
   ] as const;
 
-  // —— 未來室：根據進度動態給出「現在 / 下一步」 ——
-  const lowest = [...stations].sort((a, b) => a.pct - b.pct)[0];
-  const highest = [...stations].sort((a, b) => b.pct - a.pct)[0];
-  const nowTip =
-    overall === 0
-      ? "尚未開始，挑一個站點試試。"
-      : overall < 40
-        ? `已啟動「${highest.title}」。`
-        : overall < 80
-          ? `「${highest.title}」進展良好。`
-          : "四站均衡，可整理成果。";
-  const nextTip =
-    overall === 0
-      ? "從「發現小秘 me」開始。"
-      : lowest.pct < 40
-        ? `補強「${lowest.title}」。`
-        : sub.bookingsUsed === 0
-          ? "到「職圖」預約職人。"
-          : "匯出學習歷程。";
-
   // —— 綜合分析：12 年國教 18 學群配對 ——
   const groupScores: Record<string, number> = {
-    "社會與心理學群": explorePct * 0.55 + callPct * 0.25,
-    "教育學群": explorePct * 0.5 + cafePct * 0.25,
-    "文史哲學群": explorePct * 0.45 + cafePct * 0.25,
-    "大眾傳播學群": cafePct * 0.55 + callPct * 0.3,
-    "管理學群": cafePct * 0.5 + mapPct * 0.3,
-    "財經學群": cafePct * 0.45 + mapPct * 0.35,
-    "資訊學群": mapPct * 0.55 + explorePct * 0.2,
-    "工程學群": mapPct * 0.5 + explorePct * 0.25,
-    "建築與設計學群": mapPct * 0.45 + explorePct * 0.3,
-    "外語學群": callPct * 0.6 + cafePct * 0.2,
-    "法政學群": callPct * 0.55 + cafePct * 0.25,
-    "藝術學群": callPct * 0.45 + explorePct * 0.3,
-    "醫藥衛生學群": explorePct * 0.4 + mapPct * 0.35,
-    "生命科學學群": explorePct * 0.35 + mapPct * 0.35,
-    "生物資源學群": mapPct * 0.4 + cafePct * 0.25,
-    "地球與環境學群": mapPct * 0.4 + explorePct * 0.25,
-    "數理化學群": mapPct * 0.45 + explorePct * 0.3,
-    "遊憩與運動學群": callPct * 0.4 + cafePct * 0.3,
+    社會與心理學群: explorePct * 0.55 + callPct * 0.25,
+    教育學群: explorePct * 0.5 + cafePct * 0.25,
+    文史哲學群: explorePct * 0.45 + cafePct * 0.25,
+    大眾傳播學群: cafePct * 0.55 + callPct * 0.3,
+    管理學群: cafePct * 0.5 + mapPct * 0.3,
+    財經學群: cafePct * 0.45 + mapPct * 0.35,
+    資訊學群: mapPct * 0.55 + explorePct * 0.2,
+    工程學群: mapPct * 0.5 + explorePct * 0.25,
+    建築與設計學群: mapPct * 0.45 + explorePct * 0.3,
+    外語學群: callPct * 0.6 + cafePct * 0.2,
+    法政學群: callPct * 0.55 + cafePct * 0.25,
+    藝術學群: callPct * 0.45 + explorePct * 0.3,
+    醫藥衛生學群: explorePct * 0.4 + mapPct * 0.35,
+    生命科學學群: explorePct * 0.35 + mapPct * 0.35,
+    生物資源學群: mapPct * 0.4 + cafePct * 0.25,
+    地球與環境學群: mapPct * 0.4 + explorePct * 0.25,
+    數理化學群: mapPct * 0.45 + explorePct * 0.3,
+    遊憩與運動學群: callPct * 0.4 + cafePct * 0.3,
   };
   const topGroups = Object.entries(groupScores)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3);
 
-
-
   return (
     <div
       className="min-h-full bg-[#f2f2f7] px-5 pb-8 text-neutral-900 animate-page"
-      style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif" }}
+      style={{
+        fontFamily:
+          "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif",
+      }}
     >
       {/* Top bar */}
       <header className="flex items-center justify-between pt-4">
@@ -121,7 +127,11 @@ function HomePage() {
         ) : user ? (
           <div className="flex items-center gap-2">
             {avatarUrl ? (
-              <img src={avatarUrl} alt={displayName} className="h-9 w-9 rounded-full border border-black/5 object-cover" />
+              <img
+                src={avatarUrl}
+                alt={displayName}
+                className="h-9 w-9 rounded-full border border-black/5 object-cover"
+              />
             ) : (
               <div className="flex h-9 w-9 items-center justify-center rounded-full border border-black/5 bg-white text-[12px] font-semibold text-neutral-900">
                 {displayName.charAt(0).toUpperCase() || "U"}
@@ -196,13 +206,9 @@ function HomePage() {
         </div>
 
         <div className="px-1">
-          <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-teal-600">
-            適合學群
-          </h3>
+          <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-teal-600">適合學群</h3>
           {overall === 0 ? (
-            <p className="text-[13px] leading-relaxed text-neutral-500">
-              體驗任一站點後顯示。
-            </p>
+            <p className="text-[13px] leading-relaxed text-neutral-500">體驗任一站點後顯示。</p>
           ) : (
             <ul className="space-y-1.5">
               {topGroups.map(([name], i) => (
@@ -218,23 +224,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Now / Next */}
-      <section
-        className="mb-6 rounded-[28px] border border-black/5 bg-white p-6 shadow-sm animate-rise"
-        style={{ animationDelay: "180ms" }}
-      >
-        <div className="mb-5">
-          <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-teal-600">現在</h3>
-          <p className="text-[14px] leading-relaxed text-neutral-800">{nowTip}</p>
-        </div>
-        <div>
-          <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
-            下一步
-          </h3>
-          <p className="text-[14px] leading-relaxed text-neutral-700">{nextTip}</p>
-        </div>
-      </section>
-
       {/* 訂閱狀態（已登入且已訂閱） */}
       {user && sub.isSubscribed && (
         <div className="mb-4 animate-rise" style={{ animationDelay: "220ms" }}>
@@ -245,7 +234,10 @@ function HomePage() {
                 <p className="text-[14px] font-semibold">PRO 訂閱中</p>
               </div>
               <button
-                onClick={() => { sub.unsubscribe(); toast.success("已取消訂閱（demo）"); }}
+                onClick={() => {
+                  sub.unsubscribe();
+                  toast.success("已取消訂閱（demo）");
+                }}
                 className="rounded-full border border-black/5 bg-white px-3 py-1 text-[11px] font-bold text-neutral-700"
               >
                 取消
@@ -286,8 +278,12 @@ function HomePage() {
                 <GraduationCap className="h-[18px] w-[18px]" strokeWidth={1.9} />
               </div>
               <div>
-                <p className="text-[14px] font-semibold text-neutral-900">{isTeacher ? "教師後台" : "我是老師"}</p>
-                <p className="text-[11px] text-neutral-500">{isTeacher ? "管理班級" : "輸入註冊碼"}</p>
+                <p className="text-[14px] font-semibold text-neutral-900">
+                  {isTeacher ? "教師後台" : "我是老師"}
+                </p>
+                <p className="text-[11px] text-neutral-500">
+                  {isTeacher ? "管理班級" : "輸入註冊碼"}
+                </p>
               </div>
             </div>
             <ArrowRight className="h-4 w-4 text-neutral-400" />
@@ -327,8 +323,3 @@ function HomePage() {
     </div>
   );
 }
-
-
-
-
-

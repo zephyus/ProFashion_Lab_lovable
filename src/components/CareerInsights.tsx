@@ -25,11 +25,14 @@ function InsightGroup({ title, items }: { title: string; items: string[] }) {
 }
 
 export function CareerInsights({ skills, future, className }: CareerInsightsProps) {
+  const skillsTitle = String.fromCodePoint(0x9700, 0x8981, 0x4ec0, 0x9ebc, 0x80fd, 0x529b);
+  const futureTitle = String.fromCodePoint(0x672a, 0x4f86, 0x6709, 0x54ea, 0x4e9b, 0x767c, 0x5c55);
+
   return (
     <div className={cn("rounded-2xl border border-teal-600/10 bg-teal-50/60 p-3.5", className)}>
       <div className="grid gap-2.5 sm:grid-cols-2">
-        <InsightGroup title="\u9700\u8981\u4ec0\u9ebc\u80fd\u529b" items={skills} />
-        <InsightGroup title="\u672a\u4f86\u6709\u54ea\u4e9b\u767c\u5c55" items={future} />
+        <InsightGroup title={skillsTitle} items={skills} />
+        <InsightGroup title={futureTitle} items={future} />
       </div>
     </div>
   );
