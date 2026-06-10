@@ -1,4 +1,7 @@
+import { ChevronDown } from "lucide-react";
+
 import { cn } from "@/lib/utils";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 type CareerInsightsProps = {
   skills: string[];
@@ -8,19 +11,24 @@ type CareerInsightsProps = {
 
 function InsightGroup({ title, items }: { title: string; items: string[] }) {
   return (
-    <section className="rounded-xl bg-white/80 p-3 shadow-sm">
-      <p className="text-[11px] font-semibold tracking-wide text-teal-600">{title}</p>
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        {items.map((item) => (
-          <span
-            key={item}
-            className="rounded-full bg-teal-600/10 px-2.5 py-1 text-[11px] font-medium leading-tight text-teal-700"
-          >
-            {item}
-          </span>
-        ))}
-      </div>
-    </section>
+    <Collapsible className="rounded-xl bg-white/80 shadow-sm">
+      <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-white/90 [&[data-state=open]>svg]:rotate-180">
+        <span className="text-[11px] font-semibold tracking-wide text-teal-600">{title}</span>
+        <ChevronDown className="h-4 w-4 shrink-0 text-teal-500 transition-transform duration-200" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="px-3 pb-3 pt-0">
+        <div className="flex flex-wrap gap-1.5">
+          {items.map((item) => (
+            <span
+              key={item}
+              className="rounded-full bg-teal-600/10 px-2.5 py-1 text-[11px] font-medium leading-tight text-teal-700"
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 
