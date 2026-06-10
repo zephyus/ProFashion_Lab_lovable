@@ -12,6 +12,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { logActivity, useTrackVisit } from "@/hooks/useActivity";
+import { CareerInsights } from "@/components/CareerInsights";
 
 export const Route = createFileRoute("/_app/cafe")({
   head: () => ({ meta: [{ title: "職業咖啡館 — 職感 Zhigan" }] }),
@@ -42,6 +43,11 @@ type Post = {
   liked: boolean;
   saved: boolean;
   comments: Comment[];
+};
+
+type CareerInsight = {
+  skills: string[];
+  future: string[];
 };
 
 const STORAGE_KEY = "pfl_cafe_feed_v3";
@@ -193,6 +199,21 @@ const SEED_POSTS: Post[] = [
     comments: [],
   },
 ];
+
+const CAREER_INSIGHTS: Record<number, CareerInsight> = {
+  1: {
+    skills: ["使用者研究與同理", "視覺溝通", "持續迭代與協作"],
+    future: ["產品設計主管", "設計策略或顧問", "跨足品牌體驗"],
+  },
+  2: {
+    skills: ["系統思維", "除錯與穩定性", "與前後端協作"],
+    future: ["技術主管或架構師", "雲端與平台工程", "內部工具與基礎建設"],
+  },
+  3: {
+    skills: ["臨床觀察", "情緒支持", "夜班節奏與緊急判斷"],
+    future: ["專科護理", "個案管理與衛教", "長照與社區照護"],
+  },
+};
 
 function cloneSeedPosts() {
   return JSON.parse(JSON.stringify(SEED_POSTS)) as Post[];
@@ -665,6 +686,13 @@ function CafePage() {
                 <p className="mt-3 text-[12px] leading-relaxed text-muted-foreground">
                   {post.note}
                 </p>
+                {post.lounge === "career" && CAREER_INSIGHTS[post.id] && (
+                  <CareerInsights
+                    className="mt-4"
+                    skills={CAREER_INSIGHTS[post.id].skills}
+                    future={CAREER_INSIGHTS[post.id].future}
+                  />
+                )}
               </div>
 
               <div className="border-t border-border bg-muted/35 px-4 py-3">

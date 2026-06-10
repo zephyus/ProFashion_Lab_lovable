@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useTrackVisit, logActivity } from "@/hooks/useActivity";
 import { SubscribeDialog } from "@/components/SubscribeDialog";
+import { CareerInsights } from "@/components/CareerInsights";
 import { Crown } from "lucide-react";
 
 
@@ -53,6 +54,11 @@ type Persona = {
   intro: string;
   gender: SpeechGender;
   script: string[];
+};
+
+type CareerInsight = {
+  skills: string[];
+  future: string[];
 };
 
 
@@ -196,6 +202,53 @@ const hybridPersonas: Persona[] = [
     ],
   },
 ];
+
+const PERSONA_INSIGHTS: Record<string, CareerInsight> = {
+  av: {
+    skills: ["表演與鏡頭感", "界線感與溝通", "隱私與自我保護"],
+    future: ["內容創作與品牌經營", "轉向經紀或製作", "跨足主持與顧問"],
+  },
+  mortician: {
+    skills: ["情緒穩定與同理", "流程控管與細節", "家屬溝通能力"],
+    future: ["生命教育講師", "禮儀服務管理", "悲傷支持與顧問"],
+  },
+  esports: {
+    skills: ["反應速度與操作", "團隊溝通與紀律", "抗壓與賽事分析"],
+    future: ["教練或戰術分析師", "直播與內容創作", "青訓與賽事營運"],
+  },
+  deepsea: {
+    skills: ["體能與耐力", "海上安全與維修", "高壓環境適應"],
+    future: ["升任船員或輪機員", "漁業管理與帶隊", "返鄉技術教學"],
+  },
+  perfumer: {
+    skills: ["嗅覺敏銳", "配方試驗與記憶", "美感與市場洞察"],
+    future: ["品牌研發", "香氛顧問或講師", "跨界美妝產品開發"],
+  },
+  jobs: {
+    skills: ["產品洞察", "敘事與簡報", "跨部門整合"],
+    future: ["產品經理或創業", "設計思維顧問", "平台型產品領導"],
+  },
+  davinci: {
+    skills: ["觀察力與研究", "跨領域創作", "實驗與草圖整理"],
+    future: ["藝術創作與研究", "科技設計跨域", "策展與概念顧問"],
+  },
+  asteroid: {
+    skills: ["太空工程知識", "遠端操作與維修", "風險判斷與協作"],
+    future: ["月球/火星採礦", "太空物流與基地管理", "自動化監控"],
+  },
+  "meta-shrink": {
+    skills: ["心理諮商與倫理", "虛擬溝通能力", "資料判讀與保密"],
+    future: ["VR 諮商平台", "數位療癒產品設計", "心理科技顧問"],
+  },
+  "ai-detective": {
+    skills: ["法律素養", "資料分析與偏誤判讀", "跨部門溝通"],
+    future: ["AI 風險稽核", "合規顧問", "公共政策或研究"],
+  },
+  "legacy-restorer": {
+    skills: ["數位資料修復", "家屬溝通與敏感度", "平台工具與權限管理"],
+    future: ["數位遺產顧問", "AI 記憶整理服務", "線上紀念檔案管理"],
+  },
+};
 
 function CallPage() {
   useTrackVisit("call");
@@ -725,12 +778,20 @@ function CallPage() {
                 <h3 className="mt-2 text-lg font-bold">{p.name}</h3>
                 <p className="text-xs opacity-80">{p.job}</p>
               </div>
-              <div className="flex items-center justify-between gap-3 px-5 py-4">
-                <p className="text-xs text-muted-foreground">{p.intro}</p>
-                <button onClick={() => tryStartCall(p, i)}
-                  className="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-card)] active:scale-95">
-                  <Phone className="h-3.5 w-3.5" /> 撥打
-                </button>
+              <div className="space-y-3 px-5 py-4">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="flex-1 text-xs leading-relaxed text-muted-foreground">{p.intro}</p>
+                  <button
+                    onClick={() => tryStartCall(p, i)}
+                    className="flex shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-card)] active:scale-95"
+                  >
+                    <Phone className="h-3.5 w-3.5" /> 撥打
+                  </button>
+                </div>
+                <CareerInsights
+                  skills={PERSONA_INSIGHTS[p.id].skills}
+                  future={PERSONA_INSIGHTS[p.id].future}
+                />
               </div>
             </div>
           ))}
