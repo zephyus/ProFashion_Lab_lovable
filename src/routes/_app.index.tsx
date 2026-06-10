@@ -17,8 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useXp } from "@/hooks/useXp";
 import { useRoles } from "@/hooks/useRoles";
-import { useSubscription, FREE_AI_CALL_LIMIT, SUB_BOOKING_LIMIT } from "@/hooks/useSubscription";
-import { useActivity } from "@/hooks/useActivity";
+import { useSubscription } from "@/hooks/useSubscription";
 
 export const Route = createFileRoute("/_app/")({
   head: () => ({
@@ -39,7 +38,6 @@ function HomePage() {
   const { isTeacher } = useRoles();
   const { xp, completed, tierName } = useXp();
   const sub = useSubscription();
-  const { countsByStation } = useActivity();
 
   const displayName =
     (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ??
@@ -57,65 +55,65 @@ function HomePage() {
     toast.success("已登出");
   };
 
-  // —— 各站進度（綜合活動次數 + 訂閱配額） ——
-  const explorePct = Math.min(100, completed * 12 + (countsByStation.explore ?? 0) * 4);
-  const cafePct = Math.min(100, (countsByStation.cafe ?? 0) * 10);
-  const mapPct = sub.isSubscribed
-    ? Math.min(
-        100,
-        Math.round((sub.bookingsUsed / SUB_BOOKING_LIMIT) * 100) + (countsByStation.map ?? 0) * 6,
-      )
-    : Math.min(100, (countsByStation.map ?? 0) * 12);
-  const callPct = sub.isSubscribed
-    ? Math.min(100, (countsByStation.call ?? 0) * 10)
-    : Math.min(
-        100,
-        Math.round((sub.aiCallsUsed / FREE_AI_CALL_LIMIT) * 100) + (countsByStation.call ?? 0) * 5,
-      );
-  const overall = Math.round((explorePct + cafePct + mapPct + callPct) / 4);
-
   const stations = [
-    { key: "explore", icon: Sparkles, title: "發現小秘 me", to: "/explore", pct: explorePct },
-    { key: "cafe", icon: Coffee, title: "職業咖啡館", to: "/cafe", pct: cafePct },
-    { key: "map", icon: MapPin, title: "職圖", to: "/map", pct: mapPct },
-    { key: "call", icon: Phone, title: "您撥的號碼是未來", to: "/call", pct: callPct },
+    {
+      key: "explore",
+      icon: Sparkles,
+      title: "發現小秘 me",
+      to: "/explore",
+      description: "從興趣、特質與可能性，慢慢看清自己的輪廓。",
+      hint: "從這裡開始",
+      accent: "from-teal-500/25 via-teal-500/10 to-transparent",
+      iconClass: "bg-teal-500/10 text-teal-700",
+    },
+    {
+      key: "cafe",
+      icon: Coffee,
+      title: "職業咖啡館",
+      to: "/cafe",
+      description: "看見真實職人的語言、節奏與現場感。",
+      hint: "看見現場",
+      accent: "from-sky-500/25 via-sky-500/10 to-transparent",
+      iconClass: "bg-sky-500/10 text-sky-700",
+    },
+    {
+      key: "map",
+      icon: MapPin,
+      title: "職圖",
+      to: "/map",
+      description: "把學群、職業與下一步串成一張清楚的地圖。",
+      hint: "整理方向",
+      accent: "from-neutral-900/15 via-neutral-900/5 to-transparent",
+      iconClass: "bg-neutral-900/5 text-neutral-700",
+    },
+    {
+      key: "call",
+      icon: Phone,
+      title: "您撥的號碼是未來",
+      to: "/call",
+      description: "直接聽見不同職人的生活與轉折。",
+      hint: "聽見真實",
+      accent: "from-emerald-500/25 via-emerald-500/10 to-transparent",
+      iconClass: "bg-emerald-500/10 text-emerald-700",
+    },
   ] as const;
-
-  // —— 綜合分析：12 年國教 18 學群配對 ——
-  const groupScores: Record<string, number> = {
-    社會與心理學群: explorePct * 0.55 + callPct * 0.25,
-    教育學群: explorePct * 0.5 + cafePct * 0.25,
-    文史哲學群: explorePct * 0.45 + cafePct * 0.25,
-    大眾傳播學群: cafePct * 0.55 + callPct * 0.3,
-    管理學群: cafePct * 0.5 + mapPct * 0.3,
-    財經學群: cafePct * 0.45 + mapPct * 0.35,
-    資訊學群: mapPct * 0.55 + explorePct * 0.2,
-    工程學群: mapPct * 0.5 + explorePct * 0.25,
-    建築與設計學群: mapPct * 0.45 + explorePct * 0.3,
-    外語學群: callPct * 0.6 + cafePct * 0.2,
-    法政學群: callPct * 0.55 + cafePct * 0.25,
-    藝術學群: callPct * 0.45 + explorePct * 0.3,
-    醫藥衛生學群: explorePct * 0.4 + mapPct * 0.35,
-    生命科學學群: explorePct * 0.35 + mapPct * 0.35,
-    生物資源學群: mapPct * 0.4 + cafePct * 0.25,
-    地球與環境學群: mapPct * 0.4 + explorePct * 0.25,
-    數理化學群: mapPct * 0.45 + explorePct * 0.3,
-    遊憩與運動學群: callPct * 0.4 + cafePct * 0.3,
-  };
-  const topGroups = Object.entries(groupScores)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3);
 
   return (
     <div
-      className="min-h-full bg-[#f2f2f7] px-5 pb-8 text-neutral-900 animate-page"
+      className="relative min-h-full overflow-hidden bg-[#f2f2f7] px-5 pb-8 text-neutral-900 animate-page"
       style={{
         fontFamily:
           "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif",
+        backgroundImage:
+          "radial-gradient(circle at top, rgba(255, 255, 255, 0.98), rgba(242, 242, 247, 1) 42%, rgba(233, 241, 239, 1) 100%)",
       }}
     >
+      <div className="pointer-events-none absolute -top-24 right-[-72px] h-56 w-56 rounded-full bg-teal-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute top-56 left-[-96px] h-72 w-72 rounded-full bg-white/70 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-40 right-[-56px] h-64 w-64 rounded-full bg-sky-500/10 blur-3xl" />
+
       {/* Top bar */}
-      <header className="flex items-center justify-between pt-4">
+      <header className="relative flex items-center justify-between pt-4">
         <div className="flex flex-col">
           <span className="text-[11px] font-medium uppercase tracking-widest text-neutral-500">
             ProFashion Lab
@@ -156,71 +154,117 @@ function HomePage() {
       </header>
 
       {/* Hero */}
-      <section className="pt-8 pb-6 animate-rise">
-        <h1 className="text-[32px] font-bold leading-tight tracking-tight text-neutral-900">
-          今天，
-          <br />
-          想認識哪一個自己？
-        </h1>
+      <section className="relative pt-8 pb-5 animate-rise">
+        <div className="relative overflow-hidden rounded-[34px] border border-white/80 bg-white/75 p-6 shadow-[0_24px_80px_-42px_rgba(15,23,42,0.35)] backdrop-blur-xl">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-teal-500/35 to-transparent" />
+          <div className="absolute -right-8 top-0 h-28 w-28 rounded-full bg-teal-500/10 blur-3xl" />
+          <div className="absolute -left-6 bottom-0 h-28 w-28 rounded-full bg-sky-400/10 blur-3xl" />
+          <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-neutral-500">
+            Career Compass
+          </p>
+          <h1 className="mt-3 text-[34px] font-semibold leading-[1.08] tracking-tight text-neutral-900">
+            今天，
+            <br />
+            想認識哪一個自己？
+          </h1>
+          <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-neutral-600">
+            四個入口像四種觀看方式。先看見，再選擇。
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Link
+              to="/explore"
+              className="press inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm shadow-black/10 transition-transform hover:-translate-y-0.5"
+            >
+              <Sparkles className="h-4 w-4" strokeWidth={2} />
+              立即開始
+            </Link>
+            <span className="inline-flex items-center rounded-full border border-black/5 bg-white px-4 py-2.5 text-[13px] font-medium text-neutral-600 shadow-sm">
+              無進度壓力
+            </span>
+          </div>
+        </div>
       </section>
 
       {/* Level Card */}
       <Link
         to="/explore"
-        className="press mb-6 flex items-center justify-between gap-4 rounded-[22px] bg-[#008080] px-5 py-4 text-white shadow-lg shadow-teal-900/15 animate-rise"
+        className="press mb-6 block rounded-[28px] border border-white/80 bg-white/75 p-5 text-neutral-900 shadow-[0_24px_80px_-42px_rgba(15,23,42,0.35)] backdrop-blur-xl animate-rise"
         style={{ animationDelay: "60ms" }}
       >
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-white/20 p-2.5">
-            <Trophy className="h-5 w-5" strokeWidth={2} />
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-neutral-900 text-white">
+              <Trophy className="h-5 w-5" strokeWidth={2} />
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.24em] text-neutral-500">目前階段</p>
+              <p className="mt-1 text-[20px] font-semibold leading-tight text-neutral-900">
+                {tierName}
+              </p>
+              <p className="mt-1 text-[13px] leading-relaxed text-neutral-600">
+                {completed > 0 ? `${completed} 個站點已開始` : "從任一站點開始，系統會替你記住。"}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-[17px] font-bold leading-tight">{tierName}</p>
-            <p className="text-[11px] text-white/75">
-              {completed > 0 ? `${completed} 關` : "未開始"}
+          <div className="text-right">
+            <p className="text-[11px] uppercase tracking-[0.24em] text-neutral-500">XP</p>
+            <p className="mt-1 text-[28px] font-semibold leading-none tracking-tight text-neutral-900 tabular-nums">
+              {xp}
             </p>
           </div>
         </div>
-        <div className="text-right">
-          <p className="text-[26px] font-black leading-none tabular-nums">{xp}</p>
-          <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-white/70">XP</p>
-        </div>
       </Link>
 
-      {/* Stations + Analysis */}
+      {/* Station Guide */}
       <section
-        className="mb-6 rounded-[28px] border border-black/5 bg-white p-4 shadow-sm animate-rise"
+        className="relative mb-6 rounded-[32px] border border-white/80 bg-white/75 p-4 shadow-[0_24px_80px_-42px_rgba(15,23,42,0.3)] backdrop-blur-xl animate-rise"
         style={{ animationDelay: "120ms" }}
       >
-        <div className="mb-5 grid grid-cols-2 gap-3">
-          {stations.map((s) => (
+        <div className="mb-3 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-neutral-500">
+              Station Guide
+            </p>
+            <h3 className="mt-1 text-[18px] font-semibold tracking-tight text-neutral-900">
+              站點導覽
+            </h3>
+          </div>
+          <p className="max-w-[11rem] text-right text-[12px] leading-relaxed text-neutral-500">
+            四個入口各自獨立，也能串成一條完整路徑。
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          {stations.map((s, index) => (
             <Link
               key={s.key}
               to={s.to}
-              className="press flex flex-col items-center justify-center rounded-2xl bg-[#f2f2f7] px-3 py-4 text-center transition-colors hover:bg-neutral-200"
+              style={{ animationDelay: `${120 + index * 40}ms` }}
+              className="press group relative block overflow-hidden rounded-[28px] border border-black/5 bg-white p-4 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.35)] transition-transform hover:-translate-y-0.5 animate-rise"
             >
-              <span className="mb-1 text-[13px] font-medium text-neutral-900">{s.title}</span>
-              <span className="text-[11px] font-bold text-teal-600 tabular-nums">{s.pct}%</span>
+              <div className={`absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r ${s.accent}`} />
+              <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-neutral-900/5 blur-2xl" />
+              <div className="relative flex items-start gap-3">
+                <div
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${s.iconClass}`}
+                >
+                  <s.icon className="h-5 w-5" strokeWidth={1.9} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[17px] font-semibold leading-tight tracking-tight text-neutral-900">
+                    {s.title}
+                  </p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-neutral-600">
+                    {s.description}
+                  </p>
+                </div>
+              </div>
+              <div className="relative mt-4 flex items-center justify-between">
+                <span className="text-[12px] font-medium text-neutral-500">{s.hint}</span>
+                <ArrowRight className="h-4 w-4 text-neutral-400 transition-transform group-hover:translate-x-0.5" />
+              </div>
             </Link>
           ))}
-        </div>
-
-        <div className="px-1">
-          <h3 className="mb-2 text-[11px] font-semibold tracking-wide text-teal-600">適合學群</h3>
-          {overall === 0 ? (
-            <p className="text-[13px] leading-relaxed text-neutral-500">體驗任一站點後顯示。</p>
-          ) : (
-            <ul className="space-y-1.5">
-              {topGroups.map(([name], i) => (
-                <li key={name} className="flex items-center gap-2">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-600 text-[10px] font-bold text-white">
-                    {i + 1}
-                  </span>
-                  <span className="flex-1 text-[13px] font-semibold text-neutral-900">{name}</span>
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
       </section>
 
