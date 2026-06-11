@@ -357,7 +357,7 @@ function HomePage() {
             to="/login"
             className="press flex items-center justify-between rounded-2xl bg-teal-600 px-5 py-4 text-white shadow-lg shadow-teal-600/20"
           >
-            <p className="text-[14px] font-bold">登入保留紀錄</p>
+            <p className="text-[14px] font-bold">登入把紀錄存起來</p>
             <ArrowRight className="h-5 w-5" strokeWidth={2.4} />
           </Link>
         </div>
