@@ -168,7 +168,7 @@ function HomePage() {
             想認識哪一個自己？
           </h1>
           <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-neutral-600">
-            四個入口像四種觀看方式。先看見，再選擇。
+            四個入口，挑一個有興趣的進去逛逛就好。
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Link
@@ -176,10 +176,10 @@ function HomePage() {
               className="press inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm shadow-black/10 transition-transform hover:-translate-y-0.5"
             >
               <Sparkles className="h-4 w-4" strokeWidth={2} />
-              立即開始
+              來玩玩看
             </Link>
             <span className="inline-flex items-center rounded-full border border-black/5 bg-white px-4 py-2.5 text-[13px] font-medium text-neutral-600 shadow-sm">
-              無進度壓力
+              不用全部做完
             </span>
           </div>
         </div>
