@@ -1,13 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMemo, useState, useEffect } from "react";
 import { Gamepad2, Trophy, ChevronRight, Briefcase, RefreshCw } from "lucide-react";
 import ExploreQuiz from "../components/ExploreQuiz";
 import { internMissions } from "../lib/intern-missions";
 import { useXp } from "@/hooks/useXp";
 import { useTrackVisit, logActivity } from "@/hooks/useActivity";
+import { useLatestQuiz } from "@/hooks/useLatestQuiz";
 
 export const Route = createFileRoute("/_app/explore")({
   head: () => ({ meta: [{ title: "發現 — 職感 Zhígǎn" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    mode: typeof s.mode === "string" ? s.mode : undefined,
+  }),
   component: ExplorePage,
 });
 
@@ -15,13 +19,32 @@ type Game = "menu" | "quiz" | "intern";
 
 function ExplorePage() {
   useTrackVisit("explore");
+  const navigate = useNavigate();
+  const { mode } = Route.useSearch();
+  const { quiz: latestQuiz } = useLatestQuiz();
   const [game, setGame] = useState<Game>("menu");
+  const [hasAutoRouted, setHasAutoRouted] = useState(false);
+
+  useEffect(() => {
+    if (mode === "report" && latestQuiz && !hasAutoRouted) {
+      setGame("quiz");
+      setHasAutoRouted(true);
+    }
+  }, [mode, latestQuiz, hasAutoRouted]);
 
   // —— 測驗 ——
   if (game === "quiz") {
+    const isReportOnly = mode === "report" && !!latestQuiz;
     return (
       <div className="px-5 pt-8 pb-8">
-        <ExploreQuiz onBack={() => setGame("menu")} />
+        <ExploreQuiz
+          onBack={() => {
+            navigate({ to: "/explore", search: {} });
+            setGame("menu");
+          }}
+          isReportOnly={isReportOnly}
+          initialScores={isReportOnly ? latestQuiz.answers : undefined}
+        />
       </div>
     );
   }

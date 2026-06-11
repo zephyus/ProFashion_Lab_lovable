@@ -158,6 +158,7 @@ export default function QuizResultCard({ quiz }: Props) {
         {/* CTA：前往詳細結果 */}
         <Link
           to="/explore"
+          search={{ mode: "report" }}
           className="press mt-4 flex items-center justify-between rounded-2xl border border-black/5 bg-neutral-900 px-4 py-3 transition-transform hover:-translate-y-0.5"
         >
           <div>

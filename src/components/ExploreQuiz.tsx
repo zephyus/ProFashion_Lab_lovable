@@ -162,17 +162,19 @@ const EMPTY_SCORES: Record<Axis, number> = {
 
 interface ExploreQuizProps {
   onBack: () => void;
+  initialScores?: Record<Axis, number>;
+  isReportOnly?: boolean;
 }
 
-export default function ExploreQuiz({ onBack }: ExploreQuizProps) {
-  const [step, setStep] = useState(0);
-  const [scores, setScores] = useState<Record<Axis, number>>({ ...EMPTY_SCORES });
+export default function ExploreQuiz({ onBack, initialScores, isReportOnly = false }: ExploreQuizProps) {
+  const [step, setStep] = useState(isReportOnly ? QUESTIONS.length : 0);
+  const [scores, setScores] = useState<Record<Axis, number>>(initialScores ?? { ...EMPTY_SCORES });
 
   const done = step >= QUESTIONS.length;
   const progress = (step / QUESTIONS.length) * 100;
 
   const saveQuiz = useServerFn(saveQuizResult);
-  const savedRef = useRef(false);
+  const savedRef = useRef(isReportOnly);
   useEffect(() => {
     if (!done || savedRef.current) return;
     savedRef.current = true;
