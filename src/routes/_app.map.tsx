@@ -184,14 +184,14 @@ function MapPage() {
         <div className="mt-5 -mx-5">
           <Carousel
             setApi={setApi}
-            opts={{ align: "center", containScroll: "trimSnaps" }}
+            opts={{ align: "start", containScroll: "trimSnaps", dragFree: true }}
             className="w-full"
           >
             <CarouselContent className="-ml-3 px-5">
               {mentors.map((m, idx) => (
                 <CarouselItem
                   key={m.id}
-                  className="basis-[82%] pl-3"
+                  className="basis-[72%] pl-3"
                 >
                   <Link
                     to="/map/$mentorId"
@@ -239,7 +239,7 @@ function MapPage() {
 
       {selected && (
         <p className="mt-4 text-center text-caption">
-          {selectedIdx + 1} / {mentors.length} · 滑動或點地圖切換
+          左右滑動看更多 · {selectedIdx + 1} / {mentors.length}
         </p>
       )}
     </div>
