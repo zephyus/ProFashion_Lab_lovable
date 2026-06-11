@@ -216,7 +216,7 @@ function LoginPage() {
               {mode === "signin" ? "登入" : "註冊"}
             </h1>
             <p className="mx-auto mt-2 max-w-[280px] text-center text-subhead text-muted-foreground">
-              紀錄會跟著你，不會因為換裝置消失。
+              登入之後，換手機、換電腦也找得回紀錄。
             </p>
 
             <div className="mx-auto mt-8 w-full max-w-[320px]">
