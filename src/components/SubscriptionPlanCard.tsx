@@ -13,9 +13,9 @@ type SubscriptionPlanCardProps = {
 };
 
 const benefits = [
-  "AI 語音對話無限次",
-  `職圖每月 ${SUB_BOOKING_LIMIT} 次免費體驗`,
-  "雲端同步學習歷程",
+  "AI 語音想聊多久都行",
+  `職圖每月送你 ${SUB_BOOKING_LIMIT} 次免費`,
+  "紀錄自動雲端保存",
 ];
 
 export function SubscriptionPlanCard({ className }: SubscriptionPlanCardProps) {
