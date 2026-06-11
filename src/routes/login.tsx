@@ -173,7 +173,7 @@ function LoginPage() {
               嗨，{user.user_metadata?.full_name || user.email?.split("@")[0]}
             </h1>
             <p className="mx-auto mt-2 max-w-[280px] text-center text-subhead text-muted-foreground">
-              你的職涯紀錄已同步。
+              紀錄都幫你存好了。
             </p>
 
             <div className="mx-auto mt-8 w-full max-w-[320px] rounded-3xl bg-[image:var(--gradient-hero)] p-5 text-primary-foreground shadow-[var(--shadow-card)]">
