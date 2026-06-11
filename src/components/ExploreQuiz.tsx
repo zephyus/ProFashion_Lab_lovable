@@ -182,6 +182,17 @@ export default function ExploreQuiz({ onBack }: ExploreQuizProps) {
       type: "quiz_completed",
       detail: `${r.typeName}・核心：${r.core[0].key}・方向：${r.careers.slice(0, 3).join("、")}`,
     });
+
+    // 同時存到 localStorage，讓首頁不需登入也能顯示結果
+    try {
+      localStorage.setItem("profashion_latest_quiz", JSON.stringify({
+        archetype: r.typeName,
+        summary: `主要核心職能：${r.core[0].key}；推薦方向：${r.careers.slice(0, 4).join("、")}`,
+        answers: scores,
+        created_at: new Date().toISOString(),
+      }));
+    } catch { /* localStorage 不可用就跳過 */ }
+
     saveQuiz({
       data: {
         archetype: r.typeName,
