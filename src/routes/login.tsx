@@ -12,7 +12,7 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "登入 — 職感 Zhígǎn" },
-      { name: "description", content: "登入後，紀錄會跟著你，不會因為換裝置消失。" },
+      { name: "description", content: "登入後紀錄會留著，換手機、換電腦也找得回來。" },
     ],
   }),
   component: LoginPage,
@@ -173,7 +173,7 @@ function LoginPage() {
               嗨，{user.user_metadata?.full_name || user.email?.split("@")[0]}
             </h1>
             <p className="mx-auto mt-2 max-w-[280px] text-center text-subhead text-muted-foreground">
-              你的職涯紀錄已同步。
+              紀錄都幫你存好了。
             </p>
 
             <div className="mx-auto mt-8 w-full max-w-[320px] rounded-3xl bg-[image:var(--gradient-hero)] p-5 text-primary-foreground shadow-[var(--shadow-card)]">
@@ -216,7 +216,7 @@ function LoginPage() {
               {mode === "signin" ? "登入" : "註冊"}
             </h1>
             <p className="mx-auto mt-2 max-w-[280px] text-center text-subhead text-muted-foreground">
-              紀錄會跟著你，不會因為換裝置消失。
+              登入之後，換手機、換電腦也找得回紀錄。
             </p>
 
             <div className="mx-auto mt-8 w-full max-w-[320px]">

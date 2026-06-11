@@ -79,9 +79,9 @@ export function SubscribeDialog({ open, onClose, reason, onPaid }: Props) {
             <span className="text-xs opacity-80">/ 月</span>
           </div>
           <ul className="mt-3 space-y-1 text-[13px] leading-snug">
-            <li>· AI 語音職人對話 <b>無限次</b></li>
-            <li>· 職圖實體體驗每月 <b>{SUB_BOOKING_LIMIT} 次</b></li>
-            <li>· 隨時可取消</li>
+            <li>· AI 語音想聊多久都行</li>
+            <li>· 職圖每月送你 <b>{SUB_BOOKING_LIMIT} 次</b> 免費</li>
+            <li>· 不想用了隨時可以取消</li>
           </ul>
           <button
             onClick={handleSubscribe}

@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_app/")({
       {
         name: "description",
         content:
-          "發現小秘me、職業咖啡館、職圖、您撥的號碼是未來——四種方式，把模糊的未來變成具體的下一步。",
+          "四個入口，讓你慢慢搞懂自己以後想做什麼：發現小秘me、職業咖啡館、職圖、您撥的號碼是未來。",
       },
     ],
   }),
@@ -61,8 +61,8 @@ function HomePage() {
       icon: Sparkles,
       title: "發現小秘 me",
       to: "/explore",
-      description: "從興趣、特質與可能性，慢慢看清自己的輪廓。",
-      hint: "從這裡開始",
+      description: "幾題小測驗，看看自己是哪種人。",
+      hint: "先從這開始",
       accent: "from-teal-500/25 via-teal-500/10 to-transparent",
       iconClass: "bg-teal-500/10 text-teal-700",
     },
@@ -71,8 +71,8 @@ function HomePage() {
       icon: Coffee,
       title: "職業咖啡館",
       to: "/cafe",
-      description: "看見真實職人的語言、節奏與現場感。",
-      hint: "看見現場",
+      description: "聽不同職業的人聊他們的日常。",
+      hint: "進去逛逛",
       accent: "from-sky-500/25 via-sky-500/10 to-transparent",
       iconClass: "bg-sky-500/10 text-sky-700",
     },
@@ -81,8 +81,8 @@ function HomePage() {
       icon: MapPin,
       title: "職圖",
       to: "/map",
-      description: "把學群、職業與下一步串成一張清楚的地圖。",
-      hint: "整理方向",
+      description: "看學群跟職業怎麼接，下一步可以走哪。",
+      hint: "排排看",
       accent: "from-neutral-900/15 via-neutral-900/5 to-transparent",
       iconClass: "bg-neutral-900/5 text-neutral-700",
     },
@@ -91,8 +91,8 @@ function HomePage() {
       icon: Phone,
       title: "您撥的號碼是未來",
       to: "/call",
-      description: "直接聽見不同職人的生活與轉折。",
-      hint: "聽見真實",
+      description: "撥個電話，跟不同行業的人聊一下。",
+      hint: "聽聽看",
       accent: "from-emerald-500/25 via-emerald-500/10 to-transparent",
       iconClass: "bg-emerald-500/10 text-emerald-700",
     },
@@ -168,7 +168,7 @@ function HomePage() {
             想認識哪一個自己？
           </h1>
           <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-neutral-600">
-            四個入口像四種觀看方式。先看見，再選擇。
+            四個入口，挑一個有興趣的進去逛逛就好。
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Link
@@ -176,10 +176,10 @@ function HomePage() {
               className="press inline-flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm shadow-black/10 transition-transform hover:-translate-y-0.5"
             >
               <Sparkles className="h-4 w-4" strokeWidth={2} />
-              立即開始
+              來玩玩看
             </Link>
             <span className="inline-flex items-center rounded-full border border-black/5 bg-white px-4 py-2.5 text-[13px] font-medium text-neutral-600 shadow-sm">
-              無進度壓力
+              不用全部做完
             </span>
           </div>
         </div>
@@ -197,12 +197,12 @@ function HomePage() {
               <Trophy className="h-5 w-5" strokeWidth={2} />
             </div>
             <div>
-              <p className="text-[11px] uppercase tracking-[0.24em] text-neutral-500">目前階段</p>
+              <p className="text-[11px] uppercase tracking-[0.24em] text-neutral-500">目前等級</p>
               <p className="mt-1 text-[20px] font-semibold leading-tight text-neutral-900">
                 {tierName}
               </p>
               <p className="mt-1 text-[13px] leading-relaxed text-neutral-600">
-                {completed > 0 ? `${completed} 個站點已開始` : "從任一站點開始，系統會替你記住。"}
+                {completed > 0 ? `已經開了 ${completed} 站` : "隨便挑一站開始，會自動幫你記。"}
               </p>
             </div>
           </div>
@@ -226,11 +226,11 @@ function HomePage() {
               Station Guide
             </p>
             <h3 className="mt-1 text-[18px] font-semibold tracking-tight text-neutral-900">
-              站點導覽
+              四個入口
             </h3>
           </div>
           <p className="max-w-[11rem] text-right text-[12px] leading-relaxed text-neutral-500">
-            四個入口各自獨立，也能串成一條完整路徑。
+            分開玩可以，連著玩也行。
           </p>
         </div>
 
@@ -307,7 +307,7 @@ function HomePage() {
               </div>
               <div>
                 <p className="text-[14px] font-semibold text-neutral-900">學習歷程</p>
-                <p className="text-[11px] text-neutral-500">匯出 PDF</p>
+                <p className="text-[11px] text-neutral-500">可以匯出成 PDF</p>
               </div>
             </div>
             <ArrowRight className="h-4 w-4 text-neutral-400" />
@@ -357,7 +357,7 @@ function HomePage() {
             to="/login"
             className="press flex items-center justify-between rounded-2xl bg-teal-600 px-5 py-4 text-white shadow-lg shadow-teal-600/20"
           >
-            <p className="text-[14px] font-bold">登入保留紀錄</p>
+            <p className="text-[14px] font-bold">登入把紀錄存起來</p>
             <ArrowRight className="h-5 w-5" strokeWidth={2.4} />
           </Link>
         </div>
