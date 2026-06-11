@@ -226,11 +226,11 @@ function HomePage() {
               Station Guide
             </p>
             <h3 className="mt-1 text-[18px] font-semibold tracking-tight text-neutral-900">
-              站點導覽
+              四個入口
             </h3>
           </div>
           <p className="max-w-[11rem] text-right text-[12px] leading-relaxed text-neutral-500">
-            四個入口各自獨立，也能串成一條完整路徑。
+            分開玩可以，連著玩也行。
           </p>
         </div>
 
