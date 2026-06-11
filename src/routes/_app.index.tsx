@@ -307,7 +307,7 @@ function HomePage() {
               </div>
               <div>
                 <p className="text-[14px] font-semibold text-neutral-900">學習歷程</p>
-                <p className="text-[11px] text-neutral-500">匯出 PDF</p>
+                <p className="text-[11px] text-neutral-500">可以匯出成 PDF</p>
               </div>
             </div>
             <ArrowRight className="h-4 w-4 text-neutral-400" />
