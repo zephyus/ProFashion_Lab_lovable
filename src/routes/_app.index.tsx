@@ -18,6 +18,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useXp } from "@/hooks/useXp";
 import { useRoles } from "@/hooks/useRoles";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useLatestQuiz } from "@/hooks/useLatestQuiz";
+import QuizResultCard from "@/components/QuizResultCard";
 
 export const Route = createFileRoute("/_app/")({
   head: () => ({
@@ -38,6 +40,7 @@ function HomePage() {
   const { isTeacher } = useRoles();
   const { xp, completed, tierName } = useXp();
   const sub = useSubscription();
+  const { quiz: latestQuiz } = useLatestQuiz();
 
   const displayName =
     (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ??
@@ -214,6 +217,13 @@ function HomePage() {
           </div>
         </div>
       </Link>
+
+      {/* 測驗結果（完成測驗後才顯示） */}
+      {latestQuiz && (
+        <div className="mb-6">
+          <QuizResultCard quiz={latestQuiz} />
+        </div>
+      )}
 
       {/* Station Guide */}
       <section
