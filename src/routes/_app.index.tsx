@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_app/")({
       {
         name: "description",
         content:
-          "發現小秘me、職業咖啡館、職圖、您撥的號碼是未來——四種方式，把模糊的未來變成具體的下一步。",
+          "四個入口，讓你慢慢搞懂自己以後想做什麼：發現小秘me、職業咖啡館、職圖、您撥的號碼是未來。",
       },
     ],
   }),
