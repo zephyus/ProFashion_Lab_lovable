@@ -197,12 +197,12 @@ function HomePage() {
               <Trophy className="h-5 w-5" strokeWidth={2} />
             </div>
             <div>
-              <p className="text-[11px] uppercase tracking-[0.24em] text-neutral-500">目前階段</p>
+              <p className="text-[11px] uppercase tracking-[0.24em] text-neutral-500">目前等級</p>
               <p className="mt-1 text-[20px] font-semibold leading-tight text-neutral-900">
                 {tierName}
               </p>
               <p className="mt-1 text-[13px] leading-relaxed text-neutral-600">
-                {completed > 0 ? `${completed} 個站點已開始` : "從任一站點開始，系統會替你記住。"}
+                {completed > 0 ? `已經開了 ${completed} 站` : "隨便挑一站開始，會自動幫你記。"}
               </p>
             </div>
           </div>
