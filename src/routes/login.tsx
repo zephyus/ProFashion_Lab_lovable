@@ -12,7 +12,7 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "登入 — 職感 Zhígǎn" },
-      { name: "description", content: "登入後，紀錄會跟著你，不會因為換裝置消失。" },
+      { name: "description", content: "登入後紀錄會留著，換手機、換電腦也找得回來。" },
     ],
   }),
   component: LoginPage,
